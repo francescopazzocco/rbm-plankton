@@ -40,8 +40,8 @@
 
 Two paths under consideration, proposed as a group split:
 
-- **Group A (this group)**: Gaussian visible + log-transform
-- **Group B (other group)**: Beta visible + row-normalisation
+- **Group A**: Gaussian visible + log-transform
+- **Group B**: Beta visible + row-normalisation
 
 Key asymmetry: Beta requires data in (0,1) strictly — zero-inflation needs explicit
 handling (zero-inflated Beta or additive constant). Group B should be made aware before starting.
