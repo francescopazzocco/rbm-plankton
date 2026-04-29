@@ -11,7 +11,7 @@
 | Property            | Value                                          |
 | ------------------- | ---------------------------------------------- |
 | Source              | `data/raw/TimeSeries_countsuL_clean.csv`       |
-| Reference           | Eyring et al. (2025), *Scientific Data* 12:653 |
+| Reference           | Eyring et al. (2025), [*Scientific Data* 12:653](https://doi.org/10.1038/s41597-025-04988-9) |
 | n_visible (D)       | 83 taxa columns                                |
 | Temporal resolution | Daily                                          |
 | Date range          | 2019-03-21 → 2024-12-31                        |
