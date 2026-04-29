@@ -7,7 +7,7 @@
 
 ---
 
-## ADR-001 · Drop all-zero rows
+## LOG-001 · Drop all-zero rows
 
 **Context:** Some observation days have zero counts across all 83 taxa.
 
@@ -19,7 +19,7 @@
 
 ---
 
-## ADR-002 · Drop NaN rows for training; reserve as test set
+## LOG-002 · Drop NaN rows for training; reserve as test set
 
 **Context:** Some rows have NaN for a subset of taxa (up to 31 simultaneously).
 
@@ -31,7 +31,7 @@
 
 ---
 
-## ADR-003 · Reject row normalisation
+## LOG-003 · Reject row normalisation
 
 **Context:** Row-normalising (dividing each observation by its row sum) is a common preprocessing step for compositional data.
 
@@ -43,7 +43,7 @@
 
 ---
 
-## ADR-004 · Chronological train/val split at 85/15
+## LOG-004 · Chronological train/val split at 85/15
 
 **Context:** Standard ML practice is random train/val split; time series data requires temporal ordering.
 
@@ -55,7 +55,7 @@
 
 ---
 
-## ADR-005 · Binarisation threshold = per-taxon median
+## LOG-005 · Binarisation threshold = per-taxon median
 
 **Context:** Bernoulli visible units require binary input. Two natural thresholds: zero (presence/absence) and per-taxon median.
 
@@ -67,7 +67,7 @@
 
 ---
 
-## ADR-006 · Implement BB-RBM and NBB-RBM in parallel
+## LOG-006 · Implement BB-RBM and NBB-RBM in parallel
 
 **Context:** Multiple visible unit distributions were under consideration (Bernoulli, Gaussian, Beta, Negative Binomial).
 
@@ -79,7 +79,7 @@
 
 ---
 
-## ADR-007 · Bernoulli hidden units — implemented first, Gaussian on hold
+## LOG-007 · Bernoulli hidden units — implemented first, Gaussian on hold
 
 **Context:** Hidden units can be Bernoulli (discrete community states, binary h_j) or Gaussian (continuous latent trajectory).
 
@@ -91,7 +91,7 @@
 
 ---
 
-## ADR-008 · COUNT_SCALE = 1000 for NBB-RBM
+## LOG-008 · COUNT_SCALE = 1000 for NBB-RBM
 
 **Context:** Raw data is in organisms/μL, with values in [0, 0.44]. NB is defined for count data.
 
@@ -103,7 +103,7 @@
 
 ---
 
-## ADR-009 · L1 regularisation scope: W only for NBB-RBM
+## LOG-009 · L1 regularisation scope: W only for NBB-RBM
 
 **Context:** The original single-file implementation applied L1 to W, a, b for both models. During refactoring this was copied to NBB-RBM without review.
 
@@ -115,11 +115,12 @@
 
 ---
 
-## ADR-010 · NBB-RBM numerical stability guards
+## LOG-010 · NBB-RBM numerical stability guards
 
 **Context:** Training with L=10 crashed at epoch 161 with a Gamma distribution ValueError. Root cause: exp(η) overflow at float32 boundary → μ=inf → log-likelihood=-inf → NaN gradient → log_θ=NaN → θ=NaN.
 
 **Decision:** Three guards added to `nb_rbm.py`:
+
 1. Clamp η at max=10.0 before exp in `_mu()`
 2. Clamp log_θ to [−10, 10] after each update
 3. Apply nan_to_num(nan=0.0) to θ gradient before RMSprop step
@@ -130,7 +131,7 @@
 
 ---
 
-## ADR-011 · Training monitors: PLL for BB-RBM, NLL for NBB-RBM
+## LOG-011 · Training monitors: PLL for BB-RBM, NLL for NBB-RBM
 
 **Context:** Reconstruction MSE was used as the sole training monitor. For BB-RBM it is biased (computed on positive-phase mini-batches, not full CD reconstruction). For NBB-RBM on COUNT_SCALE=1000 data, MSE is scale-dependent and misleading (near-zero MSE was the mean-collapse symptom).
 

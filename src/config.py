@@ -20,10 +20,10 @@ VAL_FRAC     = 0.15
 PLOT_RESULTS = True
 
 # Model selection
-VISIBLE_MODEL = "bernoulli"     # "bernoulli" | "nb"
+VISIBLE_MODEL = "nb"     # "bernoulli" | "nb"
 
 # Bernoulli model params
-BINARIZE_THRESHOLD = "median"     # "median" | "zero"
+BINARIZE_THRESHOLD = "zero"     # "median" | "zero"
 
 # NB model params
 COUNT_SCALE    = 1000

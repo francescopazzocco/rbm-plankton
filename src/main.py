@@ -95,8 +95,7 @@ if __name__ == "__main__":
         theta_vals = rbm.log_theta.detach().exp().cpu().numpy()
         print(f"  θ range   : [{theta_vals.min():.3f}, {theta_vals.max():.3f}]  "
               f"mean={theta_vals.mean():.3f}")
-        with torch.no_grad():
-            ph = rbm.hidden_probs(X_train)
+        ph = rbm.hidden_probs(X_train)
         sat_lo  = (ph < 0.1).float().mean().item()
         sat_hi  = (ph > 0.9).float().mean().item()
         sat_mid = 1.0 - sat_lo - sat_hi
