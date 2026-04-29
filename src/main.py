@@ -12,7 +12,7 @@ from config import (
 )
 from data import load_and_binarise, load_raw_counts
 from models import BernoulliRBM, NBRBM
-from visualization import plot_results, plot_hidden_activations, export_results_csv
+from visualization import plot_training_curves, plot_weight_heatmap, plot_hidden_activations, export_results_csv
 from utils import get_device
 
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     print(f"\n[Config]  VISIBLE_MODEL='{VISIBLE_MODEL}'  L={N_HIDDEN}  "
           f"epochs={EPOCHS}  lr={LR}  cd={CD_STEPS}")
 
-    # ── Load data ────────────────────────────────────────────────────────
+    # ── Load data ────────────────────────────────────────────────
     if VISIBLE_MODEL == "bernoulli":
         X_train, X_val, dates_train, dates_val, taxa_cols, nan_rows, thresholds = \
             load_and_binarise(DATA_PATH, binarize=BINARIZE_THRESHOLD,
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         raise ValueError(f"Unknown VISIBLE_MODEL='{VISIBLE_MODEL}'. "
                          f"Use 'bernoulli' or 'nb'.")
 
-    # ── Train ────────────────────────────────────────────────────────────
+    # ── Train ────────────────────────────────────────────────────
     history = rbm.train(
         X_train, X_val,
         epochs    = EPOCHS,
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         verbose   = True,
     )
 
-    # ── Save ─────────────────────────────────────────────────────────────
+    # ── Save ─────────────────────────────────────────────────────
     params = rbm.numpy_params()
     W, a, b = params[0], params[1], params[2]
 
@@ -74,14 +74,15 @@ if __name__ == "__main__":
     from utils import save_weights
     save_weights(OUTPUT_DIR, save_dict)
 
-    # ── Plots and CSV export ─────────────────────────────────────────────
+    # ── Plots and CSV export ─────────────────────────────────────
     if PLOT_RESULTS:
-        plot_results(history, W, taxa_cols, OUTPUT_DIR)
+        plot_training_curves(history, OUTPUT_DIR)
+        plot_weight_heatmap(W, taxa_cols, OUTPUT_DIR)
         plot_hidden_activations(rbm, X_train, X_val,
                                 dates_train, dates_val, OUTPUT_DIR)
     export_results_csv(history, W, taxa_cols, OUTPUT_DIR)
 
-    # ── Final metrics ────────────────────────────────────────────────────
+    # ── Final metrics ────────────────────────────────────────────
     print("\n[Final metrics]")
     print(f"  train MSE : {rbm.reconstruction_mse(X_train):.4f}")
     print(f"  val   MSE : {rbm.reconstruction_mse(X_val):.4f}")
@@ -94,7 +95,8 @@ if __name__ == "__main__":
         theta_vals = rbm.log_theta.detach().exp().cpu().numpy()
         print(f"  θ range   : [{theta_vals.min():.3f}, {theta_vals.max():.3f}]  "
               f"mean={theta_vals.mean():.3f}")
-        ph = rbm.hidden_probs(X_train)
+        with torch.no_grad():
+            ph = rbm.hidden_probs(X_train)
         sat_lo  = (ph < 0.1).float().mean().item()
         sat_hi  = (ph > 0.9).float().mean().item()
         sat_mid = 1.0 - sat_lo - sat_hi

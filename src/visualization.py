@@ -40,34 +40,63 @@ def export_results_csv(history, W, taxa_cols, out_dir):
     print(f"[CSV]  saved training curves and weights → {out_dir}/")
 
 
-def plot_results(history, W, taxa_cols, out_dir):
+def plot_training_curves(history, out_dir):
     os.makedirs(out_dir, exist_ok=True)
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5))
-    ax = axes[0]
+    fig, ax = plt.subplots(1, 1, figsize=(8, 5))
     ax.plot(history["epoch"], history["train_mse"],
             color="steelblue", lw=1.5, label="train MSE")
     if history.get("val_mse") and history["val_mse"][0] is not None:
         ax.plot(history["epoch"], history["val_mse"],
                 color="firebrick", lw=1.5, ls="--", label="val MSE")
+    if history.get("train_pll"):
+        ax2 = ax.twinx()
+        ax2.plot(history["epoch"], history["train_pll"],
+                 color="steelblue", lw=1.0, ls=":", label="train PLL", alpha=0.7)
+        if history.get("val_pll") and history["val_pll"][0] is not None:
+            ax2.plot(history["epoch"], history["val_pll"],
+                     color="firebrick", lw=1.0, ls="-.", label="val PLL", alpha=0.7)
+        ax2.set_ylabel("PLL")
+        ax2.legend(loc="lower right")
+    if history.get("train_nll"):
+        ax2 = ax.twinx()
+        ax2.plot(history["epoch"], history["train_nll"],
+                 color="steelblue", lw=1.0, ls=":", label="train NLL", alpha=0.7)
+        if history.get("val_nll") and history["val_nll"][0] is not None:
+            ax2.plot(history["epoch"], history["val_nll"],
+                     color="firebrick", lw=1.0, ls="-.", label="val NLL", alpha=0.7)
+        ax2.set_ylabel("NLL")
+        ax2.legend(loc="lower right")
     ax.set_xlabel("Epoch"); ax.set_ylabel("Reconstruction MSE")
-    ax.set_title("Training curves"); ax.legend(); ax.grid(True, alpha=0.3)
+    ax.set_title("Training curves"); ax.legend(loc="upper right"); ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    for ext in [".png", ".pdf"]:
+        path = os.path.join(out_dir, f"training_curves{ext}")
+        plt.savefig(path, dpi=150 if ext == ".png" else 300, bbox_inches="tight")
+        print(f"[Plot]  saved {path}")
+    plt.close()
+
+
+def plot_weight_heatmap(W, taxa_cols, out_dir):
+    os.makedirs(out_dir, exist_ok=True)
     link  = linkage(W, method="ward")
     order = leaves_list(link)
     W_ord = W[order]
     vmax  = np.abs(W).max()
-    im    = axes[1].imshow(W_ord, aspect="auto", cmap="RdBu_r",
-                           vmin=-vmax, vmax=vmax)
-    axes[1].set_xticks(range(W.shape[1]))
-    axes[1].set_xticklabels([f"h{j}" for j in range(W.shape[1])], fontsize=9)
-    axes[1].set_yticks(range(len(W_ord)))
-    axes[1].set_yticklabels([taxa_cols[i] for i in order], fontsize=4)
-    axes[1].set_title("Weight matrix W (taxa clustered)")
-    plt.colorbar(im, ax=axes[1], shrink=0.6)
+    fig, ax = plt.subplots(1, 1, figsize=(8, max(5, len(W_ord)*0.15)))
+    im    = ax.imshow(W_ord, aspect="auto", cmap="RdBu_r",
+                      vmin=-vmax, vmax=vmax)
+    ax.set_xticks(range(W.shape[1]))
+    ax.set_xticklabels([f"h{j}" for j in range(W.shape[1])], fontsize=9)
+    ax.set_yticks(range(len(W_ord)))
+    ax.set_yticklabels([taxa_cols[i] for i in order], fontsize=4)
+    ax.set_title("Weight matrix W (taxa clustered)")
+    plt.colorbar(im, ax=ax, shrink=0.6)
     plt.tight_layout()
-    path = os.path.join(out_dir, "rbm_training.png")
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    for ext in [".png", ".pdf"]:
+        path = os.path.join(out_dir, f"weight_heatmap{ext}")
+        plt.savefig(path, dpi=150 if ext == ".png" else 300, bbox_inches="tight")
+        print(f"[Plot]  saved {path}")
     plt.close()
-    print(f"[Plot]  saved {path}")
 
 
 def plot_hidden_activations(rbm, X_train, X_val,
