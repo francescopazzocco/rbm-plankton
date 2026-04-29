@@ -1,20 +1,18 @@
 #!/bin/bash
 
-# Sweep L (hidden units) and activation functions
+# Sweep L (hidden units) for refactored RBM plankton code
+# Config is in src/config.py, entry point is src/main.py
 
-for ACT in sigmoid relu; do
-    for L in 3 5 7 10; do
-        echo "=========================================="
-        echo "Running with L = $L, HIDDEN_ACT = $ACT"
-        echo "=========================================="
+for L in 3 5 7 10; do
+    echo "=========================================="
+    echo "Running with L = $L"
+    echo "=========================================="
 
-        # Replace N_HIDDEN and HIDDEN_ACT in script
-        sed -i "s/^N_HIDDEN    = [0-9]*/N_HIDDEN    = $L/" src/rbm_plankton.py
-        sed -i "s/^HIDDEN_ACT  = \"[^\"]*\"/HIDDEN_ACT  = \"$ACT\"/" src/rbm_plankton.py
+    # Replace N_HIDDEN in config.py
+    sed -i "s/^N_HIDDEN   = [0-9]*/N_HIDDEN   = $L/" src/config.py
 
-        # Run
-        python src/rbm_plankton.py
+    # Run with PYTHONPATH set to src
+    PYTHONPATH=src python src/main.py
 
-        echo ""
-    done
+    echo ""
 done

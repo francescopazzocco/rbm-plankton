@@ -13,8 +13,10 @@
 | All-zero rows           | Drop                          | Multi-day consecutive runs → instrument downtime, not ecology                                       |
 | NaN rows                | Drop for training             | Structured block outages (ML classifier updates), not random                                        |
 | Row normalisation       | Do NOT apply for RBM          | No technical benefit; introduces simplex constraint RBM cannot model; discards total-biomass signal |
-| NaN rows post-training  | Use as structured test set    | Clamp non-missing taxa, reconstruct missing, score on non-missing                                   |
-| Visible layer transform | Log-transform: v ← log(v + ε) | All taxa are zero-inflated and heavily right-skewed (skew 3–11); z-score alone insufficient         |
+| NaN rows post-training  | Reserved as structured test set | Clamp non-missing taxa, reconstruct missing, score on non-missing                                 |
+| Visible layer transform (Bernoulli) | Binarise at per-taxon median | Median > zero threshold: avoids constant units for rare taxa; validated empirically |
+| Visible layer transform (NB) | Raw counts × COUNT_SCALE=1000 | NB handles distribution directly; scaling to approximate integer counts required for lgamma stability |
+| Log-transform / z-score | Not applied in either path    | Bernoulli uses binarisation; NB models the raw count distribution natively                          |
 
 ---
 
@@ -32,61 +34,70 @@
 
 ---
 
-## OPEN — Architecture
+## CLOSED — Model architecture
 
 ### Visible unit type
 
-**STATUS**: Pending professor + inter-group coordination
+**STATUS**: CLOSED — two parallel implementations, both retained
 
-Two paths under consideration, proposed as a group split:
+| Model | Input | Distribution | Status |
+|---|---|---|---|
+| Bernoulli-Bernoulli | Binary (median threshold) | Bernoulli | Validated |
+| NB-Bernoulli | Raw counts × 1000 | Negative Binomial | Experimental, promising |
 
-- **Group A**: Gaussian visible + log-transform
-- **Group B**: Beta visible + row-normalisation
-
-Key asymmetry: Beta requires data in (0,1) strictly — zero-inflation needs explicit
-handling (zero-inflated Beta or additive constant). Group B should be made aware before starting.
+Gaussian and Beta visible units deprioritised: Gaussian requires z-score (discards zero structure); Beta requires row normalisation (rejected).
 
 ### Hidden unit type
 
-**STATUS**: Open — test both within each visible unit choice
+**STATUS**: CLOSED — Bernoulli hidden units confirmed
 
-- **Bernoulli hidden**: discrete community states, binary h_j
-- **Gaussian hidden**: continuous latent trajectory, more natural for smooth seasonal oscillations
+L=5 NB run: sat_mid = 3% at convergence (97% of activations are near 0 or 1). Discrete community states are the correct inductive bias for this dataset. Gaussian hidden units not warranted.
 
-Decision criterion (post-training): if h(t) activations cluster near 0/1 → discrete
-architecture was appropriate. If spread continuously → Gaussian hidden units warranted.
+### NB-specific: COUNT_SCALE
+
+**STATUS**: CLOSED — COUNT_SCALE=1000
+
+COUNT_SCALE=1.0 (organisms/μL, values in [0, 0.44]) caused degenerate training: θ stuck at init, MSE near zero (mean-collapse), CD gradient near zero. Root cause: NB lgamma gradient collapses when all values ≪ 1. COUNT_SCALE=1000 brings data to approximate integer-count scale and resolves all three failure modes.
+
+### NB-specific: L1 regularisation scope
+
+**STATUS**: CLOSED — L1 on W only for NBRBM
+
+`a` in NBRBM is the log-mean baseline (μ_i = exp(a_i + W_i·h)). Applying L1 to `a` biases all means toward exp(0)=1, which is ecologically wrong. L1 applies to W only. Bernoulli model regularises W, a, b (correct — all are logit-scale parameters).
+
+### NB-specific: numerical stability
+
+**STATUS**: CLOSED — three guards implemented
+
+| Guard | Value | Reason |
+|---|---|---|
+| η clamp in `_mu` | max=10.0 | exp(η) overflows float32 at η>88; with L=10, multiple hidden units can sum weights to exceed this |
+| log_θ clamp | [−10, 10] | Prevents runaway accumulation; θ range [4.5e-5, 22026] covers all ecological scenarios |
+| Gradient nan_to_num | nan→0.0 | Catches residual NaN from inf in log-likelihood; zeroes the step rather than corrupting θ |
+
+## OPEN — Architecture
 
 ### n_hidden
 
-**STATUS**: Open
+**STATUS**: OPEN — sweep in progress
 
-- Start with 5 (archetype analysis reference point)
-- 5 is a lower bound on community states, not a prescription for RBM
-- Seasonal oscillations alone may require more units
-- Plan: train with 5, then sweep 3 / 7 / 10 and compare reconstruction MSE
+- L=5 validated: 4 seasonal community states + 1 bias absorber (h1 always-on, wasted capacity)
+- Ecological states identified: early spring (h4), summer cyanobacteria/zooplankton (h0), peak summer (h2), diatom-associated summer (h3)
+- Sweep [3, 5, 7, 10] initiated to cross-validate against archetype analysis
+- Criterion: are the same ecological community states consistently recovered across L?
+- Output isolation: `results/{model}_L{n_hidden}/` per run
 
-### σ² in Gaussian visible units
+### Bias absorber problem
 
-**STATUS**: Open
+**STATUS**: OPEN — mitigation not yet applied
 
-- Fixed at 1 (standard; works if log-transform + z-score is well-calibrated)
-- Learned per unit (more flexible but unstable)
-- Start fixed, revisit if reconstruction MSE plateaus
+At L=5, h1 is always-on (sat_hi > 99%). Its weights W[:,1] function as a second bias vector, not a community state. Candidate fixes: increase L (sweep may resolve naturally), initialise b[j] with large negative values to force hidden units off, or add per-unit entropy regularisation. Defer until sweep results are available.
 
 ---
 
 ## PENDING — Unresolved questions
 
 - January-February 2023 anomaly: bloom event or instrument artifact? Needs taxon-level zoom
-- ε for log-transform: use minimum non-zero value across dataset, or fixed constant? Affects how zeros are handled
 - Chronological split fraction: currently 85/15 — confirm with professor
-- Whether to z-score after log-transform or use raw log values
-
----
-
-## NOT YET STARTED
-
-- RBM implementation (Gaussian-Bernoulli, adapted from rbm_train_export.py)
-- Training script
-- Interpretation / analysis script
-- GitHub repository setup
+- ε for log-transform: moot for current paths (no log-transform applied); revisit if Gaussian visible is reconsidered
+- Val NLL plateau (NB, L=5): train NLL 0.585→0.435, val NLL 0.647→0.564 (gap widens after epoch ~100). Diagnosed as temporal distribution shift (val = 2024, train = 2019–2023), not overfitting. Monitor across L values in sweep.
