@@ -140,3 +140,39 @@
 **Rationale:** PLL is a tractable exact proxy for log-likelihood in Bernoulli models, computed via free-energy differences — no sampling, no bias. NLL directly measures the NB fit quality and is scale-independent. Both decrease monotonically when the model is learning, unlike MSE which can oscillate due to the positive-phase estimator bias. The val NLL plateau observed in NBB-RBM L=5 (~epoch 100) is temporal distribution shift (train=2019–2023, val=2024), not overfitting.
 
 **Consequences:** PLL and NLL are the primary diagnostic for model quality. MSE remains in the CSV for reference. Hidden unit saturation (sat_lo, sat_hi, sat_mid) added alongside NLL for NBB-RBM to detect bias absorbers and binary collapse.
+
+---
+
+## LOG-012 · Exclude nb_L10; valid NB-RBM range is L∈{3,4,5,6,7}
+
+**Context:** The L-sweep included L=10 for NB-RBM. The run diverged catastrophically between epochs 30–230 (train MSE ~27M at epoch 500, NLL columns NaN).
+
+**Decision:** Exclude L=10 from all NB-RBM analysis. Valid sweep range for NB-RBM is L∈{3,4,5,6,7}.
+
+**Rationale:** The divergence is a dynamical instability, not a recoverable hyperparameter issue. Diagnosis: theta trajectories for L=7 and L=10 are nearly identical through epoch 130 (both reach theta≈1.09), ruling out theta drift as the cause. The MSE oscillation amplitude in L=10 is larger from epoch 40 onward, indicating the weight updates are overshooting the loss landscape curvature. With more hidden units the landscape is more complex; the same learning rate that keeps L≤7 in a stable basin crosses energy barriers for L=10. Forcing convergence with a lower LR would likely yield redundant near-zero units — the instability is a signal that L=10 exceeds the data's intrinsic dimensionality, not a tuning problem. BB-RBM L=10 converged cleanly because the Bernoulli energy landscape is bounded and better-conditioned.
+
+**Consequences:** NB-RBM analysis uses L∈{3,4,5,6,7}. BB-RBM retains L=10 in the sweep for completeness.
+
+---
+
+## LOG-013 · Multi-seed training (N=10) as statistical validation for L selection
+
+**Context:** The L-sweep improvement table (sweep_analysis.py) compares single-run val NLL/PLL values across L values. RBM training is stochastic — weight initialisation and CD Gibbs sampling introduce run-to-run variance. A single-run comparison is not statistically defensible: the NLL difference between L=5 and L=7 could fall within the within-L variance.
+
+**Decision:** Run N=10 independent seeds per (family, L) combination via `main_multiseed.py`. L selection criterion: improvement from L→L+1 must exceed the within-L standard deviation across seeds.
+
+**Rationale:** The data split is chronological and deterministic — every seed sees the identical train/val partition. The only variance across seeds is weight initialisation and batch/CD sampling order, which is exactly what should be measured. The 5070 Ti supports 10 parallel training processes simultaneously (models are small: 83×L weights). Results stored in `results/multiseed/{family}_L{n}/seed_{k}/`.
+
+**Consequences:** L selection becomes statistically grounded. `sweep_analysis.py` to be extended to read multiseed results and report mean ± std improvement per L step.
+
+---
+
+## LOG-014 · Results directory partitioned by analysis stage
+
+**Context:** `results/data_analysis/` was accumulating outputs from both the initial data investigation and the L-sweep analysis — logically distinct stages mixed in one directory.
+
+**Decision:** Partition results output into three directories: `results/data_analysis/` (initial data investigation, untouched), `results/sweep/` (sweep_analysis.py outputs), `results/hidden/` (hidden activation analysis scripts).
+
+**Rationale:** Mixed output makes it hard to identify which figures belong to which analysis stage and clutters the working directory. Separate directories make each stage independently reproducible and navigable.
+
+**Consequences:** `sweep_analysis.py` updated to write to `results/sweep/`. New hidden analysis scripts write to `results/hidden/`. Existing `results/data_analysis/` content unchanged.
