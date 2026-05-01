@@ -100,22 +100,31 @@ Both models use Bernoulli hidden units. Selected by `VISIBLE_MODEL` in `config.p
 
 ```
 src/
-  config.py          hyperparameters and paths (single source of truth)
-  main.py            training entry point
-  data.py            load_and_binarise, load_raw_counts
-  utils.py           get_device, save_weights, load_weights
-  visualization.py   plot_training_curves, plot_weight_heatmap, plot_hidden_activations, export_results_csv
+  main_multiseed.py       training pipeline — parallel N-seed runs per (family, L)
+  dataset_analysis.py     EDA pipeline — figures → results/figures/dataset_analysis/
+  sweep_analysis.py       L-sweep pipeline — figures → results/figures/sweep/
+  hidden_coactivation.py  hidden analysis pipeline — weight profiles + state timelines
+  hidden_mean_activation.py  hidden analysis pipeline — mean activation per unit
+  hidden_cross_model.py   hidden analysis pipeline — NB↔BB cross-model comparison
   models/
-    base_rbm.py      shared __init__, reconstruction_mse
-    bernoulli_rbm.py BernoulliRBM: train, pll, hidden_probs, reconstruct
-    nb_rbm.py        NBRBM: train, nll, hidden_probs, reconstruct, θ update
+    io.py                 file I/O: training data loaders + results navigation
+                            (load_and_binarise, load_raw_counts, best_seed_dir, METRIC_COL)
+    utils.py              shared utilities: get_device, save_weights, load_weights
+    visualization.py      all plotting functions, organised by calling pipeline
+    base_rbm.py           shared RBM interface and initialisation
+    bernoulli_rbm.py      BernoulliRBM: train (CD-1), pll, hidden_probs, reconstruct
+    nb_rbm.py             NBRBM: train (PCD-1), nll, hidden_probs, reconstruct, θ update
 
-results/{model}_L{n_hidden}/   one directory per run
-  weights.npz
-  rbm_training_curves.csv
-  rbm_weights.csv
-  rbm_hidden_activations.csv
-  training_curves.png / .pdf
-  weight_heatmap.png / .pdf
-  hidden_activations.png
+results/
+  training_runs/{family}_L{n}/seed_{k}/   training artifacts (canonical: multiseed PCD runs)
+    weights.npz
+    rbm_training_curves.csv
+    rbm_weights.csv
+    rbm_hidden_activations.csv
+    train.log
+  figures/
+    training_runs/     training curves and weight heatmaps (populated when PLOT_RESULTS=True)
+    dataset_analysis/  EDA figures from dataset_analysis.py
+    hidden/            hidden activation analysis outputs
+    sweep/             L-sweep analysis figures
 ```

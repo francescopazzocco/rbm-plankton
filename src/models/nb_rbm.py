@@ -1,7 +1,7 @@
 """
-nb_rbm.py — Negative-Binomial–Bernoulli RBM (experimental)
-=======================================================
-NB visible units with Bernoulli hidden units.
+nb_rbm.py - Negative-Binomial-Bernoulli RBM
+============================================
+NB visible units with Bernoulli hidden units. Canonical model family (L=6 selected).
 """
 
 import math
@@ -16,31 +16,31 @@ class NBRBM(BaseRBM):
     NB-Bernoulli RBM trained by CD-k with RMSprop.
 
     Visible units: Negative Binomial
-      p(v_i | h) = NB(μ_i, θ_i)
-      μ_i = exp(a_i + Σ_j W_ij * h_j)   ← exp ensures positivity
-      θ_i = exp(log_theta_i)             ← learned per-taxon dispersion
+      p(v_i | h) = NB(u_i, theta_i)
+      u_i = exp(a_i + sum_j W_ij * h_j)      <- exp ensures positivity
+      theta_i = exp(log_theta_i)             <- learned per-taxon dispersion
 
     Hidden units: Bernoulli (unchanged from standard RBM)
-      p(h_j=1 | v) = σ(b_j + Σ_i W_ij * v_i)
+      p(h_j=1 | v) = sum(b_j + sum_i W_ij * v_i)
 
     NB log-likelihood (continuous support via lgamma):
-      log NB(v; μ, θ) = lgamma(v+θ) - lgamma(θ) - lgamma(v+1)
-                       + θ*log(θ/(θ+μ)) + v*log(μ/(θ+μ))
+      log NB(v; u, theta) = lgamma(v+theta) - lgamma(theta) - lgamma(v+1)
+                       + theta*log(theta/(theta+u)) + v*log(u/(theta+u))
 
     CD-k gradient derivation:
-      ∂log NB(v_i|h)/∂η_i  = θ_i*(v_i - μ_i) / (μ_i + θ_i)
-      where η_i = a_i + W_i·h  and  ∂μ_i/∂η_i = μ_i
+      dlog NB(v_i|h)/dn_i  = theta_i*(v_i - u_i) / (u_i + theta_i)
+      where n_i = a_i + W_i*h  and  du_i/dn_i = u_i
 
-      → dW_ij ∝ Σ_batch [h_j^+ * r_i^+  -  h_j^- * r_i^-]
-      → da_i  ∝ Σ_batch [r_i^+ - r_i^-]
-      where r_i = θ_i*(v_i - μ_i)/(μ_i + θ_i)   (weighted residual)
+      -> dW_ij ~ sum_batch [h_j^+ * r_i^+  -  h_j^- * r_i^-]
+      -> da_i  ~ sum_batch [r_i^+ - r_i^-]
+      where r_i = theta_i*(v_i - u_i)/(u_i + theta_i)   (weighted residual)
 
       db_j uses standard CD: ph0_j - phk_j  (hidden bias unaffected by
       visible distribution)
 
-      θ update: gradient of NB log-likelihood w.r.t. log_theta_i,
+      theta update: gradient of NB log-likelihood w.r.t. log_theta_i,
       computed via autograd on the positive phase batch only.
-      (θ does not participate in the CD chain — only in the likelihood.)
+      (theta does not participate in the CD chain - only in the likelihood.)
     """
 
     def __init__(self, n_visible, n_hidden,
@@ -53,15 +53,15 @@ class NBRBM(BaseRBM):
     # --- internal helpers ---
 
     def _eta(self, H):
-        """Linear predictor: η = a + H @ W.T  →  shape (batch, D)"""
+        """Linear predictor: n = a + H @ W.T  ->  shape (batch, D)"""
         return self.a.unsqueeze(0) + H @ self.W.t()
 
     def _mu(self, H):
-        """NB mean: μ_i = exp(η_i), clamped to prevent float32 overflow."""
+        """NB mean: u_i = exp(n_i), clamped to prevent float32 overflow."""
         return torch.exp(self._eta(H).clamp(max=10.0))
 
     def _ph_given_v(self, V):
-        """P(H=1|V) = σ(b + V @ W),  shape (batch, L)"""
+        """P(H=1|V) = sum(b + V @ W),  shape (batch, L)"""
         return torch.sigmoid(V @ self.W + self.b)
 
     @staticmethod
@@ -70,8 +70,8 @@ class NBRBM(BaseRBM):
 
     def _sample_nb(self, mu):
         """
-        Sample from NB(μ, θ) using the Gamma-Poisson mixture:
-          g ~ Gamma(θ, θ/μ)   →   v ~ Poisson(g)
+        Sample from NB(u, theta) using the Gamma-Poisson mixture:
+          g ~ Gamma(theta, theta/u)   ->   v ~ Poisson(g)
         Returns float tensor (Poisson samples are non-negative integers).
         """
         theta = self.log_theta.detach().exp().clamp(min=1e-4)
@@ -83,10 +83,10 @@ class NBRBM(BaseRBM):
 
     def _nb_log_prob(self, V, mu):
         """
-        NB log-likelihood via lgamma — supports non-integer V.
-        log NB(v; μ, θ) = lgamma(v+θ) - lgamma(θ) - lgamma(v+1)
-                         + θ*log(θ/(θ+μ)) + v*log(μ/(θ+μ))
-        Shape: (batch, D) → scalar (mean over batch and taxa)
+        NB log-likelihood via lgamma - supports non-integer V.
+        log NB(v; u, theta) = lgamma(v+theta) - lgamma(theta) - lgamma(v+1)
+                         + theta*log(theta/(theta+u)) + v*log(u/(theta+u))
+        Shape: (batch, D) -> scalar (mean over batch and taxa)
         """
         theta = self.log_theta.exp().clamp(min=1e-4)
         eps   = 1e-8
@@ -100,8 +100,8 @@ class NBRBM(BaseRBM):
 
     def _nb_residual(self, V, mu):
         """
-        Weighted residual r_i = θ_i*(v_i - μ_i)/(μ_i + θ_i)
-        This is ∂log NB(v_i|h)/∂η_i — used in CD gradients for W and a.
+        Weighted residual r_i = theta_i*(v_i - u_i)/(u_i + theta_i)
+        This is dlog NB(v_i|h)/dn_i - used in CD gradients for W and a.
         Shape: (batch, D)
         """
         theta = self.log_theta.detach().exp().clamp(min=1e-4)
@@ -111,7 +111,7 @@ class NBRBM(BaseRBM):
 
     @torch.no_grad()
     def reconstruct(self, V):
-        """V → h sample → μ (NB mean, not a sample)"""
+        """V -> h sample -> u (NB mean, not a sample)"""
         ph = self._ph_given_v(V)
         H  = self._sample_bernoulli(ph)
         return self._mu(H)
@@ -141,13 +141,13 @@ class NBRBM(BaseRBM):
         Parameters
         ----------
         lr_theta : float | None
-            Learning rate for θ (dispersion). If None, uses lr * 0.1.
-            θ is updated via autograd on the positive phase NB log-likelihood
-            (not via CD — θ does not affect the Gibbs chain direction).
+            Learning rate for theta (dispersion). If None, uses lr * 0.1.
+            theta is updated via autograd on the positive phase NB log-likelihood
+            (not via CD - theta does not affect the Gibbs chain direction).
         use_pcd : bool
             Use Persistent CD instead of standard CD. Persistent chains are
             maintained across batches so they can cross energy barriers between
-            modes — the structural fix for slow mixing at L≥5.
+            modes - the structural fix for slow mixing at L>=5.
         n_pcd_chains : int
             Number of persistent fantasy particles. Must be >= batch_f.
         """
@@ -227,7 +227,7 @@ class NBRBM(BaseRBM):
                 if gamma > 0:
                     self.W -= gamma * current_lr * self.W.sign()
 
-                # θ update via autograd on positive phase NLL
+                # theta update via autograd on positive phase NLL
                 self.log_theta.requires_grad_(True)
                 mu0_for_theta = self._mu(H0.detach())
                 nll_theta = -self._nb_log_prob(V0, mu0_for_theta)
@@ -269,7 +269,7 @@ class NBRBM(BaseRBM):
 
                 if verbose:
                     stats = {"nll": f"{train_nll:.2f}",
-                             "θ_mean": f"{theta_mean:.3f}",
+                             "theta_mean": f"{theta_mean:.3f}",
                              "sat_mid": f"{sat_mid:.0%}",
                              "batch": batch_size}
                     if val_nll is not None:

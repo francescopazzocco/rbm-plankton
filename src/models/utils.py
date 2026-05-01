@@ -1,5 +1,5 @@
 """
-utils.py — Shared utilities for RBM plankton project
+utils.py - Shared utilities for RBM plankton project
 ==================================================
 """
 

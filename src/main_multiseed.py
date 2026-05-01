@@ -1,22 +1,23 @@
 """
-main_multiseed.py — Parallel multi-seed training for statistical L comparison.
+main_multiseed.py - Parallel multi-seed training for statistical L comparison.
 
 Trains each (family, L, seed) combination in parallel using ProcessPoolExecutor.
-Saves only CSVs (no plots) to results/multiseed/{family}_L{n}/seed_{k}/.
+Saves CSVs and weights to results/training_runs/{family}_L{n}/seed_{k}/.
 
 Usage:
     python src/main_multiseed.py
 """
 
+import contextlib
+import multiprocessing
 import os
 import sys
-import contextlib
-from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-# ── Sweep configuration ───────────────────────────────────────────────────────
+# -- Sweep configuration -------------------------------------------------------
 
 N_SEEDS     = 10
 MAX_WORKERS = 10
@@ -28,29 +29,29 @@ L_VALUES = {
 }
 
 # Fixed hyperparameters
-EPOCHS        = 500
-LR            = 0.01
-LR_DECAY      = 0.998
-CD_STEPS      = 1
-N_BATCHES     = 20
-BATCH_I       = 10
-BATCH_F       = 256
-GAMMA         = 1e-4
-BETA          = 0.9
-EPSILON       = 1e-4
-VAL_FRAC      = 0.15
-COUNT_SCALE   = 1000
+EPOCHS         = 500
+LR             = 0.01
+LR_DECAY       = 0.998
+CD_STEPS       = 1
+N_BATCHES      = 20
+BATCH_I        = 10
+BATCH_F        = 256
+GAMMA          = 1e-4
+BETA           = 0.9
+EPSILON        = 1e-4
+VAL_FRAC       = 0.15
+COUNT_SCALE    = 1000
 THETA_INIT_LOG = 0.0
 
-# PCD settings (NB only — Bernoulli landscape is well-conditioned)
+# PCD settings (NB only - Bernoulli landscape is well-conditioned)
 USE_PCD      = True
 N_PCD_CHAINS = 500   # must be >= BATCH_F
 
 DATA_PATH = Path(__file__).parent.parent / "data/raw/TimeSeries_countsuL_clean.csv"
-OUT_ROOT  = Path(__file__).parent.parent / "results" / "multiseed_pcd"
+OUT_ROOT  = Path(__file__).parent.parent / "results" / "training_runs"
 
 
-# ── Worker ────────────────────────────────────────────────────────────────────
+# -- Worker --------------------------------------------------------------------
 
 def train_one(job: tuple) -> str:
     family, l_val, seed, out_dir = job
@@ -68,10 +69,10 @@ def train_one(job: tuple) -> str:
             torch.manual_seed(seed)
             np.random.seed(seed)
 
-            from data import load_and_binarise, load_raw_counts
+            from models.io import load_and_binarise, load_raw_counts
             from models import BernoulliRBM, NBRBM
-            from visualization import export_results_csv
-            from utils import get_device, save_weights
+            from models.visualization import export_results_csv
+            from models.utils import get_device, save_weights
 
             device = get_device()
 
@@ -128,7 +129,7 @@ def train_one(job: tuple) -> str:
     return f"OK   {family} L={l_val} seed={seed}"
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# -- Main ----------------------------------------------------------------------
 
 def build_jobs() -> list[tuple]:
     jobs = []
@@ -161,8 +162,7 @@ def main():
     failed    = 0
 
     with ProcessPoolExecutor(max_workers=MAX_WORKERS,
-                             mp_context=__import__("multiprocessing")
-                             .get_context("spawn")) as pool:
+                             mp_context=multiprocessing.get_context("spawn")) as pool:
         futures = {pool.submit(train_one, job): job for job in jobs}
         for future in as_completed(futures):
             result = future.result()

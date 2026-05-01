@@ -1,7 +1,6 @@
 """
-bernoulli_rbm.py — Bernoulli-Bernoulli RBM
+bernoulli_rbm.py - Bernoulli-Bernoulli RBM
 ==========================================
-Validated on plankton data (L=5, median threshold).
 """
 
 import math
@@ -12,14 +11,7 @@ from .base_rbm import BaseRBM
 
 
 class BernoulliRBM(BaseRBM):
-    """
-    Bernoulli-Bernoulli RBM trained by CD-k with RMSprop.
-
-    Validated on plankton data (L=5, median threshold):
-      - All 5 hidden units empirically binary (>90% near 0 or 1)
-      - Seasonal community structure recovered without temporal supervision
-      - Ecologically coherent taxa groupings per hidden unit
-    """
+    """Bernoulli-Bernoulli RBM trained by CD-k with RMSprop."""
 
     def __init__(self, n_visible, n_hidden, device=torch.device("cpu")):
         super().__init__(n_visible, n_hidden, device, scale_init=True)

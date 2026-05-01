@@ -1,13 +1,27 @@
 """
-data.py — Data loading and preprocessing for RBM plankton models
-==============================================================
+io.py - File I/O for the RBM plankton project.
+
+Training data loaders (called by main_multiseed.py):
+  load_and_binarise   Bernoulli-Bernoulli RBM preprocessing
+  load_raw_counts     NB-Bernoulli RBM preprocessing
+
+Results navigation (called by hidden_*.py and sweep_analysis.py):
+  METRIC_COL          canonical val metric column per model family
+  best_seed_dir       return best-converged seed directory for a (family, L) run
 """
+
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
-from config import DATA_PATH, VAL_FRAC
 
+_ROOT     = Path(__file__).parent.parent.parent
+DATA_PATH = str(_ROOT / "data/raw/TimeSeries_countsuL_clean.csv")
+VAL_FRAC  = 0.15
+
+
+# -- Training data -------------------------------------------------------------
 
 def _base_load(path, val_frac, device):
     """Shared steps: parse, sort, drop zero rows, separate NaN rows, split."""
@@ -81,3 +95,31 @@ def load_raw_counts(path=DATA_PATH, scale=1000,
     X_train = torch.tensor(X[:n_train], dtype=torch.float32, device=device)
     X_val   = torch.tensor(X[n_train:], dtype=torch.float32, device=device)
     return X_train, X_val, dates_train, dates_val, taxa_cols, nan_rows
+
+
+# -- Results navigation --------------------------------------------------------
+
+METRIC_COL = {
+    "nb":               "val_nll",
+    "bernoulli_median": "val_pll",
+    "bernoulli_zero":   "val_pll",
+}
+
+
+def best_seed_dir(family_l_dir: Path, metric_col: str) -> Path | None:
+    """Return the seed_* subdir with the lowest final val metric."""
+    best_val, best_dir = float("inf"), None
+    for seed_dir in sorted(family_l_dir.glob("seed_*")):
+        csv = seed_dir / "rbm_training_curves.csv"
+        if not csv.exists():
+            continue
+        df = pd.read_csv(csv)
+        if metric_col not in df.columns:
+            continue
+        series = df[metric_col].dropna()
+        if series.empty:
+            continue
+        v = series.iloc[-1]
+        if v < best_val:
+            best_val, best_dir = v, seed_dir
+    return best_dir

@@ -1,5 +1,5 @@
 """
-base_rbm.py — Base class for RBM models
+base_rbm.py - Base class for RBM models
 ========================================
 Shared interface and initialization logic.
 """

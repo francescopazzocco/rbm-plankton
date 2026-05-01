@@ -1,5 +1,5 @@
 """
-models/__init__.py — Expose RBM model classes
+models/__init__.py - Expose RBM model classes
 ============================================
 """
 
