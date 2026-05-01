@@ -176,3 +176,45 @@
 **Rationale:** Mixed output makes it hard to identify which figures belong to which analysis stage and clutters the working directory. Separate directories make each stage independently reproducible and navigable.
 
 **Consequences:** `sweep_analysis.py` updated to write to `results/sweep/`. New hidden analysis scripts write to `results/hidden/`. Existing `results/data_analysis/` content unchanged.
+
+---
+
+## LOG-015 · NB-RBM training instability at L≥5: slow mixing, not gradient explosion
+
+**Context:** Multi-seed training (N=10) at L≥5 shows ~10% of runs diverge regardless of learning rate. Gradient clipping (max norm=1.0 on dW/da/db and g_θ) was implemented and tested. Results: L=5 worst-case seed improved (0.87→0.67) but L=6 divergence rate worsened (1→2 failures). Clipping was reverted.
+
+**Decision:** Do not apply gradient clipping to NB-RBM. Accept the ~10% failure rate at L≥5 and resolve it operationally by running multiple seeds and selecting the best converged result. The proper structural fix is Persistent CD (PCD) — deferred to a future iteration.
+
+**Rationale:** The clipping failure revealed the true instability mechanism: **slow Gibbs chain mixing in the presence of multimodal distributions**, not gradient explosion. When the model distribution has two well-separated modes (e.g., bloom vs non-bloom community states), the CD-1 chain takes only one step per batch and cannot cross the low-probability valley between modes. The negative phase samples are therefore drawn from one mode only, biasing the CD gradient — the update direction is wrong, not just its magnitude. Gradient clipping constrains the magnitude of a biased signal, which cannot fix the directional bias and may worsen it by interfering with legitimate large updates needed early in training. The instability worsens with larger L because more hidden units give the model more capacity to carve out sharp, well-separated energy basins, making the valley deeper and the chain slower to mix. The proper fix is PCD, which maintains persistent Markov chains across batches and allows them to cross energy barriers given enough time.
+
+**Consequences:** NB-RBM training remains CD-1. For final model selection, run ≥3 seeds per (family, L) and keep the best-NLL converged result. PCD implementation added to ROADMAP as Next item.
+
+---
+
+## LOG-016 · Persistent Contrastive Divergence (PCD) for NB-RBM
+
+**Context:** LOG-015 identified slow Gibbs chain mixing as the root cause of 10–30% divergence rate at L≥5. CD-1 restarts the Markov chain from the data every batch, so the chain never has time to cross low-probability valleys between modes.
+
+**Decision:** Implement PCD-1 in `nb_rbm.py` via `use_pcd=True` flag. Maintain a buffer of `n_pcd_chains=500` persistent visible-unit particles. Each batch, a random subset of particles is advanced by `cd_steps` Gibbs steps and stored back. The positive phase is unchanged (still uses real data). Applied to NB-RBM only — Bernoulli energy landscape is bounded and does not require it.
+
+**Rationale:** PCD keeps the fantasy particles in the model's current distribution across batches. Over time the chains migrate between modes (bloom/non-bloom states) rather than being restarted in the data distribution each time. This removes the directional bias in the CD gradient that caused divergence. `n_pcd_chains=500 ≥ BATCH_F=256` ensures we never need to reuse a particle within the same batch draw. FPCD (fast weights) was considered but deferred: PCD-1 is the minimal intervention; fast weights add a hyperparameter pair and should only be introduced if PCD still shows significant divergence.
+
+**Consequences:** Multiseed sweep rerun under `results/multiseed_pcd/` for NB L∈{3,4,5,6,7}. Divergence rate at L≥5 expected to drop substantially. If divergence persists, next step is FPCD (add fast weight tensor with high LR + decay).
+
+---
+
+## LOG-017 · n_hidden = 6 selected for all model families
+
+**Context:** PCD multiseed sweep (N=10 seeds, all families, L∈{3,4,5,6,7}) complete. All 150 runs converged.
+
+**Decision:** n_hidden = 6 for NB-RBM, bernoulli_median, and bernoulli_zero.
+
+**Rationale:** Two complementary lines of evidence both point to L=6:
+
+1. *Step-wise criterion (LOG-013)*: improvement from L→L+1 must exceed within-L std. For NB-RBM the 5→6 step (Δ=0.0124, 1.6σ) is significant; the 6→7 step (Δ=0.0019, 0.2σ) is noise. For bernoulli_median no single step clearly exceeds its std, but the pattern is identical.
+
+2. *Cumulative view (confirmed by sweep_analysis.py)*: L=3→6 yields ~2.5% NLL/PLL reduction for both NB-RBM and bernoulli_median — well beyond any within-L std. L=7 adds nothing cumulatively. The step-wise criterion is conservative; the cumulative picture provides the stronger argument and both converge to L=6.
+
+bernoulli_zero is flat across all L (total range 0.0044 ≈ 3σ of L=3): no signal in either direction. L=6 chosen by consistency; the flatness confirms that zero-threshold binarization produces a near-trivial problem (sparse vectors → model predicts near-constant zeros), validating the median threshold decision in LOG-005.
+
+**Consequences:** Canonical models for downstream analysis: NB-RBM L=6 seed_8 (val_nll=0.5437, global minimum), bernoulli_median L=6 best seed. Hidden activation analysis and cross-model community state comparison proceed at L=6.

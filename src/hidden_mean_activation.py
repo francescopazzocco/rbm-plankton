@@ -14,14 +14,39 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-RESULTS_DIR = Path(__file__).parent.parent / "results"
+RESULTS_DIR = Path(__file__).parent.parent / "results" / "multiseed_pcd"
 OUT_DIR     = Path(__file__).parent.parent / "results" / "hidden"
 
 FAMILIES = ["bernoulli_median", "bernoulli_zero", "nb"]
 
+METRIC_COL = {
+    "nb":               "val_nll",
+    "bernoulli_median": "val_pll",
+    "bernoulli_zero":   "val_pll",
+}
+
 # Units with mean activation above/below these thresholds are flagged
 ABSORBER_HI = 0.90
 ABSORBER_LO = 0.10
+
+
+def best_seed_dir(family_l_dir: Path, metric_col: str) -> Path | None:
+    """Return the seed_* subdir with the lowest final val metric."""
+    best_val, best_dir = float("inf"), None
+    for seed_dir in sorted(family_l_dir.glob("seed_*")):
+        csv = seed_dir / "rbm_training_curves.csv"
+        if not csv.exists():
+            continue
+        df = pd.read_csv(csv)
+        if metric_col not in df.columns:
+            continue
+        series = df[metric_col].dropna()
+        if series.empty:
+            continue
+        v = series.iloc[-1]
+        if v < best_val:
+            best_val, best_dir = v, seed_dir
+    return best_dir
 
 
 def discover_runs(results_dir: Path) -> dict[str, dict[int, Path]]:
@@ -34,7 +59,13 @@ def discover_runs(results_dir: Path) -> dict[str, dict[int, Path]]:
         if not m:
             continue
         family, l_val = m.group(1), int(m.group(2))
-        csv = d / "rbm_hidden_activations.csv"
+        metric_col = METRIC_COL.get(family)
+        if metric_col is None:
+            continue
+        seed_dir = best_seed_dir(d, metric_col)
+        if seed_dir is None:
+            continue
+        csv = seed_dir / "rbm_hidden_activations.csv"
         if csv.exists():
             runs.setdefault(family, {})[l_val] = csv
     return runs
@@ -92,6 +123,24 @@ def plot_family(family: str, family_runs: dict[int, Path], out_dir: Path):
     plt.close(fig)
 
 
+def save_summary_csv(runs: dict, out_dir: Path):
+    rows = []
+    for family, family_runs in runs.items():
+        for l_val, csv in family_runs.items():
+            means = mean_activations(csv)
+            for unit, v in means.items():
+                flag = ("absorber_hi" if v >= ABSORBER_HI
+                        else "absorber_lo" if v <= ABSORBER_LO
+                        else "active")
+                rows.append({"family": family, "L": l_val,
+                             "unit": unit, "mean_activation": round(v, 4),
+                             "flag": flag})
+    df = pd.DataFrame(rows)
+    out = out_dir / "mean_activation_summary.csv"
+    df.to_csv(out, index=False)
+    print(f"Saved: {out}")
+
+
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     runs = discover_runs(RESULTS_DIR)
@@ -101,6 +150,8 @@ def main():
             print(f"No runs found for {family}, skipping.")
             continue
         plot_family(family, runs[family], OUT_DIR)
+
+    save_summary_csv(runs, OUT_DIR)
 
 
 if __name__ == "__main__":

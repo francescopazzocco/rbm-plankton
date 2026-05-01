@@ -19,14 +19,39 @@ import matplotlib.colors as mcolors
 import numpy as np
 import pandas as pd
 
-RESULTS_DIR = Path(__file__).parent.parent / "results"
+RESULTS_DIR = Path(__file__).parent.parent / "results" / "multiseed_pcd"
 OUT_DIR     = Path(__file__).parent.parent / "results" / "hidden"
 
 FAMILIES = ["bernoulli_median", "bernoulli_zero", "nb"]
 
+METRIC_COL = {
+    "nb":               "val_nll",
+    "bernoulli_median": "val_pll",
+    "bernoulli_zero":   "val_pll",
+}
+
+
+def best_seed_dir(family_l_dir: Path, metric_col: str) -> Path | None:
+    """Return the seed_* subdir with the lowest final val metric."""
+    best_val, best_dir = float("inf"), None
+    for seed_dir in sorted(family_l_dir.glob("seed_*")):
+        csv = seed_dir / "rbm_training_curves.csv"
+        if not csv.exists():
+            continue
+        df = pd.read_csv(csv)
+        if metric_col not in df.columns:
+            continue
+        series = df[metric_col].dropna()
+        if series.empty:
+            continue
+        v = series.iloc[-1]
+        if v < best_val:
+            best_val, best_dir = v, seed_dir
+    return best_dir
+
 
 def discover_runs(results_dir: Path) -> dict[str, dict[int, dict[str, Path]]]:
-    """Return {family: {L: {activations, weights}}}."""
+    """Return {family: {L: {activations, weights}}} using the best seed per (family, L)."""
     pattern = re.compile(r"^(.+)_L(\d+)$")
     runs: dict[str, dict[int, dict[str, Path]]] = {}
     for d in sorted(results_dir.iterdir()):
@@ -36,8 +61,14 @@ def discover_runs(results_dir: Path) -> dict[str, dict[int, dict[str, Path]]]:
         if not m:
             continue
         family, l_val = m.group(1), int(m.group(2))
-        act_csv = d / "rbm_hidden_activations.csv"
-        w_csv   = d / "rbm_weights.csv"
+        metric_col = METRIC_COL.get(family)
+        if metric_col is None:
+            continue
+        seed_dir = best_seed_dir(d, metric_col)
+        if seed_dir is None:
+            continue
+        act_csv = seed_dir / "rbm_hidden_activations.csv"
+        w_csv   = seed_dir / "rbm_weights.csv"
         if act_csv.exists() and w_csv.exists():
             runs.setdefault(family, {})[l_val] = {
                 "activations": act_csv,
@@ -163,6 +194,45 @@ def plot_state_timeline(family: str, family_runs: dict[int, dict], out_dir: Path
     plt.close(fig)
 
 
+# ── CSV summaries ─────────────────────────────────────────────────────────────
+
+def save_state_frequency(runs: dict, out_dir: Path):
+    """State frequency table: fraction of days each unit is dominant per (family, L)."""
+    rows = []
+    for family, family_runs in runs.items():
+        for l_val, paths in family_runs.items():
+            act = load_activations(paths["activations"])
+            state = dominant_state(act)
+            counts = state.value_counts().sort_index()
+            total = len(state)
+            for unit in range(l_val):
+                n = counts.get(unit, 0)
+                rows.append({"family": family, "L": l_val, "unit": f"h{unit}",
+                             "n_days": int(n), "fraction": round(n / total, 4)})
+    df = pd.DataFrame(rows)
+    out = out_dir / "state_frequency.csv"
+    df.to_csv(out, index=False)
+    print(f"Saved: {out}")
+
+
+def save_dominant_state_l6(runs: dict, out_dir: Path, target_l: int = 6):
+    """Per-date dominant state for each family at target_l — for cross-model comparison."""
+    frames = []
+    for family, family_runs in runs.items():
+        if target_l not in family_runs:
+            continue
+        act = load_activations(family_runs[target_l]["activations"])
+        state = dominant_state(act).rename(family)
+        frames.append(state)
+    if not frames:
+        return
+    df = pd.concat(frames, axis=1)
+    df.index.name = "date"
+    out = out_dir / f"dominant_state_L{target_l}.csv"
+    df.to_csv(out)
+    print(f"Saved: {out}")
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -176,6 +246,9 @@ def main():
         print(f"\n── {family} ──")
         plot_weight_profiles(family, runs[family], OUT_DIR)
         plot_state_timeline(family, runs[family], OUT_DIR)
+
+    save_state_frequency(runs, OUT_DIR)
+    save_dominant_state_l6(runs, OUT_DIR)
 
 
 if __name__ == "__main__":

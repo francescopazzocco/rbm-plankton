@@ -133,9 +133,10 @@ class NBRBM(BaseRBM):
               cd_steps=1, batch_i=10, batch_f=256, n_batches=20,
               gamma=1e-4, beta=0.9, epsilon=1e-4,
               lr_theta=None,
+              use_pcd=False, n_pcd_chains=500,
               eval_every=10, verbose=True):
         """
-        CD-k training for NB-Bernoulli RBM.
+        CD-k / PCD-k training for NB-Bernoulli RBM.
 
         Parameters
         ----------
@@ -143,6 +144,12 @@ class NBRBM(BaseRBM):
             Learning rate for θ (dispersion). If None, uses lr * 0.1.
             θ is updated via autograd on the positive phase NB log-likelihood
             (not via CD — θ does not affect the Gibbs chain direction).
+        use_pcd : bool
+            Use Persistent CD instead of standard CD. Persistent chains are
+            maintained across batches so they can cross energy barriers between
+            modes — the structural fix for slow mixing at L≥5.
+        n_pcd_chains : int
+            Number of persistent fantasy particles. Must be >= batch_f.
         """
         N           = X_train.shape[0]
         current_lr  = lr
@@ -160,6 +167,11 @@ class NBRBM(BaseRBM):
                    "val_nll": [], "theta_mean": [],
                    "sat_lo": [], "sat_hi": [], "sat_mid": [], "epoch": []}
 
+        # PCD: initialise persistent particle buffer from training data
+        if use_pcd:
+            pcd_init = torch.randperm(N, device=self.device)[:n_pcd_chains]
+            V_pcd = X_train[pcd_init].clone()
+
         pbar = tqdm(range(1, epochs + 1), desc="Training RBM [NB]",
                     unit="epoch")
         for epoch in pbar:
@@ -176,11 +188,24 @@ class NBRBM(BaseRBM):
                 mu0 = self._mu(H0)
                 r0  = self._nb_residual(V0, mu0)
 
-                Hk = H0
-                for _ in range(cd_steps):
-                    Vk  = self._sample_nb(self._mu(Hk))
+                if use_pcd:
+                    # Negative phase: continue persistent chains
+                    sel = torch.randint(0, n_pcd_chains, (batch_size,),
+                                        device=self.device)
+                    Vk = V_pcd[sel]
+                    for _ in range(cd_steps):
+                        phk = self._ph_given_v(Vk)
+                        Hk  = self._sample_bernoulli(phk)
+                        Vk  = self._sample_nb(self._mu(Hk))
+                    V_pcd[sel] = Vk.detach()   # persist the new state
                     phk = self._ph_given_v(Vk)
                     Hk  = self._sample_bernoulli(phk)
+                else:
+                    Hk = H0
+                    for _ in range(cd_steps):
+                        Vk  = self._sample_nb(self._mu(Hk))
+                        phk = self._ph_given_v(Vk)
+                        Hk  = self._sample_bernoulli(phk)
 
                 muk = self._mu(Hk)
                 rk  = self._nb_residual(Vk, muk)

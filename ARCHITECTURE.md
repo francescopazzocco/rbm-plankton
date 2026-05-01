@@ -64,12 +64,13 @@ Both models use Bernoulli hidden units. Selected by `VISIBLE_MODEL` in `config.p
 | η clamp          | max=10.0 before exp (float32 overflow guard)                   |
 | log_θ clamp      | [−10, 10] after each update                                    |
 | θ gradient guard | nan_to_num(nan=0.0) before RMSprop step                        |
+| Negative phase   | PCD-1: 500 persistent fantasy particles, initialised from X_train, advanced 1 Gibbs step per batch and stored back |
 
 ### Shared training mechanics
 
 | Parameter    | Value / formula                                              |
 | ------------ | ------------------------------------------------------------ |
-| Algorithm    | CD-k (default k=1)                                           |
+| Algorithm    | BB-RBM: CD-1 · NBB-RBM: PCD-1 (500 persistent particles)    |
 | Optimiser    | RMSprop, β=0.9, ε=1e-4                                       |
 | Batch size   | Annealed BATCH_I→BATCH_F quadratically over epochs           |
 | LR schedule  | Multiplicative decay per epoch (LR × LR_DECAY)              |

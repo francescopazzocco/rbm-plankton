@@ -22,12 +22,12 @@ N_SEEDS     = 10
 MAX_WORKERS = 10
 
 L_VALUES = {
-    "bernoulli_median": [3, 4, 5, 6, 7, 10],
-    "bernoulli_zero":   [3, 4, 5, 6, 7, 10],
     "nb":               [3, 4, 5, 6, 7],
+    "bernoulli_median": [3, 4, 5, 6, 7],
+    "bernoulli_zero":   [3, 4, 5, 6, 7],
 }
 
-# Fixed hyperparameters — identical to the original sweep
+# Fixed hyperparameters
 EPOCHS        = 500
 LR            = 0.01
 LR_DECAY      = 0.998
@@ -42,8 +42,12 @@ VAL_FRAC      = 0.15
 COUNT_SCALE   = 1000
 THETA_INIT_LOG = 0.0
 
+# PCD settings (NB only — Bernoulli landscape is well-conditioned)
+USE_PCD      = True
+N_PCD_CHAINS = 500   # must be >= BATCH_F
+
 DATA_PATH = Path(__file__).parent.parent / "data/raw/TimeSeries_countsuL_clean.csv"
-OUT_ROOT  = Path(__file__).parent.parent / "results" / "multiseed"
+OUT_ROOT  = Path(__file__).parent.parent / "results" / "multiseed_pcd"
 
 
 # ── Worker ────────────────────────────────────────────────────────────────────
@@ -86,12 +90,15 @@ def train_one(job: tuple) -> str:
                             device=device, theta_init_log=THETA_INIT_LOG)
                 thresholds = None
 
+            pcd_kwargs = ({"use_pcd": USE_PCD, "n_pcd_chains": N_PCD_CHAINS}
+                          if family == "nb" else {})
             history = rbm.train(
                 X_train, X_val,
                 epochs=EPOCHS, lr=LR, lr_decay=LR_DECAY,
                 cd_steps=CD_STEPS, batch_i=BATCH_I, batch_f=BATCH_F,
                 n_batches=N_BATCHES, gamma=GAMMA, beta=BETA, epsilon=EPSILON,
                 eval_every=10, verbose=False,
+                **pcd_kwargs,
             )
 
             # Save training curves + weights

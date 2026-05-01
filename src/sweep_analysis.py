@@ -14,7 +14,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-RESULTS_DIR = Path(__file__).parent.parent / "results"
+RESULTS_DIR = Path(__file__).parent.parent / "results/multiseed_pcd"
 FIGURES_DIR = Path(__file__).parent.parent / "results" / "sweep"
 
 # Metric column and direction per family (higher/lower is better)
@@ -31,10 +31,10 @@ COLORS = {
 }
 
 
-def discover_runs(results_dir: Path) -> dict[str, dict[int, Path]]:
-    """Return {family: {L: csv_path}} for all valid result directories."""
+def discover_runs(results_dir: Path) -> dict[str, dict[int, list[Path]]]:
+    """Return {family: {L: [csv_paths]}} for all valid result directories."""
     pattern = re.compile(r"^(.+)_L(\d+)$")
-    runs: dict[str, dict[int, Path]] = {}
+    runs: dict[str, dict[int, list[Path]]] = {}
     for d in sorted(results_dir.iterdir()):
         if not d.is_dir():
             continue
@@ -42,9 +42,9 @@ def discover_runs(results_dir: Path) -> dict[str, dict[int, Path]]:
         if not m:
             continue
         family, l_val = m.group(1), int(m.group(2))
-        csv = d / "rbm_training_curves.csv"
-        if csv.exists():
-            runs.setdefault(family, {})[l_val] = csv
+        csvs = list(d.glob("seed_*/rbm_training_curves.csv"))
+        if csvs:
+            runs.setdefault(family, {})[l_val] = sorted(csvs)
     return runs
 
 
@@ -56,26 +56,39 @@ def load_curves(csv_path: Path, col: str) -> pd.Series | None:
     return df.set_index("epoch")[col]
 
 
+def aggregate_curves(csv_paths: list[Path], col: str) -> tuple[pd.Series, pd.Series] | None:
+    """Aggregate a metric across seeds; return (mean, std) or None if all failed."""
+    curves = [load_curves(p, col) for p in csv_paths]
+    curves = [c for c in curves if c is not None]
+    if not curves:
+        return None
+    df = pd.concat(curves, axis=1)
+    return df.mean(axis=1), df.std(axis=1)
+
+
 def plot_final_metric(runs, figures_dir: Path):
     fig, axes = plt.subplots(1, len(FAMILY_META), figsize=(14, 4), sharey=False)
-    fig.suptitle("Final val metric vs L (last epoch)", fontsize=13)
+    fig.suptitle("Final val metric vs L (last epoch, mean ± std over seeds)", fontsize=13)
 
     for ax, (family, meta) in zip(axes, FAMILY_META.items()):
         col = meta["col"]
         family_runs = runs.get(family, {})
-        xs, ys = [], []
+        xs, means, stds = [], [], []
         for l_val in sorted(family_runs):
-            curve = load_curves(family_runs[l_val], col)
-            if curve is None:
+            agg = aggregate_curves(family_runs[l_val], col)
+            if agg is None:
                 continue
+            mean_curve, std_curve = agg
             xs.append(l_val)
-            ys.append(curve.iloc[-1])
+            means.append(mean_curve.iloc[-1])
+            stds.append(std_curve.iloc[-1])
 
         color = COLORS[family]
-        ax.plot(xs, ys, "o-", color=color, linewidth=2, markersize=7)
-        for x, y in zip(xs, ys):
-            ax.annotate(f"{y:.3f}", (x, y), textcoords="offset points",
-                        xytext=(0, 8), ha="center", fontsize=8)
+        ax.errorbar(xs, means, yerr=stds, fmt="o-", color=color, linewidth=2,
+                    markersize=7, capsize=4, label=family)
+        for x, y, s in zip(xs, means, stds):
+            ax.annotate(f"{y:.3f}±{s:.3f}", (x, y), textcoords="offset points",
+                        xytext=(0, 8), ha="center", fontsize=7)
 
         ax.set_title(family)
         ax.set_xlabel("L (hidden units)")
@@ -92,7 +105,7 @@ def plot_final_metric(runs, figures_dir: Path):
 
 def plot_training_curves(runs, figures_dir: Path):
     fig, axes = plt.subplots(1, len(FAMILY_META), figsize=(15, 4), sharey=False)
-    fig.suptitle("Val metric training curves by L", fontsize=13)
+    fig.suptitle("Val metric training curves by L (mean ± 1σ over seeds)", fontsize=13)
 
     cmap = plt.colormaps["viridis"]
 
@@ -103,14 +116,19 @@ def plot_training_curves(runs, figures_dir: Path):
         n = len(l_values)
 
         for i, l_val in enumerate(l_values):
-            curve = load_curves(family_runs[l_val], col)
-            if curve is None:
+            agg = aggregate_curves(family_runs[l_val], col)
+            if agg is None:
                 ax.annotate(f"L={l_val}: diverged", xy=(0.05, 0.05 + i*0.07),
                             xycoords="axes fraction", fontsize=8, color="red")
                 continue
+            mean_curve, std_curve = agg
             color = cmap(i / max(n - 1, 1))
-            ax.plot(curve.index, curve.values, color=color,
+            ax.plot(mean_curve.index, mean_curve.values, color=color,
                     linewidth=1.5, label=f"L={l_val}")
+            ax.fill_between(mean_curve.index,
+                            mean_curve.values - std_curve.values,
+                            mean_curve.values + std_curve.values,
+                            color=color, alpha=0.2)
 
         ax.set_title(family)
         ax.set_xlabel("Epoch")
@@ -126,31 +144,41 @@ def plot_training_curves(runs, figures_dir: Path):
 
 
 def plot_nb_diagnostics(runs, figures_dir: Path):
-    """Two-panel figure: NB val_nll and theta_mean trajectories per L."""
+    """Two-panel figure: NB val_nll and theta_mean trajectories per L (mean ± 1σ)."""
     nb_runs = runs.get("nb", {})
     l_values = sorted(nb_runs)
     n = len(l_values)
     cmap = plt.colormaps["viridis"]
 
     fig, (ax_nll, ax_theta) = plt.subplots(1, 2, figsize=(12, 4))
-    fig.suptitle("NB-RBM: NLL and θ trajectories by L", fontsize=13)
+    fig.suptitle("NB-RBM: NLL and θ trajectories by L (mean ± 1σ over seeds)", fontsize=13)
 
     for i, l_val in enumerate(l_values):
-        csv = nb_runs[l_val]
+        csvs = nb_runs[l_val]
         color = cmap(i / max(n - 1, 1))
         label = f"L={l_val}"
 
-        nll = load_curves(csv, "val_nll")
-        theta = load_curves(csv, "theta_mean")
+        nll_agg = aggregate_curves(csvs, "val_nll")
+        theta_agg = aggregate_curves(csvs, "theta_mean")
 
-        if nll is not None:
-            ax_nll.plot(nll.index, nll.values, color=color, linewidth=1.5, label=label)
+        if nll_agg is not None:
+            nll_mean, nll_std = nll_agg
+            ax_nll.plot(nll_mean.index, nll_mean.values, color=color, linewidth=1.5, label=label)
+            ax_nll.fill_between(nll_mean.index,
+                                nll_mean.values - nll_std.values,
+                                nll_mean.values + nll_std.values,
+                                color=color, alpha=0.2)
         else:
             ax_nll.annotate(f"L={l_val}: diverged", xy=(0.05, 0.05 + i * 0.07),
                             xycoords="axes fraction", fontsize=8, color="red")
 
-        if theta is not None:
-            ax_theta.plot(theta.index, theta.values, color=color, linewidth=1.5, label=label)
+        if theta_agg is not None:
+            theta_mean, theta_std = theta_agg
+            ax_theta.plot(theta_mean.index, theta_mean.values, color=color, linewidth=1.5, label=label)
+            ax_theta.fill_between(theta_mean.index,
+                                  theta_mean.values - theta_std.values,
+                                  theta_mean.values + theta_std.values,
+                                  color=color, alpha=0.2)
 
     ax_nll.set_title("Val NLL (↓)")
     ax_nll.set_xlabel("Epoch")
@@ -174,33 +202,32 @@ def plot_nb_diagnostics(runs, figures_dir: Path):
 def print_improvement_table(runs):
     """Print relative val metric improvement per L step for each family."""
     print("\n── Relative improvement per L step ──")
-    print(f"{'family':<22} {'L→L+1':<10} {'val metric':<12} {'Δ abs':<10} {'Δ %'}")
-    print("-" * 65)
+    print(f"{'family':<22} {'L→L+1':<10} {'val metric':<18} {'Δ abs':<10} {'Δ %'}")
+    print("-" * 75)
 
     for family, meta in FAMILY_META.items():
         col = meta["col"]
         better = meta["better"]
         family_runs = runs.get(family, {})
 
-        pairs: list[tuple[int, float]] = []
+        pairs: list[tuple[int, float, float]] = []
         for l_val in sorted(family_runs):
-            curve = load_curves(family_runs[l_val], col)
-            if curve is not None:
-                pairs.append((l_val, curve.iloc[-1]))
+            agg = aggregate_curves(family_runs[l_val], col)
+            if agg is not None:
+                mean_curve, std_curve = agg
+                pairs.append((l_val, mean_curve.iloc[-1], std_curve.iloc[-1]))
 
         for i in range(len(pairs) - 1):
-            l_a, v_a = pairs[i]
-            l_b, v_b = pairs[i + 1]
+            l_a, v_a, s_a = pairs[i]
+            l_b, v_b, s_b = pairs[i + 1]
             delta = v_b - v_a
             rel   = delta / abs(v_a) * 100
-            # for PLL higher is better (positive delta = improvement)
-            # for NLL lower is better (negative delta = improvement)
             marker = ""
             if better == "higher" and delta > 0:
                 marker = "↑"
             elif better == "lower" and delta < 0:
                 marker = "↓"
-            print(f"{family:<22} {l_a}→{l_b:<8} {v_a:<12.4f} {delta:+.4f}   {rel:+.2f}% {marker}")
+            print(f"{family:<22} {l_a}→{l_b:<8} {v_a:.4f}±{s_a:.4f}  {delta:+.4f}   {rel:+.2f}% {marker}")
         print()
 
 
@@ -210,7 +237,8 @@ def main():
 
     print("Discovered runs:")
     for family, ls in sorted(runs.items()):
-        print(f"  {family}: L={sorted(ls.keys())}")
+        details = ", ".join(f"L{l}({len(ls[l])} seeds)" for l in sorted(ls.keys()))
+        print(f"  {family}: {details}")
 
     print_improvement_table(runs)
     plot_final_metric(runs, FIGURES_DIR)
