@@ -39,12 +39,12 @@ rbm-plankton/
 │       └── TimeSeries_countsuL_clean.csv
 │
 ├── src/
-│   ├── main_multiseed.py        # Training pipeline — parallel N-seed runs
-│   ├── dataset_analysis.py      # EDA pipeline — dataset structure figures
-│   ├── sweep_analysis.py        # L-sweep pipeline — val metric vs L figures
-│   ├── hidden_coactivation.py   # Hidden analysis — weight profiles + state timelines
+│   ├── main_multiseed.py         # Training pipeline — parallel N-seed runs
+│   ├── dataset_analysis.py       # EDA pipeline — dataset structure figures
+│   ├── sweep_analysis.py         # L-sweep pipeline — val metric vs L figures
+│   ├── hidden_coactivation.py    # Hidden analysis — weight profiles + state timelines
 │   ├── hidden_mean_activation.py # Hidden analysis — mean activation per unit
-│   ├── hidden_cross_model.py    # Hidden analysis — NB vs BB cross-model comparison
+│   ├── hidden_cross_model.py     # Hidden analysis — NB vs BB cross-model comparison
 │   └── models/
 │       ├── io.py                # File I/O: data loaders + results navigation
 │       ├── utils.py             # Shared utilities: device, save/load weights
@@ -71,9 +71,20 @@ rbm-plankton/
 
 ## Setup
 
+### Using uv (recommended)
+
 ```bash
-python -m venv rbm_plankton
-source rbm_plankton/bin/activate
+sudo apt install uv
+uv venv
+source .venv/bin/activate
+uv sync
+```
+
+### Using pip
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -95,11 +106,11 @@ runs automatically. Results go to `results/training_runs/{family}_L{n}/seed_{k}/
 
 **Model families:**
 
-| Family            | Visible units   | Training   |
-| ----------------- | --------------- | ---------- |
-| `nb`              | Negative-Binomial | PCD-1    |
-| `bernoulli_median`| Bernoulli (median threshold) | CD-1 |
-| `bernoulli_zero`  | Bernoulli (zero threshold)   | CD-1 |
+| Family             | Visible units                | Training |
+| ------------------ | ---------------------------- | -------- |
+| `nb`               | Negative-Binomial            | PCD-1    |
+| `bernoulli_median` | Bernoulli (median threshold) | CD-1     |
+| `bernoulli_zero`   | Bernoulli (zero threshold)   | CD-1     |
 
 ### Analysis pipelines
 
@@ -116,16 +127,17 @@ python src/hidden_cross_model.py      # NB vs BB-median comparison
 
 ## Status
 
-| Stage | Status |
-| ----- | ------ |
-| Dataset EDA | Done |
-| L-sweep (N=10 seeds, L∈{3,4,5,6,7}, all families) | Done — `results/training_runs/` |
-| L selection | Done — **L=6** for all families (LOG-017) |
-| Hidden activation analysis | Done — `results/figures/hidden/` |
-| Cross-model comparison (NB vs BB-median) | Done |
-| NaN test set evaluation | **In progress** — October 2022 structured missingness |
+| Stage                                             | Status                                    |
+| ------------------------------------------------- | ----------------------------------------- |
+| Dataset EDA                                       | Done                                      |
+| L-sweep (N=10 seeds, L∈{3,4,5,6,7}, all families) | Done — `results/training_runs/`           |
+| L selection                                       | Done — **L=6** for all families (LOG-017) |
+| Hidden activation analysis                        | Done — `results/figures/hidden/`          |
+| Cross-model comparison (NB vs BB-median)          | Done                                      |
+| NaN test set evaluation                           | **In progress**                           |
 
 **Key results:**
+
 - L=6 selected: cumulative ~2.5% NLL/PLL gain over L=3; no gain at L=7.
 - Both NB-RBM and BB-median independently recover the same two dominant ecological
   axes (summer community, winter community).

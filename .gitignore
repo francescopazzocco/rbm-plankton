@@ -1,0 +1,54 @@
+# Windows / WSL
+*:Zone.Identifier
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# C / C++ / CUDA
+*.o
+*.obj
+*.so
+*.a
+*.out
+*.exe
+*.dll
+*.lib
+*.ptx
+*.cubin
+
+# Misc
+*.tmp
+*.bak
+*.cache
+
+# Virtual environments
+.venv/
+venv/
+env/
+rbm_plankton/
+
+# LLM instructions
+*[Cc]laude*.md
+*[Ss]kills*.md
+
+# Papers and copyrighted documents
+doc/*.pdf
+
+# Superseded experimental runs
+archive/
+
+# Results: ignore training runs, keep figures
+results/*
+!results/figures/
+!results/figures/**
