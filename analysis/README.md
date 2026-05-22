@@ -61,11 +61,10 @@ conda run -n jupyter python analysis/plot_visible_by_hidden.py \
 - `--output-dir`: folder for PNG and CSV outputs (default `analysis/results/visible_by_hidden`)
 - `--mode`: `bernoulli` or `zinb` (auto-detected if omitted)
 - `--patterns-csv`: optional CSV with column `pattern` containing binary strings
-- `--title-prefix`: prefix used in plot titles
-
-Additional options (new):
 - `--no-normalize`: plot raw values instead of renormalizing each hidden node to frequency [0,1]
 - `--log-y`: display y-axis on logarithmic scale (small values clamped to avoid zeros)
+- `--layout`: `rows` (1 subplot per hidden), `grid` (1 subplot per species, 10x9), or `both`. Default is `rows`.
+- `--title-prefix`: prefix used in plot titles
 
 ### Y-scale meaning
 - Default (no `--no-normalize`): each hidden node row is renormalized to frequencies that sum to 1 across species (y in [0,1]). Useful to compare relative species contribution per hidden unit.
