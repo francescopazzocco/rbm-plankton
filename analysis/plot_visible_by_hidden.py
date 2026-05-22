@@ -195,6 +195,87 @@ def plot_per_hidden_rows(species, probs_list, labels, out_path: Path, title: str
 
 
 
+def plot_per_species_grid(species, probs_list, labels, out_path: Path, title: str, normalize: bool = True, log_y: bool = False, mode: str = "bernoulli"):
+    """Plot one subplot per species in a grid layout (hidden nodes / patterns on x-axis)."""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    D = len(species)
+    L = len(probs_list)
+    
+    ncols = 10
+    nrows = int(np.ceil(D / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(2 * ncols, 2.5 * nrows), sharex=True, sharey=True)
+    axes_flat = axes.flatten()
+
+    data = np.zeros((D, L))
+    for j in range(L):
+        p = probs_list[j]
+        if normalize:
+            s = p.sum()
+            data[:, j] = p / s if s > 0 else 0
+        else:
+            data[:, j] = p
+
+    cmap = matplotlib.colormaps["rainbow"]
+    colors = cmap(np.linspace(0, 1, L, endpoint=False))
+    x = np.arange(L)
+    
+    for i in range(D):
+        ax = axes_flat[i]
+        vals = data[i, :]
+        ax.scatter(x, vals, facecolors=colors, marker="o", s=25, alpha=0.9, edgecolors="black", linewidths=0.35, zorder=3)
+        ax.set_title(species[i], fontsize=8, pad=3)
+        ax.grid(True, axis="y", alpha=0.2)
+        
+        # Bottom row gets labels, elsewhere hidden
+        if i >= D - ncols:
+            ax.set_xticks(x)
+            ax.set_xticklabels(labels, rotation=90, fontsize=7)
+        else:
+            ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+
+    for i in range(D, len(axes_flat)):
+        axes_flat[i].set_visible(False)
+
+    if log_y:
+        positive = data[data > 0]
+        floor = float(np.min(positive)) if positive.size > 0 else 1e-6
+        ceiling = float(np.max(data)) if data.size > 0 else floor * 10.0
+        lower = max(floor / 1.5, 1e-9)
+        upper = max(ceiling * 1.15, lower * 10.0)
+        for ax in axes_flat[:D]:
+            ax.set_yscale("log")
+            ax.set_ylim(lower, upper)
+            ax.axhline(floor, color="0.4", linestyle="--", linewidth=0.8, alpha=0.7, zorder=2)
+    else:
+        vmax = float(np.nanmax(data)) if data.size > 0 else 1.0
+        vmin = float(np.nanmin(data)) if data.size > 0 else 0.0
+        lower = min(0.0, vmin - 0.05 * max(1.0, abs(vmin)))
+        upper = max(vmax * 1.05, 1e-9)
+        for ax in axes_flat[:D]:
+            if normalize:
+                ax.set_ylim(0.0, 1.0)
+            else:
+                ax.set_ylim(lower, upper)
+
+    if normalize:
+        ylab = "Frequency"
+    else:
+        if mode == "bernoulli":
+            ylab = "Probability"
+        elif mode == "zinb":
+            ylab = "Expected count"
+        else:
+            ylab = "Value"
+    if log_y:
+        ylab = f"{ylab} (log scale)"
+        
+    fig.text(0.02, 0.5, ylab, va="center", rotation="vertical", fontsize=12)
+    fig.suptitle(title, fontsize=14, y=0.99)
+    fig.subplots_adjust(left=0.06, right=0.98, top=0.95, bottom=0.05, hspace=0.3, wspace=0.1)
+    fig.savefig(out_path, dpi=250, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", type=Path, required=True,
@@ -208,6 +289,8 @@ def main():
                         help="Do not renormalize per-hidden to frequency [0,1]; plot raw values")
     parser.add_argument("--log-y", action="store_true",
                         help="Use log scale for y-axis (avoid zeros automatically)")
+    parser.add_argument("--layout", choices=["rows", "grid", "both"], default="rows",
+                        help="Plot layout: rows (1 subplot per hidden), grid (1 subplot per species), or both")
     parser.add_argument("--title-prefix", default="RBM",
                         help="Title prefix for plots")
     args = parser.parse_args()
@@ -234,10 +317,18 @@ def main():
         probs_list.append(probs)
         labels.append(f"h{j}")
 
-    plot_path = out_dir / f"visible_by_hidden_{mode}.png"
     # per-hidden-row plot (renormalizes each hidden node to frequency [0,1])
-    plot_per_hidden_rows(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs by hidden ({mode})",
-                         normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
+    if args.layout in ["rows", "both"]:
+        plot_path = out_dir / f"visible_by_hidden_{mode}_rows.png"
+        plot_per_hidden_rows(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs by hidden ({mode})",
+                             normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
+        print(f"Saved plot {plot_path}")
+        
+    if args.layout in ["grid", "both"]:
+        plot_path = out_dir / f"visible_by_hidden_{mode}_grid.png"
+        plot_per_species_grid(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs per species ({mode})",
+                              normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
+        print(f"Saved plot {plot_path}")
 
     # save raw CSV and normalized-frequency CSV
     df = pd.DataFrame({label: probs for label, probs in zip(labels, probs_list)}, index=species)
@@ -269,10 +360,19 @@ def main():
             probs_patterns.append(probs)
             labels_pat.append(f"p{k}")
 
-        plot_path2 = out_dir / f"visible_by_patterns_{mode}.png"
-        plot_per_hidden_rows(species, probs_patterns, labels_pat, plot_path2,
-             f"{args.title_prefix} visible by hidden patterns ({mode})",
-             normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
+        if args.layout in ["rows", "both"]:
+            plot_path2 = out_dir / f"visible_by_patterns_{mode}_rows.png"
+            plot_per_hidden_rows(species, probs_patterns, labels_pat, plot_path2,
+                 f"{args.title_prefix} visible by hidden patterns ({mode})",
+                 normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
+            print(f"Saved plot {plot_path2}")
+                 
+        if args.layout in ["grid", "both"]:
+            plot_path2 = out_dir / f"visible_by_patterns_{mode}_grid.png"
+            plot_per_species_grid(species, probs_patterns, labels_pat, plot_path2,
+                 f"{args.title_prefix} visible per species by pattern ({mode})",
+                 normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
+            print(f"Saved plot {plot_path2}")
 
         df2 = pd.DataFrame({label: probs for label, probs in zip(labels_pat, probs_patterns)}, index=species)
         csv_path2 = out_dir / f"visible_by_patterns_{mode}.csv"
