@@ -1,8 +1,8 @@
-# Comparison: Cheng's Archetypal Analysis vs. RBM Hidden Node Activations
+# Comparison: Archetypal Analysis vs. RBM Hidden Node Activations
 
 **Date:** 2026-05-22  
 **Dataset:** Lake Zurich plankton time series, 2019–2025  
-**Archetype analysis:** Cheng (PhD), k=5, provided by Prof. Carlo  
+**Archetype analysis:** k=5, provided
 **RBM analysis:** this project, families NB / ZINB / bernoulli_median / bernoulli_zero / _sigmoid / _softmax / _relu, L=3–10  
 **Reproducibility script:** `analysis/archetype_rbm_comparison.py`
 
@@ -10,17 +10,17 @@
 
 ## TL;DR
 
-All usable RBM families independently recover the same ecological structure as Cheng's archetypal analysis. The four core seasonal communities — spring *Aulacoseira*, winter centric diatom, summer chrysophytes, summer green algae + cyanobacteria — appear robustly across NB, ZINB, and bernoulli models. The RBM additionally splits the chrysophyte season into two temporal stages (early vs. peak summer) that Cheng's k=5 merges into one. The cryptophyte community (archetype A3) is only recovered as a discrete state by the ZINB family; the NB model distributes cryptophyte as background across all units and cannot isolate it. ReLU models collapse entirely and are ecologically uninformative.
+All usable RBM families independently recover the same ecological structure as archetypal analysis. The four core seasonal communities — spring *Aulacoseira*, winter centric diatom, summer chrysophytes, summer green algae + cyanobacteria — appear robustly across NB, ZINB, and bernoulli models. The RBM additionally splits the chrysophyte season into two temporal stages (early vs. peak summer) that k=5 merges into one. The cryptophyte community (archetype A3) is only recovered as a discrete state by the ZINB family; the NB model distributes cryptophyte as background across all units and cannot isolate it. ReLU models collapse entirely and are ecologically uninformative.
 
 ---
 
 ## 1. Overview
 
-Cheng's archetypal analysis and the RBM hidden-node analysis were run independently on the same plankton dataset. Cheng decomposed the community into k=5 archetypes; the RBM learns a latent representation with L hidden units through unsupervised training. This document compares the ecological communities recovered by each approach and identifies where they agree, where the RBM is finer-grained, and where model family choice matters.
+Archetypal analysis and the RBM hidden-node analysis were run independently on the same plankton dataset. It decomposed the community into k=5 archetypes; the RBM learns a latent representation with L hidden units through unsupervised training. This document compares the ecological communities recovered by each approach and identifies where they agree, where the RBM is finer-grained, and where model family choice matters.
 
 ---
 
-## 2. Cheng's Archetypes (k=5)
+## 2. Archetypes analysis (k=5)
 
 Source files: `prof/archetypes_k5_profiles.csv`, `prof/archetypes_k5_timeseries.csv`, and companion figures.
 
@@ -63,7 +63,7 @@ Summary from `results/02_model_analysis/mean_activation_summary.csv` and the shu
 
 ### 4.1 The Four Robustly Recovered Communities
 
-Four of Cheng's five archetypes appear consistently across every usable model family. Their seasonal fingerprints (from `results/tables/hidden/seasonal_profiles_nb.csv` and `seasonal_profiles_bb.csv`) match the archetype composition timeseries.
+Four of five archetypes appear consistently across every usable model family. Their seasonal fingerprints (from `results/tables/hidden/seasonal_profiles_nb.csv` and `seasonal_profiles_bb.csv`) match the archetype composition timeseries.
 
 #### A2 — Spring diatom (*Aulacoseira*)
 
@@ -96,7 +96,7 @@ This is where the RBM is **finer-grained than the archetypes**. Rather than a si
 - **Early-summer unit** (peaks April–June): uroglena and dinobryon present, often co-occurring with spring taxa — NB h3 (uroglena=0.831, dinobryon=0.408)
 - **Peak-summer unit** (June maximum): high dinobryon + uroglena without diatom co-occurrence — NB h4 (uroglena=0.911, dinobryon=0.847)
 
-Cheng's A1 collapses these into a single archetype because archetypes are convex-hull extremes of the full dataset; the RBM detects the temporal substructure within the chrysophyte season. This split is consistent across NB, ZINB, and bernoulli families.
+A1 collapses these into a single archetype because archetypes are convex-hull extremes of the full dataset; the RBM detects the temporal substructure within the chrysophyte season. This split is consistent across NB, ZINB, and bernoulli families.
 
 ---
 
@@ -128,13 +128,13 @@ This is the most ecologically interesting divergence between model families.
 
 ### 4.4 Chronological vs. Shuffled Split
 
-The dominant-state timeseries for the shuffled split (`results/02_model_analysis/shuffled/dominant_state_L6_shuffled.csv`) shows the same families of states as the chronological split. The ecological communities found by the RBM are not a consequence of temporal ordering in training — they are real recurring assemblages in the data. This is consistent with Cheng's archetypes, which make no assumption about time ordering.
+The dominant-state timeseries for the shuffled split (`results/02_model_analysis/shuffled/dominant_state_L6_shuffled.csv`) shows the same families of states as the chronological split. The ecological communities found by the RBM are not a consequence of temporal ordering in training — they are real recurring assemblages in the data. This is consistent with archetypes, which make no assumption about time ordering.
 
 ---
 
 ## 5. Summary Table
 
-| Cheng archetype | Best RBM match | Families where this holds | Notes |
+| archetype | Best RBM match | Families where this holds | Notes |
 |----------------|---------------|--------------------------|-------|
 | A1 — Dinobryon | **Two units** (early + peak summer chrysophyte) | NB, ZINB, bernoulli (L≥5) | RBM is finer-grained than k=5 |
 | A2 — Aulacoseira | One dedicated spring unit | All usable families | Most robustly recovered |
@@ -149,13 +149,13 @@ The dominant-state timeseries for the shuffled split (`results/02_model_analysis
 
 1. **Broad agreement:** The RBM and archetypal analysis independently recover the same four major seasonal plankton communities (spring *Aulacoseira*, cold-season centric diatom, summer chrysophytes, summer green algae + cyanobacteria).
 
-2. **RBM substructure:** The chrysophyte season is consistently split into two temporal stages by the RBM — an early-summer and a peak-summer community — which Cheng's k=5 constraint merges. This is a genuine additional finding, not an artefact.
+2. **RBM substructure:** The chrysophyte season is consistently split into two temporal stages by the RBM — an early-summer and a peak-summer community — which k=5 constraint merges. This is a genuine additional finding, not an artefact.
 
 3. **ZINB recovers the cryptophyte state; NB does not.** The zero-inflation model's ability to distinguish true absences from sampling zeros gives cryptophyte discriminatory power that the plain NB model cannot exploit. This is the clearest argument in this dataset for preferring ZINB over NB.
 
 4. **ReLU activation is ecologically unusable** — all units collapse to absorbers regardless of L or family.
 
-5. **L=5 with sigmoid hidden activation** (nb_sigmoid or zinb_sigmoid) is the best-controlled configuration for direct comparison with k=5 archetypes: no dead units, no absorbers, and unit count matches Cheng's decomposition.
+5. **L=5 with sigmoid hidden activation** (nb_sigmoid or zinb_sigmoid) is the best-controlled configuration for direct comparison with k=5 archetypes: no dead units, no absorbers, and unit count matches decomposition.
 
 6. **Community states are robust to train/test split** — appearing in both chronological and shuffled configurations — confirming that the RBM is detecting genuine ecological structure.
 
