@@ -162,44 +162,27 @@ Hidden monitoring is injected via mixins from `_hidden_monitors.py`.
 ## Source layout
 
 ```
-src/
-  main_multiseed.py       training pipeline — parallel N-seed runs per (family, L)
-  dataset_analysis.py     EDA pipeline — figures → results/01_exploratory/
-  sweep_analysis.py       L-sweep pipeline — final metric → results/04_model_selection/, diagnostics → results/diagnostics/
-  hidden_coactivation.py  hidden analysis pipeline — weight profiles + state timelines → results/02_model_analysis/
-  hidden_mean_activation.py  hidden analysis pipeline — mean activation per unit → results/02_model_analysis/
-  hidden_cross_model.py   hidden analysis pipeline — NB↔BB cross-model comparison → results/02_model_analysis/ + tables/hidden/
-  nan_test_eval.py        NaN test set evaluation — zero-impute clamped inference, NLL on observed taxa only → results/03_evaluation/ + tables/
-  split_comparison.py     chronological vs shuffled split comparison → results/03_evaluation/ + tables/
-  plot_training_runs.py   post-hoc plotting — training curves, weight heatmaps, hidden activations from training_runs/ → figures/training_runs/
-    models/
-      __init__.py           exports: BernoulliRBM, NB_RBM, NB_ReLU_RBM, NBSigmoidRBM, NBSoftmaxRBM, ZINB_RBM, ZINB_ReLU_RBM, ZINBSigmoidRBM, ZINBSoftmaxRBM
-      _constants.py         all shared numeric constants with documented rationale (stability guards, training defaults, monitoring thresholds)
-      io.py                 file I/O: training data loaders + results navigation
-                            (load_and_binarise, load_raw_counts, best_seed_dir, METRIC_COL)
-      utils.py              shared utilities: get_device, save_weights, load_weights
-      visualization.py      all plotting functions, organised by calling pipeline
-      base_rbm.py           shared RBM interface and initialisation
-      bernoulli_rbm.py      BernoulliRBM: train (CD-1), pll, hidden_probs, reconstruct
-      nb_rbm.py             NB_RBM, NB_ReLU_RBM, NBSigmoidRBM, NBSoftmaxRBM: train (PCD-1), nll, hidden_probs, reconstruct, θ update
-      zinb_rbm.py           ZINB_RBM, ZINB_ReLU_RBM, ZINBSigmoidRBM, ZINBSoftmaxRBM: train (PCD-1), nll, hidden_probs, reconstruct, θ + π update
-      _hidden_monitors.py   mixins: BernoulliHiddenMonitor, ReLUHiddenMonitor, SigmoidHiddenMonitor, SoftmaxHiddenMonitor
-
-training_runs/{family}_L{n}/seed_{k}/   training artifacts (canonical: multiseed PCD runs)
-  weights.npz
-  rbm_training_curves.csv
-  rbm_weights.csv
-  rbm_hidden_activations.csv
-  train.log
-training_runs_CD1/                      CD-1 training artifacts (separate sweep)
-figures/training_runs/                  training curves and weight heatmaps (plot_training_runs.py)
-
-results/
-  README.md            index of all outputs
-  01_exploratory/      dataset EDA figures from dataset_analysis.py
-  02_model_analysis/   hidden state analysis figures from hidden_*.py (weight profiles, state timelines, activations, cross-model)
-  03_evaluation/       model evaluation figures from nan_test_eval.py + split_comparison.py
-  04_model_selection/  L-sweep final validation metrics from sweep_analysis.py
-  tables/              CSV supporting data (hidden activations, NaN evaluation, split comparison)
-  diagnostics/         training curves from L-sweeps (sweep/ + sweep_shuffled/)
+code/
+  src/models/                   core library (RBM model classes, I/O, utils, plotting)
+  train/                        "make me" pipeline
+    config.py                     experiment hyperparameters + data locations + single-run flag
+    train.py                      single-run (default) or multi-seed sweep trainer
+  diagnostic/                   model evaluation — "did the training work?"
+    sweep_analysis.py             L-sweep metrics → results/04_model_selection/
+    nan_test_eval.py              NaN test set evaluation → results/03_evaluation/
+    split_comparison.py           split strategy comparison → results/03_evaluation/
+    plot_training_runs.py         training curves from training_runs/ → figures/training_runs/
+  analysis/                     ecological interpretation — "what do the hidden units mean?"
+    hidden_coactivation.py        weight profiles + state timelines → results/02_model_analysis/
+    hidden_mean_activation.py     mean activation per unit → results/02_model_analysis/
+    hidden_cross_model.py         NB↔BB cross-model comparison → results/02_model_analysis/ + tables/hidden/
+    hidden_pattern_analysis.py    binary pattern analysis of hidden states
+    rbm_hidden_stackplot.py       normalised hidden activation stackplot
+    plot_visible_by_hidden.py     visible-unit probabilities per hidden node
+    archetype_rbm_comparison.py   quantitative comparison with Cheng's archetypes
+    dataset_analysis.py           EDA pipeline → results/01_exploratory/
+  archive/                      one-off plot scripts (not yet merged into standard pipelines)
+    plot_final_metric_nb.py       final NLL vs L for NB+ZINB sigmoid/softmax
+    plot_sigmoid_nll.py           nb_sigmoid train NLL curves
+    plot_zinb_nll.py              ZINB sigmoid/softmax train NLL curves
 ```

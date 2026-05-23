@@ -39,6 +39,8 @@ env/
 rbm_plankton/
 
 # LLM instructions
+.opencode/
+.claude/
 *[Cc]laude*.md
 *[Ss]kills*.md
 
@@ -48,7 +50,7 @@ doc/*.pdf
 # Superseded experimental runs
 archive/
 
-# Training run data (weights, CSVs, logs) — large, regeneratable
+# Legacy training/weights directories (still on disk, don't re-track)
 training_runs/
 training_runs_v1/
 training_runs_v2/
@@ -57,8 +59,14 @@ training_runs_CD1/
 weights/
 weights.zip
 
-# Generated per-run figures (from plot_training_runs.py)
+# Legacy generated figures
 figures/
+
+# Training run data (weights, CSVs, logs) — large, regeneratable
+trained_models/
+
+# Diagnostic outputs (regeneratable evaluation artifacts)
+diagnostic_outputs/
 
 # Raw data
 data/
@@ -73,11 +81,5 @@ results/*
 !results/01_exploratory/**
 !results/02_model_analysis/
 !results/02_model_analysis/**
-!results/03_evaluation/
-!results/03_evaluation/**
-!results/04_model_selection/
-!results/04_model_selection/**
 !results/tables/
 !results/tables/**
-!results/diagnostics/
-!results/diagnostics/**
