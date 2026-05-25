@@ -161,6 +161,24 @@ LR_PARAM_MULTIPLIER = 0.1
 # Weight initialisation
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Model family catalog
+# ---------------------------------------------------------------------------
+
+# Canonical ordering for all batch-analysis scripts (hidden_mean_activation,
+# hidden_coactivation, nan_test_eval, etc.).  Kept in one place so that
+# adding or renaming a family propagates everywhere automatically.
+ALL_FAMILIES = [
+    "bernoulli_median", "bernoulli_zero",
+    "nb", "nb_relu", "nb_sigmoid", "nb_softmax",
+    "zinb", "zinb_relu", "zinb_sigmoid", "zinb_softmax",
+]
+
+
+# ---------------------------------------------------------------------------
+# Weight initialisation
+# ---------------------------------------------------------------------------
+
 # Numerator in the Xavier-style weight scale: W ~ N(0, sqrt(FACTOR / (D + L))).
 # Why 4.0: standard Glorot normal uses factor=2 (fan_avg), He uses 2/fan_in.
 # The factor 4 was chosen empirically for count-scale inputs (V ~ O(100-1000)

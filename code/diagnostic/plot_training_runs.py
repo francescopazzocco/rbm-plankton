@@ -20,44 +20,30 @@ import numpy as np
 import pandas as pd
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from models.io import load_hidden_activations
 from models.visualization import plot_training_curves, plot_weight_heatmap
 
 
 def load_history_from_csv(csv_path: Path) -> dict:
-    """Load training history from rbm_training_curves.csv"""
     df = pd.read_csv(csv_path)
-    history = {
-        "epoch": df["epoch"].tolist(),
-        "train_mse": df["train_mse"].tolist(),
-    }
-    if "val_mse" in df.columns:
-        history["val_mse"] = df["val_mse"].tolist()
-    if "train_pll" in df.columns:
-        history["train_pll"] = df["train_pll"].tolist()
-    if "val_pll" in df.columns:
-        history["val_pll"] = df["val_pll"].tolist()
-    if "train_nll" in df.columns:
-        history["train_nll"] = df["train_nll"].tolist()
-    if "val_nll" in df.columns:
-        history["val_nll"] = df["val_nll"].tolist()
+    history = {"epoch": df["epoch"].tolist(), "train_mse": df["train_mse"].tolist()}
+    for col in ["val_mse", "train_pll", "val_pll", "train_nll", "val_nll"]:
+        if col in df.columns:
+            history[col] = df[col].tolist()
     return history
 
 
 def load_weights_from_csv(csv_path: Path) -> tuple[np.ndarray, list]:
-    """Load weight matrix and taxa columns from rbm_weights.csv"""
     df = pd.read_csv(csv_path, index_col=0)
-    W = df.values
-    taxa_cols = df.index.tolist()
-    return W, taxa_cols
+    return df.values, df.index.tolist()
 
 
 def plot_hidden_activations_from_csv(activations_csv: Path, out_dir: Path):
-    """Plot hidden activations time series from saved CSV"""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    df = pd.read_csv(activations_csv, index_col=0, parse_dates=True)
+    df = load_hidden_activations(activations_csv)
     dates_all = df.index
     H_all = df.values
     n_hidden = H_all.shape[1]

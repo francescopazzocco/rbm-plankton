@@ -22,7 +22,7 @@
 
 ## Preprocessing
 
-Two paths, selected by the `family` string in `main_multiseed.py`.
+Two paths, selected by the `family` string in `code/train/config.py`.
 Both apply `COUNT_SCALE=1000` (organisms/μL → organisms/mL) as a shared first step for numerical stability (see LOG-024).
 
 **Bernoulli path** (`load_and_binarise`):
@@ -42,7 +42,7 @@ NaN rows are retained separately as a structured post-training test set.
 
 ## Models
 
-Model families are selected by the `family` string in `L_VALUES` (see `main_multiseed.py`).  
+Model families are selected by the `family` string in `L_VALUES` (see `code/train/config.py`).  
 All models share the `BaseRBM` initialisation (`W`, `a`, `b`, scale_init).  
 Hidden monitoring is injected via mixins from `_hidden_monitors.py`.
 
@@ -167,21 +167,22 @@ code/
   train/                        "make me" pipeline
     config.py                     experiment hyperparameters + data locations + single-run flag
     train.py                      single-run (default) or multi-seed sweep trainer
+  train/                        training pipeline — "make me a model"
+    config.py                     experiment hyperparameters + data locations + single-run flag
+    dataset_analysis.py           pre-training EDA → results/01_exploratory/
+    train.py                      single-run (default) or multi-seed sweep trainer
   diagnostic/                   model evaluation — "did the training work?"
     sweep_analysis.py             L-sweep metrics → results/04_model_selection/
-    nan_test_eval.py              NaN test set evaluation → results/03_evaluation/
     split_comparison.py           split strategy comparison → results/03_evaluation/
-    plot_training_runs.py         training curves from training_runs/ → figures/training_runs/
+    nan_test_eval.py              NaN imputation evaluation → diagnostic_outputs/nan_eval_extended/ + results/03_evaluation/
+    plot_training_runs.py         training curves from trained_models/
   analysis/                     ecological interpretation — "what do the hidden units mean?"
     hidden_coactivation.py        weight profiles + state timelines → results/02_model_analysis/
     hidden_mean_activation.py     mean activation per unit → results/02_model_analysis/
     hidden_cross_model.py         NB↔BB cross-model comparison → results/02_model_analysis/ + tables/hidden/
-    hidden_pattern_analysis.py    binary pattern analysis of hidden states
-    rbm_hidden_stackplot.py       normalised hidden activation stackplot
     plot_visible_by_hidden.py     visible-unit probabilities per hidden node
     archetype_rbm_comparison.py   quantitative comparison with Cheng's archetypes
-    dataset_analysis.py           EDA pipeline → results/01_exploratory/
-  archive/                      one-off plot scripts (not yet merged into standard pipelines)
+  archive/                      one-off plot scripts (gitignored)
     plot_final_metric_nb.py       final NLL vs L for NB+ZINB sigmoid/softmax
     plot_sigmoid_nll.py           nb_sigmoid train NLL curves
     plot_zinb_nll.py              ZINB sigmoid/softmax train NLL curves
