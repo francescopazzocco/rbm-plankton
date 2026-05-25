@@ -81,5 +81,11 @@ results/*
 !results/01_exploratory/**
 !results/02_model_analysis/
 !results/02_model_analysis/**
+!results/03_evaluation/
+!results/03_evaluation/**
+!results/04_model_selection/
+!results/04_model_selection/**
+!results/diagnostics/
+!results/diagnostics/**
 !results/tables/
 !results/tables/**

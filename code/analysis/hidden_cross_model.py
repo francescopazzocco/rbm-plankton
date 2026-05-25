@@ -26,8 +26,8 @@ from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
-from models.io import best_seed_dir, METRIC_COL
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from models.io import best_seed_dir, load_hidden_activations, METRIC_COL
 from models.visualization import plot_correlation, plot_pattern_frequency, plot_seasonal_profiles
 
 RESULTS_DIR  = Path(__file__).parent.parent.parent / "trained_models"
@@ -41,8 +41,7 @@ def load_activations(family: str) -> pd.DataFrame:
     seed_dir = best_seed_dir(family_l_dir, METRIC_COL[family])
     if seed_dir is None:
         raise FileNotFoundError(f"No converged seed for {family} L={TARGET_L}")
-    df = pd.read_csv(seed_dir / "rbm_hidden_activations.csv",
-                     index_col="date", parse_dates=True)
+    df = load_hidden_activations(seed_dir / "rbm_hidden_activations.csv")
     print(f"Loaded {family} L={TARGET_L} from {seed_dir.name}  "
           f"({len(df)} days, {df.shape[1]} units)")
     return df

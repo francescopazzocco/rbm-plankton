@@ -1,7 +1,7 @@
 """
 nan_test_eval.py - NaN imputation inference with validated RBMs (L=6).
 
-For each row with missing taxa: Gibbs-impute missing values → score NLL
+For each row with missing taxa: Gibbs-impute missing values -> score NLL
 on observed positions only.
 
 Missingness patterns (after nonzero filter):
@@ -15,9 +15,9 @@ Metrics:
 
 Outputs (all in diagnostic_outputs/nan_eval_extended/):
   nan_eval_rows.csv      per-row NLL, date, missingness pattern
-  nan_eval_summary.csv   per-(family, pattern) mean ± std
-  nan_eval_bars.png      grouped bar chart — all families
-  nan_eval_timeseries.png  p31 NLL time series — all families
+  nan_eval_summary.csv   per-(family, pattern) mean +/- std
+  nan_eval_bars.png      grouped bar chart -- all families
+  nan_eval_timeseries.png  p31 NLL time series -- all families
 """
 
 import sys
@@ -31,9 +31,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn.functional as F
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from models._eval_utils import (
+    score_row_gibbs, loss_nb, loss_zinb, loss_bern,
+    sample_nb, sample_zinb, sample_bern,
+)
 from models.io import best_seed_dir, METRIC_COL, DATA_PATH
 from models.utils import load_weights, get_device
 from models.nb_rbm import NB_RBM, NBSigmoidRBM, NBSoftmaxRBM
@@ -116,111 +119,39 @@ def read_val(seed_dir: Path, col: str) -> float:
     return pd.read_csv(seed_dir / "rbm_training_curves.csv")[col].dropna().iloc[-1]
 
 
-# -- Core: Gibbs imputation + conditional scoring ---------------------------
+# -- Scoring wrappers ---------------------------------------------------------
 
-def _bernoulli_sample(prob: torch.Tensor) -> torch.Tensor:
-    return (torch.rand_like(prob) < prob).float()
-
-
-def score_row(
-    rbm,
-    v_raw: np.ndarray,
-    config: EvalConfig,
-    device,
-    sample_hidden: Callable,
-    sample_visible: Callable,
-    compute_loss: Callable,
-) -> float:
-    obs = ~np.isnan(v_raw)
-    if obs.sum() == 0:
-        return float("nan")
-
-    n_steps = config.impute_base + config.impute_per_nan * int((~obs).sum())
-    obs_t   = torch.tensor(obs, device=device)
-    v_raw_t = torch.tensor(v_raw.astype(np.float32), device=device)
-
-    v_curr_t = torch.tensor(np.where(obs, v_raw, 0.0).astype(np.float32), device=device)
-    for _ in range(n_steps):
-        ph = rbm._ph_given_v(v_curr_t.unsqueeze(0))
-        h  = sample_hidden(ph)
-        v  = sample_visible(rbm, h).squeeze(0)
-        v_curr_t = torch.where(obs_t, v_raw_t, v)
-
-    v_inp_t = v_curr_t.unsqueeze(0).expand(config.n_samples, -1)
-    v_obs_t = v_raw_t[obs_t].unsqueeze(0).expand(config.n_samples, -1)
-    ph = rbm._ph_given_v(v_inp_t)
-    H  = sample_hidden(ph)
-    return compute_loss(rbm, H, obs_t, v_obs_t)
+def score_nb_family(rbm, v_raw: np.ndarray, config: EvalConfig, device) -> float:
+    return score_row_gibbs(
+        rbm, v_raw, device,
+        n_samples=config.n_samples,
+        impute_base=config.impute_base,
+        impute_per_nan=config.impute_per_nan,
+        sample_hidden=rbm._sample_bernoulli,
+        sample_visible=sample_nb,
+        compute_loss=loss_nb)
 
 
-# -- NB loss -----------------------------------------------------------------
-
-def _loss_nb(rbm: NB_RBM, H: torch.Tensor, obs_t: torch.Tensor, v_obs_t: torch.Tensor) -> float:
-    mu    = rbm._mu(H)[:, obs_t]
-    theta = rbm.log_theta[obs_t].exp().clamp(min=1e-4)
-    eps   = 1e-8
-    log_nb = (torch.lgamma(v_obs_t + theta)
-              - torch.lgamma(theta)
-              - torch.lgamma(v_obs_t + 1)
-              + theta * torch.log(theta / (theta + mu + eps))
-              + v_obs_t * torch.log(mu   / (theta + mu + eps)))
-    return -log_nb.mean(dim=1).mean().item()
+def score_zinb_family(rbm, v_raw: np.ndarray, config: EvalConfig, device) -> float:
+    return score_row_gibbs(
+        rbm, v_raw, device,
+        n_samples=config.n_samples,
+        impute_base=config.impute_base,
+        impute_per_nan=config.impute_per_nan,
+        sample_hidden=rbm._sample_bernoulli,
+        sample_visible=sample_zinb,
+        compute_loss=loss_zinb)
 
 
-def _sample_visible_nb(rbm: NB_RBM, h: torch.Tensor) -> torch.Tensor:
-    return rbm._sample_nb(rbm._mu(h))
-
-
-def score_nb_family(rbm: NB_RBM, v_raw: np.ndarray, config: EvalConfig, device) -> float:
-    return score_row(rbm, v_raw, config, device,
-                     rbm._sample_bernoulli, _sample_visible_nb, _loss_nb)
-
-
-# -- ZINB loss ---------------------------------------------------------------
-
-def _loss_zinb(rbm: ZINB_RBM, H: torch.Tensor, obs_t: torch.Tensor, v_obs_t: torch.Tensor) -> float:
-    mu    = rbm._mu(H)[:, obs_t]
-    theta = rbm.log_theta[obs_t].exp().clamp(min=1e-4)
-    pi    = rbm._pi()[obs_t]
-    eps   = 1e-8
-
-    log_nb_zero = theta * torch.log(theta / (theta + mu + eps))
-    log_nb_full = (torch.lgamma(v_obs_t + theta)
-                   - torch.lgamma(theta)
-                   - torch.lgamma(v_obs_t + 1)
-                   + theta * torch.log(theta / (theta + mu + eps))
-                   + v_obs_t * torch.log(mu   / (theta + mu + eps)))
-
-    log_prob_pos  = torch.log(1 - pi + eps) + log_nb_full
-    log_prob_zero = torch.logaddexp(torch.log(pi + eps),
-                                    torch.log(1 - pi + eps) + log_nb_zero)
-    log_prob = torch.where(v_obs_t > 0, log_prob_pos, log_prob_zero)
-    return -log_prob.mean(dim=1).mean().item()
-
-
-def _sample_visible_zinb(rbm: ZINB_RBM, h: torch.Tensor) -> torch.Tensor:
-    return rbm._sample_zinb(rbm._mu(h))
-
-
-def score_zinb_family(rbm: ZINB_RBM, v_raw: np.ndarray, config: EvalConfig, device) -> float:
-    return score_row(rbm, v_raw, config, device,
-                     rbm._sample_bernoulli, _sample_visible_zinb, _loss_zinb)
-
-
-# -- Bernoulli loss ----------------------------------------------------------
-
-def _loss_bern(rbm: BernoulliRBM, H: torch.Tensor, obs_t: torch.Tensor, v_obs_t: torch.Tensor) -> float:
-    pv = rbm._pv_given_h(H)[:, obs_t].clamp(1e-7, 1 - 1e-7)
-    return F.binary_cross_entropy(pv, v_obs_t, reduction="none").mean(dim=1).mean().item()
-
-
-def _sample_visible_bern(rbm: BernoulliRBM, h: torch.Tensor) -> torch.Tensor:
-    return torch.bernoulli(rbm._pv_given_h(h))
-
-
-def score_bern(rbm: BernoulliRBM, v_raw: np.ndarray, config: EvalConfig, device) -> float:
-    return score_row(rbm, v_raw, config, device,
-                     _bernoulli_sample, _sample_visible_bern, _loss_bern)
+def score_bern(rbm, v_raw: np.ndarray, config: EvalConfig, device) -> float:
+    return score_row_gibbs(
+        rbm, v_raw, device,
+        n_samples=config.n_samples,
+        impute_base=config.impute_base,
+        impute_per_nan=config.impute_per_nan,
+        sample_hidden=lambda ph: (torch.rand_like(ph) < ph).float(),
+        sample_visible=sample_bern,
+        compute_loss=loss_bern)
 
 
 # -- Evaluation loop ---------------------------------------------------------
@@ -294,7 +225,7 @@ def plot_bars(summary: pd.DataFrame, out: Path):
     ax.set_xticklabels([PATTERN_LABELS[p] for p in PATTERNS])
     ax.set_xlabel("Missingness pattern")
     ax.set_ylabel("NLL on observed taxa\n(NB/ZINB: count NLL  |  Bernoulli: BCE)")
-    ax.set_title("NaN test set evaluation — all model families (optimal L per family)")
+    ax.set_title("NaN test set evaluation - all model families (optimal L per family)")
     ax.legend(fontsize=7, ncol=2, loc="upper left")
     ax.set_ylim(bottom=0)
     fig.tight_layout()
@@ -316,7 +247,7 @@ def plot_timeseries(df: pd.DataFrame, out: Path):
                 markersize=3, linewidth=1, label=cfg["label"], alpha=0.85)
     ax.set_xlabel("Date")
     ax.set_ylabel("NLL / BCE (52 observed taxa)")
-    ax.set_title("p31 pattern — per-day test NLL, all model families (optimal L per family)")
+    ax.set_title("p31 pattern - per-day test NLL, all model families (optimal L per family)")
     ax.legend(fontsize=7, ncol=2)
     ax.tick_params(axis="x", rotation=30)
     fig.tight_layout()
@@ -326,10 +257,6 @@ def plot_timeseries(df: pd.DataFrame, out: Path):
 
 # -- Main --------------------------------------------------------------------
 
-# (family_name, dir_name, metric_key, model_cls, is_zinb)
-# Optimal L per family: nb_chron=6, nb_shuffled=8, nb_sigmoid=7, nb_softmax=7,
-#                       zinb=8, zinb_sigmoid=7, zinb_softmax=6, bernoulli*=6
-# is_zinb=None → Bernoulli family
 _SPECS = [
     ("nb",               "nb_L6",                     "nb",               NB_RBM,         False),
     ("nb_shuffled",      "nb_L8_shuffled",             "nb",               NB_RBM,         False),
@@ -388,8 +315,8 @@ def main():
     df = pd.concat(all_dfs, ignore_index=True)
     df["pattern"] = df["n_miss"].map(PATTERN_MAP)
 
-    rows_out   = config.out_root / "nan_eval_rows.csv"
-    summary    = summarise(df)
+    rows_out    = config.out_root / "nan_eval_rows.csv"
+    summary     = summarise(df)
     summary_out = config.out_root / "nan_eval_summary.csv"
     df.to_csv(rows_out, index=False)
     summary.to_csv(summary_out, index=False)

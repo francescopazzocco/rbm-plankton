@@ -10,6 +10,7 @@ Results navigation (called by hidden_*.py and sweep_analysis.py):
   best_seed_dir       return best-converged seed directory for a (family, L) run
 """
 
+import re
 from pathlib import Path
 
 import numpy as np
@@ -110,6 +111,33 @@ def load_raw_counts(path=DATA_PATH, scale=1000,
 
 
 # -- Results navigation --------------------------------------------------------
+
+def discover_run_dirs(results_dir: Path, suffix: str = "") -> dict[str, dict[int, list[Path]]]:
+    """Scan results_dir for {family}_L{n}{suffix}/seed_* directories.
+
+    Returns {family: {L: [seed_dir_paths]}} sorted by family name and L value.
+    """
+    pattern = re.compile(rf"^(.+)_L(\d+){re.escape(suffix)}$")
+    runs: dict[str, dict[int, list[Path]]] = {}
+    for d in sorted(results_dir.iterdir()):
+        if not d.is_dir():
+            continue
+        m = pattern.match(d.name)
+        if not m:
+            continue
+        family, l_val = m.group(1), int(m.group(2))
+        seed_dirs = sorted(d.glob("seed_*"))
+        if seed_dirs:
+            runs.setdefault(family, {})[l_val] = seed_dirs
+    return runs
+
+
+def load_hidden_activations(csv_path: Path) -> pd.DataFrame:
+    """Load rbm_hidden_activations.csv, return (date_indexed, only h* columns)."""
+    df = pd.read_csv(csv_path, parse_dates=["date"])
+    hidden_cols = [c for c in df.columns if c.startswith("h")]
+    return df.set_index("date")[hidden_cols]
+
 
 METRIC_COL = {
     "nb":               "val_nll",

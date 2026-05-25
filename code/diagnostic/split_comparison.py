@@ -26,9 +26,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn.functional as F
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from models._eval_utils import score_row_gibbs, loss_nb, loss_bern
 from models.io import best_seed_dir, METRIC_COL, DATA_PATH
 from models.utils import load_weights, get_device
 from models.nb_rbm import NB_RBM
@@ -38,7 +38,7 @@ RESULTS_DIR = Path(__file__).parent.parent.parent / "trained_models"
 OUT_DIR     = Path(__file__).parent.parent.parent / "results" / "tables"
 FIG_DIR     = Path(__file__).parent.parent.parent / "diagnostic_outputs" / "03_evaluation"
 N_SAMPLES   = 100
-N_GIBBS     = 5      # clamped Gibbs steps to infer missing positions before scoring
+N_GIBBS     = 5
 COUNT_SCALE = 1000
 
 CONFIGS = [
@@ -56,14 +56,10 @@ PATTERN_LABELS = {
 PATTERNS = ["p3_3miss", "p31_31miss", "p54_54miss"]
 
 
-# -- Directory helpers ---------------------------------------------------------
-
 def run_dir(family: str, L: int, split: str) -> Path:
     suffix = "_shuffled" if split == "shuffled" else ""
     return RESULTS_DIR / f"{family}_L{L}{suffix}"
 
-
-# -- Model loading -------------------------------------------------------------
 
 def load_nb(seed_dir: Path, device) -> NB_RBM:
     npz = load_weights(seed_dir / "weights.npz")
@@ -85,8 +81,6 @@ def load_bernoulli(seed_dir: Path, device) -> tuple[BernoulliRBM, np.ndarray]:
     rbm.W, rbm.a, rbm.b = W, a, b
     return rbm, npz["thresholds"]
 
-
-# -- Data loading --------------------------------------------------------------
 
 def nan_rows_nb() -> tuple[pd.DataFrame, list]:
     df = pd.read_csv(DATA_PATH, parse_dates=["date"])
@@ -110,75 +104,6 @@ def nan_rows_bernoulli(thresholds: np.ndarray) -> tuple[pd.DataFrame, list]:
     rows[taxa] = X_bin
     return rows, taxa
 
-
-# -- Scoring -------------------------------------------------------------------
-
-@torch.no_grad()
-def score_nb_row(rbm: NB_RBM, v_raw: np.ndarray, device) -> float:
-    obs = ~np.isnan(v_raw)
-    if obs.sum() == 0:
-        return float("nan")
-    obs_t   = torch.tensor(obs, device=device)
-    v_obs_t = torch.tensor(v_raw[obs].astype(np.float32), device=device).unsqueeze(0).expand(N_SAMPLES, -1)
-    # Initialise with zeros at missing positions; clamped Gibbs will fill them in
-    v_t = torch.tensor(np.where(obs, v_raw, 0.0).astype(np.float32),
-                       device=device).unsqueeze(0).expand(N_SAMPLES, -1).clone()
-    # Clamped Gibbs: infer missing positions, keep observed clamped
-    for _ in range(N_GIBBS):
-        ph = rbm._ph_given_v(v_t)
-        H  = rbm._sample_bernoulli(ph)
-        v_t[:, ~obs_t] = rbm._mu(H)[:, ~obs_t]
-    # Score observed positions using hidden state from refined v
-    ph  = rbm._ph_given_v(v_t)
-    H   = rbm._sample_bernoulli(ph)
-    mu  = rbm._mu(H)[:, obs_t]
-    theta = rbm.log_theta[obs_t].exp().clamp(min=1e-4)
-    eps   = 1e-8
-    log_nb = (torch.lgamma(v_obs_t + theta)
-              - torch.lgamma(theta)
-              - torch.lgamma(v_obs_t + 1)
-              + theta * torch.log(theta / (theta + mu + eps))
-              + v_obs_t * torch.log(mu    / (theta + mu + eps)))
-    return -log_nb.mean(dim=1).mean().item()
-
-
-@torch.no_grad()
-def score_bernoulli_row(rbm: BernoulliRBM, v_bin: np.ndarray, device) -> float:
-    obs = ~np.isnan(v_bin)
-    if obs.sum() == 0:
-        return float("nan")
-    obs_t   = torch.tensor(obs, device=device)
-    v_obs_t = torch.tensor(v_bin[obs].astype(np.float32), device=device).unsqueeze(0).expand(N_SAMPLES, -1)
-    v_t = torch.tensor(np.where(obs, v_bin, 0.0).astype(np.float32),
-                       device=device).unsqueeze(0).expand(N_SAMPLES, -1).clone()
-    # Clamped Gibbs: infer missing positions, keep observed clamped
-    for _ in range(N_GIBBS):
-        ph = rbm._ph_given_v(v_t)
-        H  = rbm._sample(ph)
-        v_t[:, ~obs_t] = rbm._pv_given_h(H)[:, ~obs_t]
-    # Score observed positions using hidden state from refined v
-    ph  = rbm._ph_given_v(v_t)
-    H   = rbm._sample(ph)
-    pv  = rbm._pv_given_h(H)[:, obs_t].clamp(1e-7, 1 - 1e-7)
-    bce = F.binary_cross_entropy(pv, v_obs_t, reduction="none")
-    return bce.mean(dim=1).mean().item()
-
-
-def evaluate(rows_df, taxa, score_fn, device) -> pd.DataFrame:
-    records = []
-    for _, row in rows_df.iterrows():
-        v   = row[taxa].values.astype(np.float32)
-        obs = ~np.isnan(v)
-        records.append({
-            "date":   row["date"],
-            "n_obs":  int(obs.sum()),
-            "n_miss": int((~obs).sum()),
-            "nll":    score_fn(v, device),
-        })
-    return pd.DataFrame(records)
-
-
-# -- Figure --------------------------------------------------------------------
 
 FAMILY_COLORS = {
     "nb":               {"chrono": "#6baed6", "shuffled": "#2171b5"},
@@ -221,8 +146,6 @@ def plot_comparison(summary: pd.DataFrame, out: Path):
     print(f"Figure: {out}")
 
 
-# -- Main ----------------------------------------------------------------------
-
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     FIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -250,15 +173,32 @@ def main():
         print(f"  seed: {seed_dir.name}   {metric_col}={val_metric:.4f}")
 
         if family == "nb":
-            model          = load_nb(seed_dir, device)
-            nan_df, taxa   = nan_rows_nb()
-            score_fn       = lambda v, d, m=model: score_nb_row(m, v, d)
+            model         = load_nb(seed_dir, device)
+            nan_df, taxa  = nan_rows_nb()
+            score_fn = lambda v, d: score_row_gibbs(
+                model, v, d, n_samples=N_SAMPLES, impute_base=N_GIBBS, impute_per_nan=0,
+                sample_hidden=model._sample_bernoulli,
+                sample_visible=lambda r, h: r._mu(h),
+                compute_loss=loss_nb)
         else:
-            model, thresh  = load_bernoulli(seed_dir, device)
-            nan_df, taxa   = nan_rows_bernoulli(thresh)
-            score_fn       = lambda v, d, m=model: score_bernoulli_row(m, v, d)
+            model, thresh = load_bernoulli(seed_dir, device)
+            nan_df, taxa  = nan_rows_bernoulli(thresh)
+            score_fn = lambda v, d: score_row_gibbs(
+                model, v, d, n_samples=N_SAMPLES, impute_base=N_GIBBS, impute_per_nan=0,
+                sample_hidden=model._sample,
+                sample_visible=lambda r, h: r._pv_given_h(h),
+                compute_loss=loss_bern)
 
-        df = evaluate(nan_df, taxa, score_fn, device)
+        records = []
+        for _, row in nan_df.iterrows():
+            v = row[taxa].values.astype(np.float32)
+            records.append({
+                "date": row["date"],
+                "n_obs": int((~np.isnan(v)).sum()),
+                "n_miss": int(np.isnan(v).sum()),
+                "nll": score_fn(v, device),
+            })
+        df = pd.DataFrame(records)
         df["family"] = family
         df["split"]  = split
         df["L"]      = L
