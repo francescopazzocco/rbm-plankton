@@ -280,7 +280,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", type=Path, required=True,
                         help="Path to weights .npz or rbm_weights.csv")
-    parser.add_argument("--output-dir", type=Path, default=Path("results/visible_by_hidden"))
+    parser.add_argument("--output-dir", type=Path, default=Path("analysis/results/visible_by_hidden"))
     parser.add_argument("--mode", choices=["bernoulli", "zinb"], default=None,
                         help="Interpretation for visible units. Auto-detect if omitted.")
     parser.add_argument("--patterns-csv", type=Path, default=None,
