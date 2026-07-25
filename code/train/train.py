@@ -17,11 +17,8 @@ import argparse
 import contextlib
 import multiprocessing
 import os
-import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from config import (
     BATCH_F, BATCH_I, BETA, COUNT_SCALE, CD_STEPS, DATA_PATH,

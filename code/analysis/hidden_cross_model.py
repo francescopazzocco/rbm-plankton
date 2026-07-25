@@ -21,12 +21,10 @@ Outputs (plots) in results/02_model_analysis/:
   seasonal_profiles.png
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from models.io import best_seed_dir, load_hidden_activations, METRIC_COL
 from models.visualization import plot_correlation, plot_pattern_frequency, plot_seasonal_profiles
 

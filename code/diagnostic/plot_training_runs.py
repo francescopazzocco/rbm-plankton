@@ -10,7 +10,6 @@ Reads the CSV files saved in each seed folder and generates plots:
 Saves figures to /diagnostic_outputs/training_curves/
 """
 
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -20,7 +19,6 @@ import numpy as np
 import pandas as pd
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from models.io import load_hidden_activations
 from models.visualization import plot_training_curves, plot_weight_heatmap
 

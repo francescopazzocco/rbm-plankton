@@ -7,12 +7,10 @@ over all samples. Identifies always-on (bias absorber) and always-off units.
 Output: results/02_model_analysis/mean_activation_{family}.png
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from models._constants import ALL_FAMILIES
 from models.io import best_seed_dir, discover_run_dirs, METRIC_COL
 from models.visualization import ABSORBER_HI, ABSORBER_LO, mean_activations, plot_family
