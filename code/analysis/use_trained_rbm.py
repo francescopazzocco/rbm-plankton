@@ -2,7 +2,7 @@
 use_trained_rbm.py
 
 Load a trained RBM from a weights.npz and instantiate the corresponding
-model class from `src/models` so you can evaluate or inspect it.
+model class from `models` so you can evaluate or inspect it.
 
 Example usage:
   conda activate Vision
@@ -23,7 +23,6 @@ Options:
 
 import argparse
 import importlib
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -31,13 +30,8 @@ import torch
 import os
 import matplotlib.pyplot as plt
 
-# Ensure project root is importable so `src.models` can be imported
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from src.models import utils as model_utils
-from src.models import io as data_io
+from models import utils as model_utils
+from models import io as data_io
 
 FAMILY_CLASS_MAP = {
     # bernoulli
@@ -115,7 +109,7 @@ def instantiate_model_from_weights(npz, device_str='cpu', override_class=None):
         found = None
         for c in candidates:
             try:
-                m = importlib.import_module(f"src.models.{c}")
+                m = importlib.import_module(f"models.{c}")
                 if hasattr(m, class_name):
                     mod_name = c
                     found = True
@@ -123,10 +117,10 @@ def instantiate_model_from_weights(npz, device_str='cpu', override_class=None):
             except Exception:
                 continue
         if mod_name is None:
-            raise ImportError(f"Could not locate class {class_name} in src.models")
+            raise ImportError(f"Could not locate class {class_name} in models")
 
     # dynamic import
-    mod = importlib.import_module(f"src.models.{mod_name}")
+    mod = importlib.import_module(f"models.{mod_name}")
     cls = getattr(mod, class_name)
 
     # locate weight arrays

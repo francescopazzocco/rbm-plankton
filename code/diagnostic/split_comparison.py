@@ -17,7 +17,6 @@ Output:
   diagnostic_outputs/03_evaluation/split_comparison.png
 """
 
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -27,7 +26,6 @@ import numpy as np
 import pandas as pd
 import torch
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from models._eval_utils import score_row_gibbs, loss_nb, loss_bern
 from models.io import best_seed_dir, METRIC_COL, DATA_PATH
 from models.utils import load_weights, get_device

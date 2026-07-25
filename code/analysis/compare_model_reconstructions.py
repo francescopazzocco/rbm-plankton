@@ -24,11 +24,10 @@ import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_DIR = Path(__file__).resolve().parent
-for path in (ROOT, SCRIPT_DIR):
-    if str(path) not in sys.path:
-        sys.path.insert(0, str(path))
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 
-from src.models import io as data_io
+from models import io as data_io
 import use_trained_rbm as trained_loader
 
 MODEL_FAMILIES = [

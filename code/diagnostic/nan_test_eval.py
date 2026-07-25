@@ -20,7 +20,6 @@ Outputs (all in diagnostic_outputs/nan_eval_extended/):
   nan_eval_timeseries.png  p31 NLL time series -- all families
 """
 
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Type
@@ -32,7 +31,6 @@ import numpy as np
 import pandas as pd
 import torch
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from models._eval_utils import (
     score_row_gibbs, loss_nb, loss_zinb, loss_bern,
     sample_nb, sample_zinb, sample_bern,

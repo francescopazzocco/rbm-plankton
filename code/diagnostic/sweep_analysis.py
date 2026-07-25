@@ -7,12 +7,10 @@ produces figures in:
   diagnostic_outputs/diagnostics/sweep{SUFFIX}/ — training curves, NB/ZINB diagnostics
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from models.io import discover_run_dirs
 from models.visualization import (
     FAMILY_META, aggregate_curves,
