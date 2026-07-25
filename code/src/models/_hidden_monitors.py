@@ -7,7 +7,8 @@ visible-side variants (NB / ZINB).
 """
 
 import torch
-from ._constants import BERNOULLI_SAT_LO, BERNOULLI_SAT_HI, SOFTMAX_ENTROPY_EPS
+
+from ._constants import BERNOULLI_SAT_HI, BERNOULLI_SAT_LO, SOFTMAX_ENTROPY_EPS
 
 
 class BernoulliHiddenMonitor:

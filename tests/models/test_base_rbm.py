@@ -1,6 +1,5 @@
 import pytest
 import torch
-
 from models.base_rbm import BaseRBM
 
 

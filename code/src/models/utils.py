@@ -4,6 +4,7 @@ utils.py - Shared utilities for RBM plankton project
 """
 
 import os
+
 import numpy as np
 import torch
 

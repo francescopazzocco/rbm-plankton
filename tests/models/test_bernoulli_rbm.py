@@ -1,5 +1,4 @@
 import torch
-
 from models.bernoulli_rbm import BernoulliRBM
 
 

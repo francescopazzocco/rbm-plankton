@@ -1,5 +1,7 @@
 # RBM-Plankton
 
+[![CI](https://github.com/francescopazzocco/rbm-plankton/actions/workflows/ci.yml/badge.svg)](https://github.com/francescopazzocco/rbm-plankton/actions/workflows/ci.yml)
+
 Restricted Boltzmann Machine for unsupervised learning of plankton community
 structure from Lake Greifen monitoring data (2019–2024).
 
@@ -26,7 +28,8 @@ DOI: [10.1038/s41597-025-04988-9](https://doi.org/10.1038/s41597-025-04988-9)
 # 1. Clone & install
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e .          # editable install: makes `models` importable, reads requirements.txt
+# pip install -e ".[dev]" # add pytest + ruff if you'll run tests/lint
 
 # 2. Place your data (see data requirements below)
 #    data/raw/TimeSeries_countsuL_clean.csv
@@ -114,9 +117,9 @@ Requires Python 3.10+.
 
 ```bash
 sudo apt install uv
-uv venv
+uv sync             # creates .venv, installs the project + requirements.txt deps
+# uv sync --extra dev   # add pytest + ruff if you'll run tests/lint
 source .venv/bin/activate
-uv sync
 ```
 
 ### Using pip
@@ -124,8 +127,23 @@ uv sync
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e .          # editable install: makes `models` importable, reads requirements.txt
+# pip install -e ".[dev]" # add pytest + ruff if you'll run tests/lint
 ```
+
+---
+
+## Development
+
+Tests and lint cover `code/src/models` (the core library) and don't need the raw
+dataset or trained weights:
+
+```bash
+pytest tests/
+ruff check code/src/models tests/
+```
+
+Same checks CI runs on every push/PR (`.github/workflows/ci.yml`).
 
 ---
 

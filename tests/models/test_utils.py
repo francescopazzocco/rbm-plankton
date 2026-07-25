@@ -1,6 +1,5 @@
 import numpy as np
-
-from models.utils import save_weights, load_weights
+from models.utils import load_weights, save_weights
 
 
 def test_save_and_load_weights_round_trip(tmp_path):
