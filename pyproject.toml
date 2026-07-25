@@ -13,10 +13,14 @@ dynamic = ["dependencies"]
 dependencies = {file = ["requirements.txt"]}
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0.0"]
+dev = ["pytest>=7.0.0", "ruff>=0.4.0"]
 
 [tool.setuptools]
 package-dir = {"" = "code/src"}
 
 [tool.setuptools.packages.find]
 where = ["code/src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

@@ -14,6 +14,7 @@ Sections (in order):
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
@@ -22,7 +23,6 @@ import numpy as np
 import pandas as pd
 import torch
 from scipy.cluster.hierarchy import leaves_list, linkage
-
 
 # =============================================================================
 # main_multiseed

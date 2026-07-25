@@ -4,20 +4,33 @@ zinb_rbm.py - Zero-Inflated Negative Binomial RBM
 ZINB visible units with Bernoulli hidden units.
 """
 
-import math
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
-from .base_rbm import BaseRBM
-from ._hidden_monitors import BernoulliHiddenMonitor, ReLUHiddenMonitor, SigmoidHiddenMonitor, SoftmaxHiddenMonitor
+
 from ._constants import (
-    THETA_CLAMP_MIN, LOG_PROB_EPS, ETA_CLAMP_MAX,
-    LOG_PARAM_CLAMP_MIN, LOG_PARAM_CLAMP_MAX,
-    RELU_HIDDEN_CLAMP_MAX, LR_PARAM_MULTIPLIER,
-    DEFAULT_LR_DECAY, DEFAULT_GAMMA,
-    DEFAULT_BATCH_I, DEFAULT_BATCH_F, DEFAULT_N_BATCHES,
-    DEFAULT_BETA, DEFAULT_RMSPROP_EPS,
+    DEFAULT_BATCH_F,
+    DEFAULT_BATCH_I,
+    DEFAULT_BETA,
+    DEFAULT_GAMMA,
+    DEFAULT_LR_DECAY,
+    DEFAULT_N_BATCHES,
+    DEFAULT_RMSPROP_EPS,
+    ETA_CLAMP_MAX,
+    LOG_PARAM_CLAMP_MAX,
+    LOG_PARAM_CLAMP_MIN,
+    LOG_PROB_EPS,
+    LR_PARAM_MULTIPLIER,
+    RELU_HIDDEN_CLAMP_MAX,
+    THETA_CLAMP_MIN,
 )
+from ._hidden_monitors import (
+    BernoulliHiddenMonitor,
+    ReLUHiddenMonitor,
+    SigmoidHiddenMonitor,
+    SoftmaxHiddenMonitor,
+)
+from .base_rbm import BaseRBM
 
 
 class ZINB_RBM(BernoulliHiddenMonitor, BaseRBM):

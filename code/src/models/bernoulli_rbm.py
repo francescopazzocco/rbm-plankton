@@ -3,17 +3,21 @@ bernoulli_rbm.py - Bernoulli-Bernoulli RBM
 ==========================================
 """
 
-import math
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
-from .base_rbm import BaseRBM
+
 from ._constants import (
+    DEFAULT_BATCH_F,
+    DEFAULT_BATCH_I,
+    DEFAULT_BETA,
+    DEFAULT_GAMMA,
+    DEFAULT_LR_DECAY,
+    DEFAULT_N_BATCHES,
+    DEFAULT_RMSPROP_EPS,
     PROB_CLAMP_MIN,
-    DEFAULT_LR_DECAY, DEFAULT_GAMMA,
-    DEFAULT_BATCH_I, DEFAULT_BATCH_F, DEFAULT_N_BATCHES,
-    DEFAULT_BETA, DEFAULT_RMSPROP_EPS,
 )
+from .base_rbm import BaseRBM
 
 
 class BernoulliRBM(BaseRBM):

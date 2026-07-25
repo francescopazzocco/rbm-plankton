@@ -5,8 +5,10 @@ Shared interface and initialization logic.
 """
 
 import math
+
 import torch
 import torch.nn.functional as F
+
 from ._constants import XAVIER_SCALE_FACTOR
 
 
