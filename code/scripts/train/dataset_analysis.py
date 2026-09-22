@@ -169,7 +169,7 @@ def fig3_annual_seasonal(df_clean, taxa_cols, out_dir):
     annual  = df_clean.groupby("year")["row_sum"].agg(["median", "mean", "std"])
     monthly = df_clean.groupby(["year", "month"])["row_sum"].median().unstack(0)
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5), constrained_layout=True)
 
     # Left: annual stats
     years = annual.index
@@ -189,13 +189,18 @@ def fig3_annual_seasonal(df_clean, taxa_cols, out_dir):
     ax.grid(True, alpha=0.3)
 
     # Right: seasonal shape per year (log scale)
-    ax2    = axes[1]
-    colors = plt.cm.viridis(np.linspace(0, 1, 6))
+    # Okabe-Ito palette: colorblind-safe (deuteranopia/protanopia/tritanopia),
+    # paired with distinct markers so lines don't rely on color alone.
+    ax2 = axes[1]
+    year_colors  = ["#000000", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#0072B2"]
+    year_markers = ["o", "s", "^", "D", "v", "P"]
     month_labels = ["J","F","M","A","M","J","J","A","S","O","N","D"]
     for i, yr in enumerate([2019, 2020, 2021, 2022, 2023, 2024]):
         if yr in monthly.columns:
-            ax2.semilogy(monthly.index, monthly[yr], "o-",
-                         color=colors[i], lw=1.2, alpha=0.85, label=str(yr))
+            ax2.semilogy(monthly.index, monthly[yr], linestyle="--", lw=4.0,
+                         color=year_colors[i], alpha=0.3)
+            ax2.semilogy(monthly.index, monthly[yr], marker=year_markers[i], linestyle="none",
+                         color=year_colors[i], markersize=7, alpha=0.95, label=str(yr))
     ax2.set_xticks(range(1, 13))
     ax2.set_xticklabels(month_labels)
     ax2.set_title("Seasonal shape per year - Jan-Feb 2023 anomaly (2 orders of magnitude above peers)")
@@ -203,7 +208,6 @@ def fig3_annual_seasonal(df_clean, taxa_cols, out_dir):
     ax2.legend(title="Year")
     ax2.grid(True, alpha=0.3)
 
-    plt.tight_layout()
     path = os.path.join(out_dir, "fig3_annual_seasonal.png")
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
@@ -220,60 +224,59 @@ def fig4_distributions(df_clean, taxa_cols, out_dir, eps_fraction=EPS_FRACTION):
     eps = min_nonzero * eps_fraction
     print(f"  log-transform eps = {eps:.2e}  (min nonzero = {min_nonzero:.2e})")
 
-    selected = [
-        ("aulacoseira", "dominant  | ~3% zeros"),
-        ("cryptophyte", "common    | ~0% zeros"),
-        ("rotifer",     "intermed. | ~0% zeros"),
-        ("snowella",    "rare      | ~93% zeros"),
-    ]
+    selected = ["aulacoseira", "cryptophyte", "rotifer", "snowella"]
 
     fig, axes = plt.subplots(3, 4, figsize=(16, 10))
 
-    for ci, (taxon, label) in enumerate(selected):
+    for ci, taxon in enumerate(selected):
         raw  = df_clean[taxon].values.astype(float)
         logv = np.log(raw + eps)
         zlog = (logv - logv.mean()) / (logv.std() + 1e-10)
 
         # Row 0: raw counts
         axes[0, ci].hist(raw, bins=60, color="steelblue", alpha=0.8, edgecolor="none")
-        axes[0, ci].set_title(f"{taxon}\n({label})", fontsize=8)
+        axes[0, ci].set_title(f"{taxon} (~{(raw == 0).mean():.0%} zeros)", fontsize=14)
         axes[0, ci].text(
             0.97, 0.95,
-            f"skew={stats.skew(raw):.1f}\nzeros={(raw == 0).mean():.0%}",
-            transform=axes[0, ci].transAxes, ha="right", va="top", fontsize=7,
+            f"skew={stats.skew(raw):.1f}",
+            transform=axes[0, ci].transAxes, ha="right", va="top", fontsize=11,
             bbox=dict(boxstyle="round", fc="white", alpha=0.8),
         )
         axes[0, ci].grid(True, alpha=0.3)
+        axes[0, ci].tick_params(labelsize=11)
 
         # Row 1: log-transformed
         axes[1, ci].hist(logv, bins=60, color="darkorange", alpha=0.8, edgecolor="none")
         axes[1, ci].text(
             0.97, 0.95, f"skew={stats.skew(logv):.1f}",
-            transform=axes[1, ci].transAxes, ha="right", va="top", fontsize=7,
+            transform=axes[1, ci].transAxes, ha="right", va="top", fontsize=11,
             bbox=dict(boxstyle="round", fc="white", alpha=0.8),
         )
         axes[1, ci].grid(True, alpha=0.3)
+        axes[1, ci].tick_params(labelsize=11)
 
         # Row 2: log + z-score vs N(0,1)
         axes[2, ci].hist(zlog, bins=60, color="seagreen", alpha=0.8,
-                         edgecolor="none", density=True, label="log+zscore")
+                         edgecolor="none", density=True, label="bin")
         x = np.linspace(zlog.min(), zlog.max(), 200)
-        axes[2, ci].plot(x, stats.norm.pdf(x), "k--", lw=1.5, label="N(0,1)")
+        axes[2, ci].plot(x, stats.norm.pdf(x), "k--", lw=1.5, label=r"$\mathcal{N}(0,1)$")
         axes[2, ci].text(
             0.97, 0.95, f"skew={stats.skew(zlog):.1f}",
-            transform=axes[2, ci].transAxes, ha="right", va="top", fontsize=7,
+            transform=axes[2, ci].transAxes, ha="right", va="top", fontsize=11,
             bbox=dict(boxstyle="round", fc="white", alpha=0.8),
         )
-        axes[2, ci].legend(fontsize=6)
+        axes[2, ci].legend(fontsize=11)
         axes[2, ci].grid(True, alpha=0.3)
+        axes[2, ci].tick_params(labelsize=11)
 
-    axes[0, 0].set_ylabel("Raw counts\n(organisms/uL)")
-    axes[1, 0].set_ylabel("Log-transformed\nlog(v + eps)")
-    axes[2, 0].set_ylabel("Log + z-score\nvs N(0,1)")
+    axes[0, 0].set_ylabel("Frequency", fontsize=13)
+    axes[1, 0].set_ylabel("Frequency", fontsize=13)
+    axes[2, 0].set_ylabel("Density", fontsize=13)
     fig.suptitle(
-        "Marginal distributions: raw -> log-transform -> z-score\n"
-        "All taxa are zero-inflated and right-skewed; log-transform substantially reduces skew",
-        fontsize=11, y=1.01,
+        r"Marginal distributions: 1) raw  -  2) log-transform  -  3) $z$-score" "\n"
+        r"X axis: 1) organisms/uL (raw counts)   2) $\log(v + \epsilon)$   "
+        r"3) $z$-score (standardized log, dimensionless)",
+        fontsize=16, y=1.01,
     )
 
     plt.tight_layout()

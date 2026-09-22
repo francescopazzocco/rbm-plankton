@@ -202,49 +202,97 @@ def load_curves(csv_path: Path, col: str) -> pd.Series | None:
     return df.set_index("epoch")[col]
 
 
-def aggregate_curves(csv_paths: list[Path], col: str) -> tuple[pd.Series, pd.Series] | None:
-    """Aggregate a metric across seeds; return (mean, std) or None if all failed."""
+def _aggregate_df(csv_paths: list[Path], col: str) -> pd.DataFrame | None:
     curves = [load_curves(p, col) for p in csv_paths]
     curves = [c for c in curves if c is not None]
     if not curves:
         return None
-    df = pd.concat(curves, axis=1)
+    return pd.concat(curves, axis=1)
+
+
+def aggregate_curves(csv_paths: list[Path], col: str) -> tuple[pd.Series, pd.Series] | None:
+    """Aggregate a metric across seeds; return (mean, std) or None if all failed."""
+    df = _aggregate_df(csv_paths, col)
+    if df is None:
+        return None
     return df.mean(axis=1), df.std(axis=1)
 
 
+def aggregate_curves_extrema(
+    csv_paths: list[Path], col: str
+) -> tuple[pd.Series, pd.Series, pd.Series, pd.Series] | None:
+    """Aggregate a metric across seeds; return (mean, std, min, max) or None if all failed."""
+    df = _aggregate_df(csv_paths, col)
+    if df is None:
+        return None
+    return df.mean(axis=1), df.std(axis=1), df.min(axis=1), df.max(axis=1)
+
+
+# Panels for plot_final_metric: each becomes its own figure/file. nb and zinb
+# each bundle their 4 activation profiles (plain/relu/sigmoid/softmax) into one
+# plot, distinguished by marker shape so profiles stay comparable across L.
+PANEL_GROUPS = [
+    ("bernoulli_median", ["bernoulli_median"]),
+    ("bernoulli_zero",   ["bernoulli_zero"]),
+    ("nb",               ["nb", "nb_relu", "nb_sigmoid", "nb_softmax"]),
+    ("zinb",             ["zinb", "zinb_relu", "zinb_sigmoid", "zinb_softmax"]),
+]
+
+PROFILE_MARKERS = {"": "o", "relu": "^", "sigmoid": "s", "softmax": "D"}
+
+
+def _profile_of(family: str, base: str) -> str:
+    return "" if family == base else family[len(base) + 1:]
+
+
 def plot_final_metric(runs, figures_dir: Path):
-    fig, axes = plt.subplots(1, len(FAMILY_META), figsize=(14, 4), sharey=False)
-    fig.suptitle("Final val metric vs L (last epoch, mean ± std over seeds)", fontsize=13)
+    for title, families in PANEL_GROUPS:
+        fig, ax = plt.subplots(1, 1, figsize=(6, 4.5))
+        all_xs: set[int] = set()
 
-    for ax, (family, meta) in zip(axes, FAMILY_META.items()):
-        col = meta["col"]
-        family_runs = runs.get(family, {})
-        xs, means, stds = [], [], []
-        for l_val in sorted(family_runs):
-            agg = aggregate_curves(family_runs[l_val], col)
-            if agg is None:
+        for family in families:
+            meta = FAMILY_META[family]
+            col = meta["col"]
+            family_runs = runs.get(family, {})
+            xs, means, stds, mins, maxs = [], [], [], [], []
+            for l_val in sorted(family_runs):
+                agg = aggregate_curves_extrema(family_runs[l_val], col)
+                if agg is None:
+                    continue
+                mean_curve, std_curve, min_curve, max_curve = agg
+                xs.append(l_val)
+                means.append(mean_curve.iloc[-1])
+                stds.append(std_curve.iloc[-1])
+                mins.append(min_curve.iloc[-1])
+                maxs.append(max_curve.iloc[-1])
+            if not xs:
                 continue
-            mean_curve, std_curve = agg
-            xs.append(l_val)
-            means.append(mean_curve.iloc[-1])
-            stds.append(std_curve.iloc[-1])
-        color = COLORS[family]
-        ax.errorbar(xs, means, yerr=stds, fmt="o-", color=color, linewidth=2,
-                    markersize=7, capsize=4, label=family)
-        for x, y, s in zip(xs, means, stds):
-            ax.annotate(f"{y:.3f}±{s:.3f}", (x, y), textcoords="offset points",
-                        xytext=(0, 8), ha="center", fontsize=7)
-        ax.set_title(family)
-        ax.set_xlabel("L (hidden units)")
-        ax.set_ylabel(meta["label"])
-        ax.set_xticks(xs)
-        ax.grid(True, alpha=0.3)
+            all_xs.update(xs)
+            color  = COLORS[family]
+            marker = PROFILE_MARKERS.get(_profile_of(family, title), "o")
+            ax.fill_between(xs, mins, maxs, color=color, alpha=0.12, zorder=0)
+            ax.errorbar(xs, means, yerr=stds, fmt=f"{marker}-", color=color,
+                        linewidth=2, markersize=7, capsize=4, label=family)
+            if len(families) == 1:
+                for x, y, s in zip(xs, means, stds):
+                    ax.annotate(f"{y:.3f}±{s:.3f}", (x, y), textcoords="offset points",
+                                xytext=(0, 8), ha="center", fontsize=7)
 
-    fig.tight_layout()
-    out = figures_dir / "sweep_final_metric.png"
-    fig.savefig(out, dpi=150)
-    print(f"Saved: {out}")
-    plt.close(fig)
+        ax.set_title(f"{title} — final val metric vs L\n(last epoch, mean ± std, shaded = min/max over seeds)",
+                     fontsize=10)
+        ax.set_xlabel("L (hidden units)")
+        ax.set_ylabel(FAMILY_META[families[0]]["label"])
+        if all_xs:
+            ax.set_xticks(sorted(all_xs))
+        ax.grid(True, alpha=0.3)
+        if len(families) > 1:
+            ax.legend(fontsize=8)
+
+        fig.tight_layout()
+        out = figures_dir / f"sweep_final_metric_{title}.png"
+        fig.savefig(out, dpi=150)
+        print(f"Saved: {out}")
+        plt.close(fig)
 
 
 def plot_sweep_curves(runs, figures_dir: Path):
