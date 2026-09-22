@@ -24,6 +24,8 @@ import pandas as pd
 import torch
 from scipy.cluster.hierarchy import leaves_list, linkage
 
+from .palette import OKABE_ITO, PALETTE, get_markers, get_palette
+
 # =============================================================================
 # main_multiseed
 # =============================================================================
@@ -127,7 +129,7 @@ def plot_hidden_activations(rbm, X_train, X_val, dates_train, dates_val, out_dir
                            rbm.hidden_probs(X_val)], dim=0).cpu().numpy()
     dates_all = pd.concat([dates_train, dates_val]).reset_index(drop=True)
     n_hidden = H_all.shape[1]
-    colors   = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
+    colors   = get_palette(n_hidden)
     fig, axes = plt.subplots(n_hidden, 1, figsize=(13, 2.5 * n_hidden), sharex=True)
     if n_hidden == 1:
         axes = [axes]
@@ -180,18 +182,30 @@ FAMILY_META = {
     "zinb_softmax":     dict(col="val_nll", label="Val NLL", better="lower"),
 }
 
-COLORS = {
-    "bernoulli_median": "#1f77b4",
-    "bernoulli_zero":   "#ff7f0e",
-    "nb":               "#2ca02c",
-    "zinb":             "#9467bd",
-    "nb_relu":          "#e377c2",
-    "zinb_relu":        "#8c564b",
-    "nb_sigmoid":       "#bcbd22",
-    "nb_softmax":       "#17becf",
-    "zinb_sigmoid":     "#2ca02c",
-    "zinb_softmax":     "#e377c2",
-}
+# Canonical, project-wide family order for color assignment (NOT the same as
+# FAMILY_META's key order, which drives panel layout elsewhere in this file
+# and is left alone). Grouping nb-profiles and zinb-profiles together here
+# means the two families sharing an activation profile (e.g. nb_relu /
+# zinb_relu) sit near each other in the Okabe-Ito cycle; other scripts
+# (compare_model_reconstructions.py) import this list so a given family gets
+# the same color in every figure across the project, not just within one.
+FAMILY_ORDER = [
+    "bernoulli_median", "bernoulli_zero",
+    "nb", "nb_relu", "nb_sigmoid", "nb_softmax",
+    "zinb", "zinb_relu", "zinb_sigmoid", "zinb_softmax",
+]
+
+# 10 families > 6 safe PALETTE colors, so colors repeat every 6th family
+# (nb_sigmoid reuses bernoulli_median's color, etc). Deliberately cycling the
+# 6-color PALETTE rather than escalating to the full 8-color OKABE_ITO here:
+# OKABE_ITO's yellow/reddish-purple are excluded from PALETTE precisely
+# because they're poor on a white line-plot background (see palette.py), and
+# a washed-out yellow line is worse than an earlier repeat. Repeats are safe
+# because every caller pairs color with a second channel: plot_final_metric's
+# PROFILE_MARKERS (marker shape, within one nb/zinb panel) or
+# compare_model_reconstructions.py's per-family linestyle (across >6 families
+# in one legend).
+COLORS = {family: PALETTE[i % len(PALETTE)] for i, family in enumerate(FAMILY_ORDER)}
 
 
 def load_curves(csv_path: Path, col: str) -> pd.Series | None:
@@ -574,14 +588,14 @@ def plot_state_timeline(family: str, family_runs: dict, out_dir: Path):
     if n_l == 1:
         axes = [axes]
     fig.suptitle(f"{family} - dominant hidden state over time", fontsize=11)
-    max_l = max(l_values)
-    cmap  = plt.colormaps["tab10"]
+    max_l  = max(l_values)
+    unit_colors = get_palette(max_l)
 
     for ax, l_val in zip(axes, l_values):
         act   = load_activations(family_runs[l_val]["activations"])
         state = dominant_state(act)
         dates = state.index
-        colors = [cmap(s / max_l) for s in state.values]
+        colors = [unit_colors[s] for s in state.values]
         ax.scatter(dates, np.zeros(len(dates)), c=colors,
                    marker="|", s=200, linewidths=2)
         ax.set_yticks([])
@@ -589,8 +603,8 @@ def plot_state_timeline(family: str, family_runs: dict, out_dir: Path):
         ax.set_xlim(dates.min(), dates.max())
         handles = [
             plt.Line2D([0], [0], marker="|", color="w",
-                       markerfacecolor=cmap(i / max_l),
-                       markeredgecolor=cmap(i / max_l),
+                       markerfacecolor=unit_colors[i],
+                       markeredgecolor=unit_colors[i],
                        markersize=10, label=f"h{i}")
             for i in range(l_val)
         ]
@@ -612,6 +626,13 @@ def plot_state_timeline(family: str, family_runs: dict, out_dir: Path):
 ABSORBER_HI = 0.90
 ABSORBER_LO = 0.10
 
+# Semantic 3-way color: always-on / always-off / active. Okabe-Ito vermillion
+# and blue (not tab10 red/blue) for consistency with the rest of the project;
+# gray is colorblind-neutral by construction.
+_COLOR_ALWAYS_ON  = OKABE_ITO[6]  # vermillion
+_COLOR_ALWAYS_OFF = "#7f7f7f"     # neutral gray
+_COLOR_ACTIVE     = OKABE_ITO[5]  # blue
+
 
 def mean_activations(csv: Path) -> pd.Series:
     """Mean activation per hidden unit over all samples."""
@@ -630,14 +651,14 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
         means = mean_activations(family_runs[l_val])
         units = np.arange(len(means))
         bar_colors = [
-            "#d62728" if v >= ABSORBER_HI else
-            "#7f7f7f" if v <= ABSORBER_LO else
-            "#1f77b4"
+            _COLOR_ALWAYS_ON if v >= ABSORBER_HI else
+            _COLOR_ALWAYS_OFF if v <= ABSORBER_LO else
+            _COLOR_ACTIVE
             for v in means.values
         ]
         ax.bar(units, means.values, color=bar_colors)
-        ax.axhline(ABSORBER_HI, color="#d62728", linestyle="--", linewidth=0.8, alpha=0.6)
-        ax.axhline(ABSORBER_LO, color="#7f7f7f", linestyle="--", linewidth=0.8, alpha=0.6)
+        ax.axhline(ABSORBER_HI, color=_COLOR_ALWAYS_ON, linestyle="--", linewidth=0.8, alpha=0.6)
+        ax.axhline(ABSORBER_LO, color=_COLOR_ALWAYS_OFF, linestyle="--", linewidth=0.8, alpha=0.6)
         ax.set_title(f"L={l_val}", fontsize=10)
         ax.set_xlabel("hidden unit")
         ax.set_xticks(units)
@@ -648,9 +669,9 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
             ax.text(i, v + 0.02, f"{v:.2f}", ha="center", va="bottom", fontsize=7)
 
     legend = [
-        mpatches.Patch(color="#d62728", label=f"always-on  (>{ABSORBER_HI})"),
-        mpatches.Patch(color="#7f7f7f", label=f"always-off (<{ABSORBER_LO})"),
-        mpatches.Patch(color="#1f77b4", label="active"),
+        mpatches.Patch(color=_COLOR_ALWAYS_ON, label=f"always-on  (>{ABSORBER_HI})"),
+        mpatches.Patch(color=_COLOR_ALWAYS_OFF, label=f"always-off (<{ABSORBER_LO})"),
+        mpatches.Patch(color=_COLOR_ACTIVE, label="active"),
     ]
     fig.legend(handles=legend, loc="lower center", ncol=3, fontsize=8,
                bbox_to_anchor=(0.5, -0.05))
@@ -690,22 +711,47 @@ def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6):
     plt.close(fig)
 
 
-def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6):
-    top = freq.head(15)
-    fig, ax = plt.subplots(figsize=(10, 4))
-    bars = ax.bar(range(len(top)), top["fraction"],
-                  color=plt.cm.tab10(top["n_units_on"] / 6))
-    ax.set_xticks(range(len(top)))
-    ax.set_xticklabels(top["pattern"], fontsize=8, rotation=45, ha="right",
-                       fontfamily="monospace")
-    ax.set_ylabel("fraction of days")
-    ax.set_title(f"NB L={target_l} - most common 6-bit activation patterns "
-                 f"(threshold=0.5, top 15 of {len(freq)} distinct)")
-    ax.set_xlabel("binary pattern  (h0...h5, 1=ON)")
-    for bar, row in zip(bars, top.itertuples()):
-        ax.text(bar.get_x() + bar.get_width() / 2,
-                bar.get_height() + 0.002,
-                f"{row.n_days}d", ha="center", va="bottom", fontsize=7)
+def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
+                           coverage_thresholds: tuple[float, ...] = (0.8, 0.9)):
+    """Pareto-style plot: bars are per-pattern frequency (ranked, all patterns
+    shown), overlaid with a cumulative-coverage line marking how many distinct
+    patterns are needed to account for X% of observed days -- analogous to a
+    PCA scree plot's cumulative-explained-variance cutoff.
+    """
+    freq = freq.sort_values("fraction", ascending=False).reset_index(drop=True)
+    cumulative = freq["fraction"].cumsum().clip(upper=1.0)
+    n = len(freq)
+
+    fig, ax1 = plt.subplots(figsize=(max(10, n * 0.32), 5))
+    # n_units_on in [0, 6] for a 6-bit pattern -- 7 values, so cycle the 6-color
+    # safe PALETTE (index 0 and 6 repeat) rather than escalating to the 8-color
+    # OKABE_ITO set, which would put poor-contrast yellow on one of the bars.
+    n_units_colors = [PALETTE[i % len(PALETTE)] for i in range(7)]
+    ax1.bar(range(n), freq["fraction"],
+            color=[n_units_colors[int(u)] for u in freq["n_units_on"]])
+    ax1.set_xticks(range(n))
+    ax1.set_xticklabels(freq["pattern"], fontsize=7, rotation=90,
+                        fontfamily="monospace")
+    ax1.set_ylabel("fraction of days (this pattern)")
+    ax1.set_xlabel("binary pattern (h0...h5, 1=ON), ranked by frequency")
+    ax1.set_title(f"NB L={target_l} - activation-pattern coverage "
+                 f"(threshold=0.5, {n} distinct patterns of {2 ** target_l} possible)")
+
+    ax2 = ax1.twinx()
+    ax2.plot(range(n), cumulative, color=OKABE_ITO[0], marker="o", ms=3, lw=1.5,
+             label="cumulative coverage")
+    ax2.set_ylabel("cumulative fraction of days")
+    ax2.set_ylim(0, 1.05)
+
+    cutoff_color = OKABE_ITO[6]  # vermillion
+    for i, thr in enumerate(coverage_thresholds):
+        k = int((cumulative >= thr).idxmax()) + 1
+        ax2.axhline(thr, color=cutoff_color, ls="--", lw=0.8, alpha=0.5)
+        ax2.axvline(k - 1, color=cutoff_color, ls="--", lw=0.8, alpha=0.5)
+        ax2.annotate(f"{k} patterns -> {thr:.0%}",
+                     xy=(k - 1, thr), xytext=(k - 1 + n * 0.02, thr - 0.06 - 0.08 * i),
+                     fontsize=8, color=cutoff_color)
+
     fig.tight_layout()
     out = out_dir / "nb_pattern_frequency.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
@@ -718,16 +764,21 @@ def plot_seasonal_profiles(nb_prof: pd.DataFrame, bb_prof: pd.DataFrame,
     n_units = nb_prof.shape[1]
     fig, axes = plt.subplots(2, 1, figsize=(11, 7), sharex=True)
     months = range(1, 13)
-    cmap = plt.cm.tab10
+    unit_colors  = get_palette(n_units)
+    unit_markers = get_markers(n_units)
 
     for ax, prof, title in zip(axes,
                                 [nb_prof, bb_prof],
                                 [f"NB-RBM  (L={target_l})",
                                  f"BB-median  (L={target_l})"]):
         for j, col in enumerate(prof.columns):
-            ax.plot(months, prof.loc[months, col],
-                    marker="o", ms=4, lw=1.5,
-                    color=cmap(j / n_units), label=col)
+            y = prof.loc[months, col]
+            # faint dashed connector + solid marker-only scatter (same style as
+            # fig3's per-year seasonal-shape panel), so series read by marker
+            # shape rather than relying on color alone.
+            ax.plot(months, y, linestyle="--", lw=1.0, color=unit_colors[j], alpha=0.3)
+            ax.plot(months, y, marker=unit_markers[j], linestyle="none",
+                    color=unit_colors[j], markersize=7, alpha=0.95, label=col)
         ax.set_ylabel("mean P(h=1|v)")
         ax.set_title(title, fontsize=10)
         ax.legend(loc="upper right", fontsize=7, ncol=n_units)

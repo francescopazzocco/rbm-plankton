@@ -32,6 +32,7 @@ import matplotlib.pyplot as plt
 
 from models import utils as model_utils
 from models import io as data_io
+from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 
 # NOTE: instantiate_model_from_weights below is a second implementation of what
@@ -448,28 +449,29 @@ def main():
         fig, axes = plt.subplots(nrows, 2, figsize=(18, 6 * nrows))
         axes = np.atleast_2d(axes)
         x = np.arange(D)
-        axes[0, 0].errorbar(x, recon_means, yerr=recon_stds, fmt='o')
+        panel_colors = get_palette(4)
+        axes[0, 0].errorbar(x, recon_means, yerr=recon_stds, fmt='o', color=panel_colors[0])
         axes[0, 0].set_xticks(x)
         axes[0, 0].set_xticklabels(species, rotation=90, fontsize=6)
         axes[0, 0].set_title('Reconstruction Error by Species')
         axes[0, 0].set_ylabel('L2 error')
         axes[0, 0].grid(alpha=0.5)
 
-        axes[0, 1].errorbar(x, dist_means, yerr=dist_stds, fmt='o', color='C1')
+        axes[0, 1].errorbar(x, dist_means, yerr=dist_stds, fmt='o', color=panel_colors[1])
         axes[0, 1].set_xticks(x)
         axes[0, 1].set_xticklabels(species, rotation=90, fontsize=6)
         axes[0, 1].set_title('Reconstructed Distance (other entries)')
         axes[0, 1].set_ylabel('L2 distance')
         axes[0, 1].grid(alpha=0.5)
 
-        axes[1, 0].errorbar(x, cos_masked_means, yerr=cos_masked_stds, fmt='o', color='C2')
+        axes[1, 0].errorbar(x, cos_masked_means, yerr=cos_masked_stds, fmt='o', color=panel_colors[2])
         axes[1, 0].set_xticks(x)
         axes[1, 0].set_xticklabels(species, rotation=90, fontsize=6)
         axes[1, 0].set_title('Cosine Similarity (masked entry)')
         axes[1, 0].set_ylabel('cosine similarity')
         axes[1, 0].grid(alpha=0.5)
 
-        axes[1, 1].errorbar(x, cos_other_means, yerr=cos_other_stds, fmt='o', color='C3')
+        axes[1, 1].errorbar(x, cos_other_means, yerr=cos_other_stds, fmt='o', color=panel_colors[3])
         axes[1, 1].set_xticks(x)
         axes[1, 1].set_xticklabels(species, rotation=90, fontsize=6)
         axes[1, 1].set_title('Cosine Similarity (other entries)')

@@ -30,6 +30,7 @@ from scipy import stats
 
 from models import paths
 from models.io import partition_rows
+from models.palette import get_markers, get_palette
 
 # ---------------------------------------------------------------------------
 # Parameters
@@ -189,13 +190,14 @@ def fig3_annual_seasonal(df_clean, taxa_cols, out_dir):
     ax.grid(True, alpha=0.3)
 
     # Right: seasonal shape per year (log scale)
-    # Okabe-Ito palette: colorblind-safe (deuteranopia/protanopia/tritanopia),
-    # paired with distinct markers so lines don't rely on color alone.
+    # Shared Okabe-Ito palette: colorblind-safe (deuteranopia/protanopia/
+    # tritanopia), paired with distinct markers so lines don't rely on color alone.
     ax2 = axes[1]
-    year_colors  = ["#000000", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#0072B2"]
-    year_markers = ["o", "s", "^", "D", "v", "P"]
+    years_shown  = [2019, 2020, 2021, 2022, 2023, 2024]
+    year_colors  = get_palette(len(years_shown))
+    year_markers = get_markers(len(years_shown))
     month_labels = ["J","F","M","A","M","J","J","A","S","O","N","D"]
-    for i, yr in enumerate([2019, 2020, 2021, 2022, 2023, 2024]):
+    for i, yr in enumerate(years_shown):
         if yr in monthly.columns:
             ax2.semilogy(monthly.index, monthly[yr], linestyle="--", lw=4.0,
                          color=year_colors[i], alpha=0.3)
