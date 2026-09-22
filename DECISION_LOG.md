@@ -382,3 +382,218 @@ The sampling bug found during this investigation: the old `_ph_given_v` applied 
 **Rationale:** The softmax mixture-of-experts assumption is too rigid for plankton community data, where multiple ecological processes (bloom, succession, seasonality) overlap. A distributed representation (Bernoulli or Sigmoid) is necessary to capture overlapping factors.
 
 **Consequences:** NBSoftmaxRBM retained in the codebase for completeness but not recommended for further use. It is excluded from the main sweep.
+
+---
+
+## LOG-025 · `training_runs/` is the canonical run directory; all locations live in `paths.py`
+
+**Context:** Twelve scripts each re-derived the repository root with
+`Path(__file__).parent.parent.parent` and then appended their own idea of where
+the trained runs live. Six of them, plus `code/train/config.py`,
+`ARCHITECTURE.md`, `README.md` and `.claude/SESSION_TRACKING.md`, named
+`trained_models/`. On disk the 84 run directories have always been in
+`training_runs/`, which `.gitignore` labelled "legacy". The consequence was not a
+crash: `discover_run_dirs` found nothing, every family was skipped, and the whole
+`analysis/` + `diagnostic/` layer printed "no runs found" and exited 0. The
+packaging work (`pyproject.toml`, editable install of `code/src` as `models`)
+made the `models` package importable from any working directory but said nothing
+about data or output locations, so the drift was invisible to it.
+
+**Decision:** The runs stay where they are, on disk, in `training_runs/`; the
+code and the documentation are corrected to point there. A new module
+`code/src/models/paths.py` owns every filesystem location — `PROJECT_ROOT`,
+`DATA_PATH`, `RUNS_ROOT`, `RESULTS_ROOT`, `DIAGNOSTIC_ROOT` — and the
+chronological/shuffled run-directory naming. `PROJECT_ROOT` is overridable with
+the `RBM_PLANKTON_ROOT` environment variable. No script derives a root of its
+own.
+
+The split strategy becomes a value, `CHRONO` or `SHUFFLED`, converted to the
+`_shuffled` directory suffix only by `paths.run_dir()`. `config.SHUFFLE_SPLIT`
+(a bool that controlled the shuffling) and `config.SHUFFLE_TAG` (a string that
+controlled the directory name) are replaced by the single `config.SPLIT`.
+
+**Rationale:** Renaming the directory on disk was the alternative, and it would
+have matched the existing documentation. It was rejected because it moves 47 MB
+of irreplaceable trained weights plus a `training_runs.zip` archive to satisfy a
+naming preference, and because the ambiguity has to be removed at its source in
+either case: the defect was twelve independent definitions of the same path, not
+the name they used. The paths are deliberately *not* declared in
+`pyproject.toml` — reading it at runtime requires first locating it, which is
+the same root-finding problem plus a `tomllib` dependency.
+
+Two independent constants for one concept (`SHUFFLE_SPLIT`, `SHUFFLE_TAG`) is a
+latent footgun: setting the bool without the tag writes shuffled runs into the
+chronological directories, silently mixing two split strategies in one run
+directory.
+
+**Consequences:** All fourteen non-deferred scripts now run on a clean checkout
+and produce output. Verified numerically behaviour-preserving: the rebuilt
+`io.load_model` yields bit-identical parameters to the four loaders it replaces,
+`load_nan_rows`/`scale_counts`/`binarise_rows` reproduce their predecessors
+exactly, and every deterministic tracked output regenerates byte-identical.
+`trained_models/` remains gitignored so a stale reference cannot silently create
+a second run directory.
+
+Recorded here and not fixed: the Bernoulli runs currently in `training_runs/`
+store thresholds in organisms/μL, i.e. they predate LOG-024, whose consequences
+section describes thresholds in organisms/mL. `io.binarise_rows` compares the
+NaN rows to the stored thresholds unscaled, which is correct for exactly these
+runs and would silently binarise almost everything to 0 for a Bernoulli family
+retrained with the current `train.py`. The function now warns instead of scoring
+silently; choosing the fix belongs with the scale-invariance test in the
+validation phase.
+
+---
+
+## LOG-028 · `code/` split into `src/` (library) and `scripts/` (entry points)
+
+**Context:** `code/train/`, `code/diagnostic/`, `code/analysis/` and
+`code/archive/` sat as siblings of `code/src/models/` — the installable
+library and the CLI entry points that import it were indistinguishable by
+path alone. This surfaced when a teammate pushed two commits straight to
+`master` (`custom_analysis/`, `scripts/`) that duplicated existing
+`code/analysis/` scripts under new top-level directories, one of them
+reintroducing the `sys.path.insert` hack `c6bb000` had removed — there was no
+structural cue for where a new pipeline script belongs.
+
+**Decision:** `code/train/`, `code/diagnostic/`, `code/analysis/`,
+`code/archive/` move to `code/scripts/{train,diagnostic,analysis,archive}/`.
+`code/src/models/` is unchanged and remains the only importable package
+(`pip install -e .`). The convention going forward: new reusable logic goes
+in `src/models/`; new pipeline entry points go in the matching
+`scripts/<stage>/` directory; nothing under `scripts/` reimplements what
+`src/models/` already provides.
+
+**Consequences:** Every path reference in docstrings, `README.md`,
+`ARCHITECTURE.md` and `results/README.md` updated to `code/scripts/...`.
+`pyproject.toml` package discovery (`where = ["code/src"]`) and the CI
+workflow (lints/tests `code/src/models` and `tests/` only) were already
+scoped to `src/` and needed no change. The teammate's duplicate
+`custom_analysis/` and `scripts/` content is to be discarded, not merged, once
+`origin/master` is reconciled with local history — recorded as a follow-up,
+not resolved by this entry.
+
+---
+
+## LOG-029 · ZINB not recommended for reconstruction/imputation; deficit is mostly a Gibbs-mixing artifact, not enough to change the ranking
+
+**Context:** `nan_eval_summary.csv` (`code/scripts/diagnostic/nan_test_eval.py`)
+showed ZINB (and its sigmoid/softmax hidden-unit variants) with worse NaN-imputation
+NLL than the matching NB variant across all three missingness patterns (p3, p31,
+p54), consistently regardless of hidden-unit type. Working hypothesis: not a
+genuine deficiency of zero-inflation as a modelling choice, but an artefact of
+`score_row_gibbs` (`code/src/models/_eval_utils.py`) — the imputation loop
+initialises missing positions at `v=0` (the value zero-inflation most favours)
+and, via `_sample_zinb`, redraws the discrete `z ~ Bernoulli(pi)` zero/non-zero
+branch every Gibbs step, unlike NB's single smooth mode. This could anchor a
+short, non-persistent chain (5 + 3·n_miss steps — PCD does not apply outside
+training, where weights persist chain state across updates; see LOG-016) to the
+zero-inflated mode.
+
+**Test:** `code/scripts/diagnostic/zinb_meanfield_test.py` re-scored the same
+rows and runs, replacing the ancestral `sample_zinb` step inside the imputation
+loop with the deterministic conditional mean `(1-pi)*mu` (`meanfield_zinb` in
+`_eval_utils.py`), leaving the final scoring likelihood (`loss_zinb`, full ZINB
+log-prob) unchanged in both variants. Single run, no fixed seed, no repeats.
+
+**Results (mean NLL on observed taxa):**
+
+| run | pattern | ancestral | mean-field | NB-Sigmoid (best NB variant, same pattern) |
+|---|---|---|---|---|
+| zinb L8 shuffled         | p3  | 0.422 | 0.417 | 0.375 |
+| zinb L8 shuffled         | p31 | 0.574 | 0.549 | 0.508 |
+| zinb L8 shuffled         | p54 | 0.360 | 0.327 | 0.306 |
+| zinb_sigmoid L7 shuffled | p3  | 0.414 | 0.407 | 0.375 |
+| zinb_sigmoid L7 shuffled | p31 | 0.539 | 0.549 | 0.508 |
+| zinb_sigmoid L7 shuffled | p54 | 0.336 | 0.325 | 0.306 |
+| zinb_softmax L6 shuffled | p3  | 0.430 | 0.430 | 0.375 |
+| zinb_softmax L6 shuffled | p31 | 0.571 | 0.562 | 0.508 |
+| zinb_softmax L6 shuffled | p54 | 0.355 | 0.354 | 0.306 |
+
+**Decision:** ZINB, in any hidden-unit variant, is not recommended for
+reconstruction or NaN-imputation. `NBSigmoidRBM` (LOG-021) remains the model of
+choice for both latent-pattern extraction and reconstruction/imputation — one
+model serves both purposes.
+
+**Rationale:** The mean-field substitution confirms the mixing-artifact
+hypothesis for the base ZINB (Bernoulli hidden): it recovers most of the p31/p54
+gap to NB, nearly closing it on p54 (0.360 → 0.327 vs. NB-Sigmoid's 0.306). This
+means much of plain ZINB's apparent deficit was a property of the evaluation
+procedure, not the model. Sigmoid/softmax ZINB variants show a smaller, less
+consistent recovery (p31 for zinb_sigmoid gets *worse* under mean-field),
+indicating the zero-inflation/hidden-unit-type interaction there is not
+primarily a mixing problem. Critically, **NB-Sigmoid still has the lowest NLL of
+every row in the table above, ancestral or mean-field, on every pattern** — the
+residual gap (0.02–0.04) is smaller than the original ancestral gap but never
+crosses zero. Whether the residual reflects a real (if modest) NB advantage or
+further evaluation noise is not resolved — `score_row_gibbs` has no fixed seed,
+and per-row NLL std in the original sweep (~0.13–0.20) dwarfs these deltas — but
+it does not matter for the decision: closing the artifact fully would only tie
+ZINB with the already-superior NB-Sigmoid, never surpass it. There is no
+outcome consistent with the data in which ZINB becomes the better choice.
+
+**Consequences:** No architecture change. `NBSigmoidRBM` (LOG-021) stands
+unchallenged as the canonical model for both narratives (pattern extraction,
+reconstruction). The mean-field imputation variant and its diagnostic script
+are kept as exploratory tooling (`diagnostic_outputs/zinb_meanfield_test/`,
+untracked) — not promoted to the canonical NaN-evaluation method, since that
+remains open (ROADMAP "Now" #2) and the mean-field variant was never intended
+as a replacement, only as a probe. The init-sensitivity test proposed alongside
+it (0 vs. unconditional mean vs. random NB draw as the missing-position
+initialiser) and a multi-seed repeat of this comparison are not pursued: with
+the ranking already settled, they would sharpen the explanation, not change the
+recommendation.
+
+---
+
+## LOG-029 · `results/` becomes a published tier: `publish_results.py` + `MANIFEST.json`
+
+**Context:** Nine analysis/diagnostic scripts wrote figures and tables
+directly into tracked `results/`, alongside others that already wrote into
+gitignored `diagnostic_outputs/` — an inconsistency decided per-script, not by
+policy. Consequence, observed directly this session: a routine post-rename
+verification pass (re-running every script to confirm the `code/scripts/`
+move didn't break anything) silently overwrote eight report-cited figures and
+tables with no record of why. Separately, `results/README.md` had documented
+for some time that `03_evaluation/`, part of `04_model_selection/` and
+`diagnostics/` were "frozen snapshots" — tracked files the current code no
+longer regenerates because the producing script had since moved to
+`diagnostic_outputs/` — an open item with no resolution path.
+
+**Decision:** `results/` is now a published tier, `diagnostic_outputs/` the
+only staging tier. Every script that used to import `RESULTS_ROOT` now writes
+into the equivalent `DIAGNOSTIC_ROOT` subtree instead — including
+`use_trained_rbm.py` and `compare_model_reconstructions.py`, whose
+`results/reconstruction_plots/` default was cwd-relative and never actually
+covered by `paths.py`, nor by `.gitignore`'s tracked-results allowlist (an
+accidental gap, not a decision — those plots were never meant to be tracked).
+No script writes to `results/` any more, full stop.
+
+`code/scripts/publish_results.py` is the one door in: it copies a named
+category (or `--all`) from `diagnostic_outputs/` into `results/` and records
+each copied file in `results/MANIFEST.json` via the new `models.manifest`
+module — producing script, git commit, publish timestamp. Two scripts may
+publish into the same `results/` folder (e.g. `02_model_analysis`) without
+clobbering each other's entries; only the files actually copied get touched.
+`tests/test_results_manifest.py` fails CI if a tracked file under `results/`
+has no manifest entry, which is what makes "someone bypassed
+`publish_results.py`" a caught condition rather than a silent one.
+
+**Consequences:** The "frozen snapshot" open item is resolved by construction
+— resolving today's already-generated output through the new publish flow
+surfaced seven genuinely stale tracked files that no current script produces
+under those exact paths any more (an old flat `sweep_shuffled_final_metric.png`
+naming superseded by the `shuffled/` subdirectory convention; three
+`tables/hidden/*.csv` files missing the `zinb` family and later `L` values
+added since). Removed via `git rm`, superseded by their correctly-published
+equivalents elsewhere in the tree. `results/README.md` rewritten to describe
+the tier boundary instead of a per-directory "refreshed?" table that had
+already drifted out of date once. `.gitignore` gained an explicit
+`!results/MANIFEST.json` — it would otherwise have been silently swallowed by
+the blanket `results/*` pattern, the same class of gap that hid
+`reconstruction_plots/` above.
+
+**Left as a follow-up, not decided here:** `training_runs/` (the weights
+themselves) gets no equivalent provenance ledger — raised in conversation,
+scoped out as a separate tier with a different lifecycle (gitignored, never
+published, owned solely by `train.py`/`paths.RUNS_ROOT`).

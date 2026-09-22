@@ -29,15 +29,29 @@ BaseRBM                         base_rbm.py
 
 ## Now
 
-1. **Run NBSigmoidRBM shuffled sweep** — L∈[4,5,6,7], 10 seeds, shuffled split, 500 epochs
-2. **Run NBSoftmaxRBM shuffled sweep** — L∈[4,5,6], 10 seeds, shuffled split, 500 epochs
+1. **Validation phase (§B of `.claude/REORG_AND_VALIDATION.md`)** — tests that check
+   mathematics rather than shapes, then fix the defects that survived the
+   reorganisation. Highest-value first: `BernoulliRBM.pll` against brute force
+   (it drives Bernoulli model selection and has no test), NB/ZINB log-prob
+   against `scipy.stats.nbinom`, the clamping invariant of `score_row_gibbs`.
+2. **Settle the canonical NaN-evaluation method** — LOG-018's numbers came from a
+   method no longer in the tree; `nan_test_eval` samples, `split_comparison`
+   injects means. Closes with a new ADR, never an edit to LOG-018.
 
 ---
 
 ## Next
 
-1. **Run NBSigmoidRBM chronological sweep** — L∈[4,5,6,7], 10 seeds, chronological split, 500 epochs
-2. **Evaluate sweep results** — compare NLL vs NB-Bernoulli baseline, check stability and h_mean
+1. **Read and repair `compare_model_reconstructions.py` and the four archetype
+   scripts** — deliberately untouched in the reorganisation phase pending review
+   by their authors. Dispositions proposed in §A-3 of the reorganisation report.
+2. **Decide where the diagnostic figures belong** — tracked `results/` (cited by
+   the report) or untracked `diagnostic_outputs/` (regeneratable). Today several
+   tracked figures are frozen snapshots that a re-run does not refresh; see
+   `results/README.md`.
+3. **Bernoulli threshold units** — runs on disk store thresholds in organisms/μL
+   and predate LOG-024; a retrained Bernoulli family would break
+   `io.binarise_rows` silently. Guarded by a warning, not fixed.
 
 ---
 
@@ -64,6 +78,8 @@ BaseRBM                         base_rbm.py
 
 | Item | Resolution |
 |---|---|
+| NBSigmoidRBM / NBSoftmaxRBM shuffled sweeps | Complete and written up (LOG-021, LOG-022). |
+| Codebase reorganisation (§A of the reorganisation report) | Complete (LOG-025). One run root, one loader, one preprocessing path; every non-deferred script runs. |
 | L-sweep [3,4,5,6,7,10] — BB-RBM and NBB-RBM | Complete. nb_L10 diverged (LOG-012); excluded from NB analysis. |
 | Bias absorber at L=5 (h1 always-on) | Was a first-run training artifact. All hidden units active across all current runs. |
 | NLL/PLL plateau qualitative confirmation | Confirmed by `sweep_analysis.py` — diminishing returns beyond L=5–7. |
@@ -76,3 +92,4 @@ BaseRBM                         base_rbm.py
 | January–February 2023 anomaly | Closed (LOG-019). Total abundance ~7× mean Dec 2022–Feb 2023. Eyring 2025 covers the period, documents no instrument issue, and states their philosophy is to preserve genuine biological variability. Retained as probable real ecological event; no exclusion. |
 | NB_ReLU_RBM viability | Abandoned (LOG-020). Clamp [0,5] required but 6/10 seeds still divergent at scale. ReLU is fundamentally mismatched with count-scale visible units. |
 | Hidden monitoring mixins | Complete. `BernoulliHiddenMonitor`, `ReLUHiddenMonitor`, `SigmoidHiddenMonitor`, `SoftmaxHiddenMonitor` in `_hidden_monitors.py`. |
+| ZINB underperformance on NaN-imputation: mixing artifact or genuine? | Closed (LOG-029). Mean-field imputation (`zinb_meanfield_test.py`) confirms mixing artifact explains most of plain ZINB's gap to NB, but NB-Sigmoid still has the lowest NLL on every pattern regardless. ZINB not recommended for reconstruction in any hidden-unit variant; `NBSigmoidRBM` unchanged as canonical model. |

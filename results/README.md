@@ -1,20 +1,60 @@
 # Results
 
+`results/` is a **published** tier: every file in it arrived through
+`code/scripts/publish_results.py`, never through a script writing here
+directly. No script imports `RESULTS_ROOT` any more — they all write into the
+matching subtree of the gitignored `diagnostic_outputs/` (the staging tier),
+and publishing is a separate, explicit step. See `ARCHITECTURE.md` and
+`DECISION_LOG` LOG-029 for why.
+
+## Provenance — `MANIFEST.json`
+
+Every tracked file here (except this README and the manifest itself) has an
+entry in `MANIFEST.json`: which script produced it, the git commit the
+working tree was at when it was published, and the publish timestamp.
+`tests/test_results_manifest.py` fails CI if a tracked file has no entry —
+that is what stops a plain `git add results/...` from bypassing this.
+
+To look up what produced a file: `results/MANIFEST.json` is keyed by path
+relative to `results/`. To publish fresh output, regenerate it into
+`diagnostic_outputs/` by running the producing script (below), then:
+
+```
+python code/scripts/publish_results.py <category>   # e.g. 02_model_analysis
+python code/scripts/publish_results.py --all         # everything at once
+```
+
 ## Figures
 
-| Directory | Content |
-|---|---|
-| `01_exploratory/` | Dataset EDA: row sums, periodogram, seasonal patterns, marginal distributions, NaN structure |
-| `02_model_analysis/` | Learned representations: weight profiles, hidden state timelines, seasonal profiles, cross-model correlations, mean activations |
-| `03_evaluation/` | Model evaluation: NaN imputation test, chronological vs shuffled split comparison |
-| `04_model_selection/` | L-sweep final validation metrics — best model families and hidden layer sizes |
-| `diagnostics/` | Training curves and diagnostic plots from hyperparameter sweeps (chronological + shuffled splits) |
+| Directory | Content | Produced by |
+|---|---|---|
+| `01_exploratory/` | Dataset EDA: row sums, periodogram, seasonal patterns, marginal distributions, NaN structure | `code/scripts/train/dataset_analysis.py` |
+| `02_model_analysis/` | Learned representations: weight profiles, hidden state timelines, seasonal profiles, cross-model correlations, mean activations, hidden patterns, stackplots | the `code/scripts/analysis/hidden_*` scripts, `rbm_hidden_stackplot.py`, `plot_visible_by_hidden.py` |
+| `02_model_analysis/shuffled/` | The same, for the shuffled-split runs | same scripts with `--split shuffled` |
+| `03_evaluation/` | NaN imputation test, chronological vs shuffled split comparison | `code/scripts/diagnostic/nan_test_eval.py`, `split_comparison.py` |
+| `04_model_selection/` | Final validation metrics vs L | `code/scripts/diagnostic/sweep_analysis.py`, `code/scripts/archive/plot_final_metric_nb.py` |
+| `04_model_selection/shuffled/`, `diagnostics/sweep/shuffled/` | The same, shuffled split | `sweep_analysis.py --split shuffled` |
+| `diagnostics/` | Train-NLL curves and sweep diagnostics | `code/scripts/archive/plot_*_nll.py`, `sweep_analysis.py` (nested under `diagnostics/sweep/`) |
+
+Chronological-split results sit directly in each directory; shuffled-split
+results go in a `shuffled/` subdirectory of the same one.
 
 ## Tables
 
-| Path | Content |
-|---|---|
-| `tables/hidden/` | Hidden unit activation analysis CSVs (cross-model correlation, state frequency, seasonal profiles) |
-| `tables/nan_eval_rows.csv` | Per-row NaN imputation NLL |
-| `tables/nan_eval_summary.csv` | Aggregated NaN imputation statistics per (family, missingness pattern) |
-| `tables/split_comparison.csv` | Head-to-head chronological vs shuffled split NLL comparison |
+| Path | Content | Produced by |
+|---|---|---|
+| `tables/hidden/` | Hidden unit activation analysis CSVs (cross-model correlation, matched pairs, seasonal profiles, pattern frequency) | `hidden_cross_model.py` |
+| `tables/split_comparison.csv` | Head-to-head chronological vs shuffled split NLL comparison | `code/scripts/diagnostic/split_comparison.py` |
+| `tables/nan_eval_rows.csv`, `tables/nan_eval_summary.csv` | Per-row and aggregated NaN imputation NLL | `code/scripts/diagnostic/nan_test_eval.py` |
+
+## Not published here
+
+`diagnostic_outputs/training_curves/`, `reconstruction_plots/`,
+`nan_eval_extended/` (its non-csv/png remainder) and `zinb_meanfield_test/`
+are scratch-only by design — exploratory or per-run inspection output with no
+report-citation role. They stay in `diagnostic_outputs/`, gitignored,
+regenerated on demand, never published.
+
+`training_runs/` (the trained weights themselves) is a separate tier again:
+gitignored, never committed, owned by `paths.RUNS_ROOT`. Not covered by this
+manifest.

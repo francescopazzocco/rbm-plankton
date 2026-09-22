@@ -138,3 +138,18 @@ def sample_zinb(rbm, h: torch.Tensor) -> torch.Tensor:
 
 def sample_bern(rbm, h: torch.Tensor) -> torch.Tensor:
     return torch.bernoulli(rbm._pv_given_h(h))
+
+
+def meanfield_nb(rbm, h: torch.Tensor) -> torch.Tensor:
+    """Deterministic NB conditional mean, in place of an ancestral count draw."""
+    return rbm._mu(h)
+
+
+def meanfield_zinb(rbm, h: torch.Tensor) -> torch.Tensor:
+    """Deterministic ZINB conditional mean (1-pi)*mu, in place of ancestral
+    sampling of the discrete zero/non-zero branch (z ~ Bernoulli(pi)).
+
+    Used to test whether ancestral sampling's repeated z draw is what anchors
+    the imputation chain to the zero-inflated mode (see ROADMAP.md, "Now" #3).
+    """
+    return (1 - rbm._pi().unsqueeze(0)) * rbm._mu(h)

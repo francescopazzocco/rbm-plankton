@@ -22,7 +22,7 @@
 
 ## Preprocessing
 
-Two paths, selected by the `family` string in `code/train/config.py`.
+Two paths, selected by the `family` string in `code/scripts/train/config.py`.
 Both apply `COUNT_SCALE=1000` (organisms/μL → organisms/mL) as a shared first step for numerical stability (see LOG-024).
 
 **Bernoulli path** (`load_and_binarise`):
@@ -42,7 +42,7 @@ NaN rows are retained separately as a structured post-training test set.
 
 ## Models
 
-Model families are selected by the `family` string in `L_VALUES` (see `code/train/config.py`).  
+Model families are selected by the `family` string in `L_VALUES` (see `code/scripts/train/config.py`).  
 All models share the `BaseRBM` initialisation (`W`, `a`, `b`, scale_init).  
 Hidden monitoring is injected via mixins from `_hidden_monitors.py`.
 
@@ -164,26 +164,56 @@ Hidden monitoring is injected via mixins from `_hidden_monitors.py`.
 ```
 code/
   src/models/                   core library (RBM model classes, I/O, utils, plotting)
-  train/                        "make me" pipeline
-    config.py                     experiment hyperparameters + data locations + single-run flag
-    train.py                      single-run (default) or multi-seed sweep trainer
-  train/                        training pipeline — "make me a model"
-    config.py                     experiment hyperparameters + data locations + single-run flag
-    dataset_analysis.py           pre-training EDA → results/01_exploratory/
-    train.py                      single-run (default) or multi-seed sweep trainer
-  diagnostic/                   model evaluation — "did the training work?"
-    sweep_analysis.py             L-sweep metrics → results/04_model_selection/
-    split_comparison.py           split strategy comparison → results/03_evaluation/
-    nan_test_eval.py              NaN imputation evaluation → diagnostic_outputs/nan_eval_extended/ + results/03_evaluation/
-    plot_training_runs.py         training curves from trained_models/
-  analysis/                     ecological interpretation — "what do the hidden units mean?"
-    hidden_coactivation.py        weight profiles + state timelines → results/02_model_analysis/
-    hidden_mean_activation.py     mean activation per unit → results/02_model_analysis/
-    hidden_cross_model.py         NB↔BB cross-model comparison → results/02_model_analysis/ + tables/hidden/
-    plot_visible_by_hidden.py     visible-unit probabilities per hidden node
-    archetype_rbm_comparison.py   quantitative comparison with Cheng's archetypes
-  archive/                      one-off plot scripts (gitignored)
-    plot_final_metric_nb.py       final NLL vs L for NB+ZINB sigmoid/softmax
-    plot_sigmoid_nll.py           nb_sigmoid train NLL curves
-    plot_zinb_nll.py              ZINB sigmoid/softmax train NLL curves
+    paths.py                      every filesystem location + chrono/shuffled naming
+    io.py                         preprocessing, run navigation, model loading
+  scripts/                     entry points — import the library, never reimplement it
+    train/                        training pipeline — "make me a model"
+      config.py                     experiment hyperparameters + SPLIT + single-run flag
+      dataset_analysis.py           pre-training EDA → results/01_exploratory/
+      train.py                      single-run (default) or multi-seed sweep trainer
+    diagnostic/                   model evaluation — "did the training work?"
+      sweep_analysis.py             L-sweep metrics → diagnostic_outputs/04_model_selection/
+                                    + diagnostic_outputs/diagnostics/sweep/
+      split_comparison.py           split strategy comparison → results/tables/
+                                    + diagnostic_outputs/03_evaluation/
+      nan_test_eval.py              NaN imputation evaluation → diagnostic_outputs/nan_eval_extended/
+      plot_training_runs.py         training curves from training_runs/ → diagnostic_outputs/training_curves/
+    analysis/                     ecological interpretation — "what do the hidden units mean?"
+      hidden_dominant_state.py      dominant state timelines + weight profiles → results/02_model_analysis/
+      hidden_mean_activation.py     mean activation per unit → results/02_model_analysis/
+      hidden_cross_model.py         NB↔BB cross-model comparison → results/02_model_analysis/ + tables/hidden/
+      hidden_pattern_analysis.py    binary hidden patterns of one run → results/02_model_analysis/hidden_patterns/
+      rbm_hidden_stackplot.py       hidden activation share over time → results/02_model_analysis/
+      plot_visible_by_hidden.py     visible-unit probabilities per hidden node
+      use_trained_rbm.py            load one run and inspect it (CLI)
+      compare_model_reconstructions.py   reconstruction comparison across families
+      archetype_rbm_comparison.py        quantitative comparison with Cheng's archetypes
+      distance_archetypes_rbm.py         archetype↔hidden-unit distance
+      overlap_archetypes_rbm.py          archetype↔hidden-unit overlap
+      archetype_closest_rbm_scatter.py   closest-archetype scatter
+    archive/                     one-off plot scripts (gitignored)
+      plot_final_metric_nb.py       final NLL vs L for NB+ZINB sigmoid/softmax
+      plot_sigmoid_nll.py           nb_sigmoid train NLL curves
+      plot_zinb_nll.py              ZINB sigmoid/softmax train NLL curves
 ```
+
+Trained runs live in `training_runs/{family}_L{n}[_shuffled]/seed_{k}/`.  The
+run root, the dataset path and the two output roots are defined once in
+`paths.py` and overridable with `RBM_PLANKTON_ROOT`; the `_shuffled` suffix is
+produced by `paths.run_dir()` from a `chrono`/`shuffled` value, never assembled
+at a call site.
+
+### Output tiers
+
+Three tiers, three lifecycles (see LOG-029):
+
+- `training_runs/` — trained weights and training logs. Gitignored, never
+  committed, regenerated by `train.py`. Not covered by anything below.
+- `diagnostic_outputs/` — staging tier. Every script under `code/scripts/`
+  writes here by default (`paths.DIAGNOSTIC_ROOT`). Gitignored, freely
+  overwritten by re-running a script.
+- `results/` — published tier (`paths.RESULTS_ROOT`), tracked in git. No
+  script writes here directly; `code/scripts/publish_results.py` is the only
+  path in, and it records provenance (producing script, git commit, publish
+  timestamp) in `results/MANIFEST.json` for every file it copies. See
+  `results/README.md`.

@@ -1,6 +1,8 @@
 import pandas as pd
 from models.io import (
+    CHRONO,
     METRIC_COL,
+    SHUFFLED,
     best_seed_dir,
     discover_run_dirs,
     load_hidden_activations,
@@ -22,21 +24,22 @@ def test_discover_run_dirs_groups_by_family_and_l(tmp_path):
     _make_seed_dir(tmp_path, "nb_L4", seed=0, val_pll=0.3)
     (tmp_path / "not_a_run_dir").mkdir()
 
-    runs = discover_run_dirs(tmp_path)
+    runs = discover_run_dirs(tmp_path, CHRONO)
 
     assert set(runs.keys()) == {"bernoulli_median", "nb"}
     assert set(runs["bernoulli_median"].keys()) == {4, 6}
     assert len(runs["nb"][4]) == 1
 
 
-def test_discover_run_dirs_respects_suffix(tmp_path):
+def test_discover_run_dirs_selects_only_the_requested_split(tmp_path):
     _make_seed_dir(tmp_path, "nb_L4_shuffled", seed=0, val_pll=0.3)
-    _make_seed_dir(tmp_path, "nb_L4", seed=0, val_pll=0.3)
+    _make_seed_dir(tmp_path, "nb_L6", seed=0, val_pll=0.3)
 
-    runs = discover_run_dirs(tmp_path, suffix="_shuffled")
+    shuffled = discover_run_dirs(tmp_path, SHUFFLED)
+    chrono   = discover_run_dirs(tmp_path, CHRONO)
 
-    assert list(runs.keys()) == ["nb"]
-    assert list(runs["nb"].keys()) == [4]
+    assert list(shuffled["nb"].keys()) == [4]
+    assert list(chrono["nb"].keys()) == [6]
 
 
 def test_best_seed_dir_picks_lowest_final_metric(tmp_path):

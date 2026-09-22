@@ -166,7 +166,7 @@ LR_PARAM_MULTIPLIER = 0.1
 # ---------------------------------------------------------------------------
 
 # Canonical ordering for all batch-analysis scripts (hidden_mean_activation,
-# hidden_coactivation, nan_test_eval, etc.).  Kept in one place so that
+# hidden_dominant_state, nan_test_eval, etc.).  Kept in one place so that
 # adding or renaming a family propagates everywhere automatically.
 ALL_FAMILIES = [
     "bernoulli_median", "bernoulli_zero",
