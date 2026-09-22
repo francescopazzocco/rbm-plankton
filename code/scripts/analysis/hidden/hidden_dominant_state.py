@@ -9,28 +9,34 @@ Two figures per model family:
   1. Weight profiles: species x hidden unit heatmap (species sorted by dominant unit)
   2. Dominant state timeline: each date assigned to its argmax hidden unit, one row per L
 
-Output: results/02_model_analysis/weight_profiles_{family}.png
-        results/02_model_analysis/state_timeline_{family}.png
-        (shuffled-split runs under results/02_model_analysis/shuffled/)
+Output: results/02_model_analysis/hidden/weight_profiles_{family}.png
+        results/02_model_analysis/hidden/state_timeline_{family}.png
+        (shuffled-split runs under results/02_model_analysis/hidden/shuffled/)
 
 Usage:
-    python code/scripts/analysis/hidden_dominant_state.py [--split chrono|shuffled]
+    python code/scripts/analysis/hidden/hidden_dominant_state.py [--split chrono|shuffled]
 """
 
 import argparse
 from pathlib import Path
 
 import pandas as pd
-
 from models._constants import ALL_FAMILIES
 from models.io import (
-    CHRONO, SPLITS, best_seed_dir, discover_run_dirs, METRIC_COL,
-    split_out_dir, split_suffix,
+    CHRONO,
+    METRIC_COL,
+    SPLITS,
+    best_seed_dir,
+    discover_run_dirs,
+    split_out_dir,
+    split_suffix,
 )
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 from models.visualization import (
-    load_activations, dominant_state,
-    plot_weight_profiles, plot_state_timeline,
+    dominant_state,
+    load_activations,
+    plot_state_timeline,
+    plot_weight_profiles,
 )
 
 
@@ -46,7 +52,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    out_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis", args.split)
+    out_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden", args.split)
     out_dir.mkdir(parents=True, exist_ok=True)
     all_dirs = discover_run_dirs(args.runs_root, args.split)
 

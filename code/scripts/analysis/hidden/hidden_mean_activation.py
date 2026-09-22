@@ -4,22 +4,26 @@ hidden_mean_activation.py - Mean hidden unit activation across L values.
 For each model family and L, computes the mean activation of each hidden unit
 over all samples. Identifies always-on (bias absorber) and always-off units.
 
-Output: results/02_model_analysis/mean_activation_{family}.png
-        (shuffled-split runs under results/02_model_analysis/shuffled/)
+Output: results/02_model_analysis/hidden/mean_activation_{family}.png
+        (shuffled-split runs under results/02_model_analysis/hidden/shuffled/)
 
 Usage:
-    python code/scripts/analysis/hidden_mean_activation.py [--split chrono|shuffled]
+    python code/scripts/analysis/hidden/hidden_mean_activation.py [--split chrono|shuffled]
 """
 
 import argparse
 from pathlib import Path
 
 import pandas as pd
-
 from models._constants import ALL_FAMILIES
 from models.io import (
-    CHRONO, SPLITS, best_seed_dir, discover_run_dirs, METRIC_COL,
-    split_out_dir, split_suffix,
+    CHRONO,
+    METRIC_COL,
+    SPLITS,
+    best_seed_dir,
+    discover_run_dirs,
+    split_out_dir,
+    split_suffix,
 )
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 from models.visualization import ABSORBER_HI, ABSORBER_LO, mean_activations, plot_family
@@ -36,7 +40,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    out_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis", args.split)
+    out_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden", args.split)
     out_dir.mkdir(parents=True, exist_ok=True)
     all_dirs = discover_run_dirs(args.runs_root, args.split)
 

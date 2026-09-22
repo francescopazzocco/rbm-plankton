@@ -15,28 +15,35 @@ Outputs (CSVs) in results/tables/hidden/:
   seasonal_profiles_nb.csv       - mean activation by month
   seasonal_profiles_bb.csv       - mean activation by month
 
-Outputs (plots) in results/02_model_analysis/:
-  cross_model_correlation.png
-  nb_pattern_frequency.png
-  seasonal_profiles.png
+Outputs (plots) in results/02_model_analysis/hidden/:
+  cross_model_correlation_L{L}.png
+  nb_pattern_frequency_L{L}.png
+  seasonal_profiles_L{L}.png
 
 Usage:
-    python code/scripts/analysis/hidden_cross_model.py [--split chrono|shuffled] [--L 6]
+    python code/scripts/analysis/hidden/hidden_cross_model.py [--split chrono|shuffled] [--L 6]
 """
 
 import argparse
 from pathlib import Path
 
 import pandas as pd
-
 from models.io import (
-    CHRONO, SPLITS, best_seed_dir, load_hidden_activations, METRIC_COL,
-    run_dir, split_out_dir,
+    CHRONO,
+    METRIC_COL,
+    SPLITS,
+    best_seed_dir,
+    load_hidden_activations,
+    run_dir,
+    split_out_dir,
 )
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 from models.visualization import (
-    hidden_binary, pattern_frequency,
-    plot_correlation, plot_pattern_frequency, plot_seasonal_profiles,
+    hidden_binary,
+    pattern_frequency,
+    plot_correlation,
+    plot_pattern_frequency,
+    plot_seasonal_profiles,
 )
 
 
@@ -93,7 +100,7 @@ def seasonal_profile(act: pd.DataFrame) -> pd.DataFrame:
 def main():
     args = parse_args()
     csv_dir = split_out_dir(DIAGNOSTIC_ROOT / "tables" / "hidden", args.split)
-    fig_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis", args.split)
+    fig_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden", args.split)
     csv_dir.mkdir(parents=True, exist_ok=True)
     fig_dir.mkdir(parents=True, exist_ok=True)
 

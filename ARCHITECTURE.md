@@ -178,19 +178,22 @@ code/
                                     + diagnostic_outputs/03_evaluation/
       nan_test_eval.py              NaN imputation evaluation → diagnostic_outputs/nan_eval_extended/
       plot_training_runs.py         training curves from training_runs/ → diagnostic_outputs/training_curves/
-    analysis/                     ecological interpretation — "what do the hidden units mean?"
-      hidden_dominant_state.py      dominant state timelines + weight profiles → results/02_model_analysis/
-      hidden_mean_activation.py     mean activation per unit → results/02_model_analysis/
-      hidden_cross_model.py         NB↔BB cross-model comparison → results/02_model_analysis/ + tables/hidden/
-      hidden_pattern_analysis.py    binary hidden patterns of one run → results/02_model_analysis/hidden_patterns/
-      rbm_hidden_stackplot.py       hidden activation share over time → results/02_model_analysis/
-      plot_visible_by_hidden.py     visible-unit probabilities per hidden node
-      use_trained_rbm.py            load one run and inspect it (CLI)
-      compare_model_reconstructions.py   reconstruction comparison across families
-      archetype_rbm_comparison.py        quantitative comparison with Cheng's archetypes
-      distance_archetypes_rbm.py         archetype↔hidden-unit distance
-      overlap_archetypes_rbm.py          archetype↔hidden-unit overlap
-      archetype_closest_rbm_scatter.py   closest-archetype scatter
+    analysis/                     ecological interpretation
+      hidden/                        "what do the hidden units mean?" → results/02_model_analysis/hidden/
+        hidden_dominant_state.py      dominant state timelines + weight profiles
+        hidden_mean_activation.py     mean activation per unit
+        hidden_cross_model.py         NB↔BB cross-model comparison (+ tables/hidden/)
+        hidden_pattern_analysis.py    binary hidden patterns of one run → hidden/patterns/
+        rbm_hidden_stackplot.py       hidden activation share over time
+        plot_visible_by_hidden.py     visible-unit probabilities per hidden node → hidden/visible_by_hidden/
+      archetype/                     RBM vs. Cheng's k=5 archetypes → results/02_model_analysis/archetype/
+        archetype_rbm_comparison.py        quantitative comparison, tables for doc/archetype_rbm_comparison.md
+        distance_archetypes_rbm.py         archetype↔hidden-unit distance
+        overlap_archetypes_rbm.py          archetype↔hidden-unit overlap
+        archetype_closest_rbm_scatter.py   closest-archetype scatter
+      reconstruction/                cross-family reconstruction comparison → results/reconstruction_plots/
+        use_trained_rbm.py            load one run and inspect it (CLI); loader used as a sibling import
+        compare_model_reconstructions.py   reconstruction comparison across families
     archive/                     one-off plot scripts (gitignored)
       plot_final_metric_nb.py       final NLL vs L for NB+ZINB sigmoid/softmax
       plot_sigmoid_nll.py           nb_sigmoid train NLL curves

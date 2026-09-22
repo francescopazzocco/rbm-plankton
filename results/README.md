@@ -29,8 +29,9 @@ python code/scripts/publish_results.py --all         # everything at once
 | Directory | Content | Produced by |
 |---|---|---|
 | `01_exploratory/` | Dataset EDA: row sums, periodogram, seasonal patterns, marginal distributions, NaN structure | `code/scripts/train/dataset_analysis.py` |
-| `02_model_analysis/` | Learned representations: weight profiles, hidden state timelines, seasonal profiles, cross-model correlations, mean activations, hidden patterns, stackplots | the `code/scripts/analysis/hidden_*` scripts, `rbm_hidden_stackplot.py`, `plot_visible_by_hidden.py` |
-| `02_model_analysis/shuffled/` | The same, for the shuffled-split runs | same scripts with `--split shuffled` |
+| `02_model_analysis/hidden/` | Learned representations: weight profiles, hidden state timelines, seasonal profiles, cross-model correlations, mean activations, hidden patterns, stackplots, visible-by-hidden | the `code/scripts/analysis/hidden/` scripts |
+| `02_model_analysis/hidden/shuffled/` | The same, for the shuffled-split runs | same scripts with `--split shuffled` |
+| `02_model_analysis/archetype/` | RBM vs. Cheng's k=5 archetypes: distance/overlap heatmaps, closest-archetype scatter | the `code/scripts/analysis/archetype/` scripts |
 | `03_evaluation/` | NaN imputation test, chronological vs shuffled split comparison | `code/scripts/diagnostic/nan_test_eval.py`, `split_comparison.py` |
 | `04_model_selection/` | Final validation metrics vs L | `code/scripts/diagnostic/sweep_analysis.py`, `code/scripts/archive/plot_final_metric_nb.py` |
 | `04_model_selection/shuffled/`, `diagnostics/sweep/shuffled/` | The same, shuffled split | `sweep_analysis.py --split shuffled` |

@@ -492,13 +492,13 @@ def plot_overall_summary(
 def main():
     epilog = (
         "Examples:\n"
-        "  python code/scripts/analysis/compare_model_reconstructions.py --Ln 6 --seed 0\n\n"
-        "  python code/scripts/analysis/compare_model_reconstructions.py --Ln 9 --seed 2 --sample-seed 123\n\n"
-        "  python code/scripts/analysis/compare_model_reconstructions.py --Ln 6 --seed 0 --raw\n\n"
+        "  python code/scripts/analysis/reconstruction/compare_model_reconstructions.py --Ln 6 --seed 0\n\n"
+        "  python code/scripts/analysis/reconstruction/compare_model_reconstructions.py --Ln 9 --seed 2 --sample-seed 123\n\n"
+        "  python code/scripts/analysis/reconstruction/compare_model_reconstructions.py --Ln 6 --seed 0 --raw\n\n"
 
-        "  python code/scripts/analysis/compare_model_reconstructions.py --overall --test 150\n\n"
+        "  python code/scripts/analysis/reconstruction/compare_model_reconstructions.py --overall --test 150\n\n"
 
-        "  python code/scripts/analysis/compare_model_reconstructions.py --Ln 6 --seed 0 --plot-out diagnostic_outputs/reconstruction_plots/custom.png\n"
+        "  python code/scripts/analysis/reconstruction/compare_model_reconstructions.py --Ln 6 --seed 0 --plot-out diagnostic_outputs/reconstruction_plots/custom.png\n"
     )
 
     parser = argparse.ArgumentParser(

@@ -705,7 +705,7 @@ def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6):
                     fontsize=8, color="black" if abs(v) < 0.6 else "white")
     plt.colorbar(im, ax=ax, shrink=0.8, label="Pearson r")
     fig.tight_layout()
-    out = out_dir / "cross_model_correlation.png"
+    out = out_dir / f"cross_model_correlation_L{target_l}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
@@ -753,7 +753,7 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
                      fontsize=8, color=cutoff_color)
 
     fig.tight_layout()
-    out = out_dir / "nb_pattern_frequency.png"
+    out = out_dir / f"nb_pattern_frequency_L{target_l}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
@@ -792,7 +792,7 @@ def plot_seasonal_profiles(nb_prof: pd.DataFrame, bb_prof: pd.DataFrame,
     axes[-1].set_xlabel("month")
     fig.suptitle("Seasonal activation profiles - NB vs BB-median", fontsize=11)
     fig.tight_layout()
-    out = out_dir / "seasonal_profiles.png"
+    out = out_dir / f"seasonal_profiles_L{target_l}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)

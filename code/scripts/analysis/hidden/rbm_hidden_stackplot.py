@@ -5,8 +5,8 @@ Shows the share of total hidden activation held by each unit on each date, which
 makes the seasonal handover between units visible.
 
 Usage:
-    python code/scripts/analysis/rbm_hidden_stackplot.py
-    python code/scripts/analysis/rbm_hidden_stackplot.py --family nb_sigmoid --L 7 --split shuffled
+    python code/scripts/analysis/hidden/rbm_hidden_stackplot.py
+    python code/scripts/analysis/hidden/rbm_hidden_stackplot.py --family nb_sigmoid --L 7 --split shuffled
 """
 
 from __future__ import annotations
@@ -15,14 +15,19 @@ import argparse
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-
 from models.io import (
-    CHRONO, METRIC_COL, SPLITS, best_seed_dir, load_hidden_activations, run_dir,
+    CHRONO,
+    METRIC_COL,
+    SPLITS,
+    best_seed_dir,
+    load_hidden_activations,
+    run_dir,
+    split_out_dir,
 )
 from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
@@ -101,7 +106,9 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Use this seed directory directly, ignoring --family/--L/--split")
     parser.add_argument("--output", type=Path, default=None,
                         help="Where to save the stackplot "
-                             "(default: results/02_model_analysis/hidden_stackplot_{family}_L{n}.png)")
+                             "(default: results/02_model_analysis/hidden/"
+                             "hidden_stackplot_{family}_L{n}.png, "
+                             "or .../shuffled/... for --split shuffled)")
     parser.add_argument("--title", default=None, help="Figure title")
     return parser
 
@@ -114,7 +121,7 @@ def main() -> None:
     print(f"Reading {seed_dir}")
 
     output = args.output or (
-        DIAGNOSTIC_ROOT / "02_model_analysis"
+        split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden", args.split)
         / f"hidden_stackplot_{args.family}_L{args.L}.png")
     title = args.title or (
         f"{args.family} L={args.L} ({args.split}) — "
