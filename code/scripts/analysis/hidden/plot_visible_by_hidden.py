@@ -11,13 +11,25 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-
 from models.paths import DIAGNOSTIC_ROOT
+
+
+def _run_tag(weights_path: Path) -> str:
+    """Identify a weights file by its run: '{family}_L{n}[_shuffled]/seed_k' ->
+    '{family}_L{n}[_shuffled]_seed_k'. Falls back to the file stem for a path
+    that doesn't follow the training_runs/ convention (e.g. a bare .csv).
+    """
+    seed_dir, family_l_dir = weights_path.resolve().parent, weights_path.resolve().parent.parent
+    if seed_dir.name.startswith("seed_"):
+        return f"{family_l_dir.name}_{seed_dir.name}"
+    return weights_path.stem
 
 
 def sigmoid(x: np.ndarray) -> np.ndarray:
@@ -283,7 +295,7 @@ def main():
     parser.add_argument("--weights", type=Path, required=True,
                         help="Path to weights .npz or rbm_weights.csv")
     parser.add_argument("--output-dir", type=Path,
-                        default=DIAGNOSTIC_ROOT / "02_model_analysis" / "visible_by_hidden")
+                        default=DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden" / "visible_by_hidden")
     parser.add_argument("--mode", choices=["bernoulli", "zinb"], default=None,
                         help="Interpretation for visible units. Auto-detect if omitted.")
     parser.add_argument("--patterns-csv", type=Path, default=None,
@@ -306,6 +318,7 @@ def main():
         mode = "zinb" if "logit_pi" in extras or "log_theta" in extras else "bernoulli"
 
     species = taxa if taxa is not None else [f"s{i}" for i in range(D)]
+    tag = _run_tag(args.weights)
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -322,25 +335,25 @@ def main():
 
     # per-hidden-row plot (renormalizes each hidden node to frequency [0,1])
     if args.layout in ["rows", "both"]:
-        plot_path = out_dir / f"visible_by_hidden_{mode}_rows.png"
+        plot_path = out_dir / f"visible_by_hidden_{tag}_{mode}_rows.png"
         plot_per_hidden_rows(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs by hidden ({mode})",
                              normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
         print(f"Saved plot {plot_path}")
         
     if args.layout in ["grid", "both"]:
-        plot_path = out_dir / f"visible_by_hidden_{mode}_grid.png"
+        plot_path = out_dir / f"visible_by_hidden_{tag}_{mode}_grid.png"
         plot_per_species_grid(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs per species ({mode})",
                               normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
         print(f"Saved plot {plot_path}")
 
     # save raw CSV and normalized-frequency CSV
     df = pd.DataFrame({label: probs for label, probs in zip(labels, probs_list)}, index=species)
-    csv_path = out_dir / f"visible_by_hidden_{mode}.csv"
+    csv_path = out_dir / f"visible_by_hidden_{tag}_{mode}.csv"
     df.to_csv(csv_path)
 
     df_freq = pd.DataFrame({label: (probs / (probs.sum() if probs.sum() > 0 else 1.0))
                              for label, probs in zip(labels, probs_list)}, index=species)
-    csv_path_freq = out_dir / f"visible_by_hidden_{mode}_freq.csv"
+    csv_path_freq = out_dir / f"visible_by_hidden_{tag}_{mode}_freq.csv"
     df_freq.to_csv(csv_path_freq)
 
     print(f"Saved plot {plot_path}")
@@ -364,26 +377,26 @@ def main():
             labels_pat.append(f"p{k}")
 
         if args.layout in ["rows", "both"]:
-            plot_path2 = out_dir / f"visible_by_patterns_{mode}_rows.png"
+            plot_path2 = out_dir / f"visible_by_patterns_{tag}_{mode}_rows.png"
             plot_per_hidden_rows(species, probs_patterns, labels_pat, plot_path2,
                  f"{args.title_prefix} visible by hidden patterns ({mode})",
                  normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
             print(f"Saved plot {plot_path2}")
                  
         if args.layout in ["grid", "both"]:
-            plot_path2 = out_dir / f"visible_by_patterns_{mode}_grid.png"
+            plot_path2 = out_dir / f"visible_by_patterns_{tag}_{mode}_grid.png"
             plot_per_species_grid(species, probs_patterns, labels_pat, plot_path2,
                  f"{args.title_prefix} visible per species by pattern ({mode})",
                  normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
             print(f"Saved plot {plot_path2}")
 
         df2 = pd.DataFrame({label: probs for label, probs in zip(labels_pat, probs_patterns)}, index=species)
-        csv_path2 = out_dir / f"visible_by_patterns_{mode}.csv"
+        csv_path2 = out_dir / f"visible_by_patterns_{tag}_{mode}.csv"
         df2.to_csv(csv_path2)
 
         df2_freq = pd.DataFrame({label: (probs / (probs.sum() if probs.sum() > 0 else 1.0))
                      for label, probs in zip(labels_pat, probs_patterns)}, index=species)
-        csv_path2_freq = out_dir / f"visible_by_patterns_{mode}_freq.csv"
+        csv_path2_freq = out_dir / f"visible_by_patterns_{tag}_{mode}_freq.csv"
         df2_freq.to_csv(csv_path2_freq)
 
         print(f"Saved plot {plot_path2}")

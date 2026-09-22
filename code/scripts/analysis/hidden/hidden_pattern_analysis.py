@@ -8,15 +8,15 @@ The discretisation itself lives in models.visualization (hidden_binary,
 pattern_frequency) and is shared with hidden_cross_model.py, so the threshold
 rule exists in exactly one place.
 
-Outputs (results/02_model_analysis/hidden_patterns/ by default):
-  pattern_frequency_{mode}.csv   pattern -> n_days, fraction, n_units_on
-  pattern_timeline_{mode}.csv    date -> pattern
-  pattern_histogram_{mode}.png
-  pattern_timeline_{mode}.png
+Outputs (results/02_model_analysis/hidden/patterns/[shuffled/] by default):
+  pattern_frequency_{family}_L{L}_{mode}.csv   pattern -> n_days, fraction, n_units_on
+  pattern_timeline_{family}_L{L}_{mode}.csv    date -> pattern
+  pattern_histogram_{family}_L{L}_{mode}.png
+  pattern_timeline_{family}_L{L}_{mode}.png
 
 Usage:
-    python code/scripts/analysis/hidden_pattern_analysis.py
-    python code/scripts/analysis/hidden_pattern_analysis.py --family nb_softmax --L 7 \
+    python code/scripts/analysis/hidden/hidden_pattern_analysis.py
+    python code/scripts/analysis/hidden/hidden_pattern_analysis.py --family nb_softmax --L 7 \
         --split shuffled --mode winner
 """
 
@@ -26,18 +26,24 @@ import argparse
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.cluster.hierarchy import leaves_list, linkage
-
 from models.io import (
-    CHRONO, METRIC_COL, SPLITS, best_seed_dir, load_hidden_activations, run_dir,
+    CHRONO,
+    METRIC_COL,
+    SPLITS,
+    best_seed_dir,
+    load_hidden_activations,
+    run_dir,
+    split_out_dir,
 )
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 from models.visualization import hidden_binary, pattern_frequency, pattern_labels
+from scipy.cluster.hierarchy import leaves_list, linkage
 
 
 def resolve_seed_dir(family: str, n_hidden: int, split: str, runs_root: Path) -> Path:
@@ -148,9 +154,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--seed-dir", type=Path, default=None,
                         help="Use this seed directory directly, ignoring "
                              "--family/--L/--split")
-    parser.add_argument("--output-dir", type=Path,
-                        default=DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden_patterns",
-                        help="Directory where plots and tables are saved")
+    parser.add_argument("--output-dir", type=Path, default=None,
+                        help="Directory where plots and tables are saved "
+                             "(default: diagnostic_outputs/02_model_analysis/hidden/patterns/"
+                             "[shuffled/], split-aware)")
     parser.add_argument("--mode", choices=["threshold", "winner"], default="threshold",
                         help="threshold: each unit on above 0.5 (Bernoulli/sigmoid units); "
                              "winner: one-hot argmax (softmax units)")
@@ -172,14 +179,17 @@ def main() -> None:
     summary = pattern_frequency(binary)
     timeline = pattern_labels(binary).reset_index()
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    summary_path = args.output_dir / f"pattern_frequency_{args.mode}.csv"
-    timeline_path = args.output_dir / f"pattern_timeline_{args.mode}.csv"
+    output_dir = args.output_dir or split_out_dir(
+        DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden" / "patterns", args.split)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    tag = f"{args.family}_L{args.L}_{args.mode}"
+    summary_path = output_dir / f"pattern_frequency_{tag}.csv"
+    timeline_path = output_dir / f"pattern_timeline_{tag}.csv"
     summary.to_csv(summary_path, index=False)
     timeline.to_csv(timeline_path, index=False)
 
-    pattern_hist_path = args.output_dir / f"pattern_histogram_{args.mode}.png"
-    pattern_timeline_path = args.output_dir / f"pattern_timeline_{args.mode}.png"
+    pattern_hist_path = output_dir / f"pattern_histogram_{tag}.png"
+    pattern_timeline_path = output_dir / f"pattern_timeline_{tag}.png"
 
     plot_pattern_histogram(
         summary,

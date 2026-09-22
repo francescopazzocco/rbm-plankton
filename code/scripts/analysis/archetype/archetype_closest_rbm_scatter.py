@@ -1,10 +1,24 @@
 import argparse
 from pathlib import Path
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib as mpl
+from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, run_dir, split_suffix
+from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import PROJECT_ROOT as ROOT
 from scipy.spatial.distance import euclidean
+
+
+def resolve_weights(family: str, n_hidden: int, split: str, runs_root: Path) -> Path:
+    """Best-converged seed's weights.npz for one (family, L, split) run."""
+    seed_dir = best_seed_dir(run_dir(family, n_hidden, split, runs_root), METRIC_COL[family])
+    if seed_dir is None:
+        raise FileNotFoundError(
+            f"No converged seed for {family} L={n_hidden} ({split}) in {runs_root}")
+    return seed_dir / "weights.npz"
+
 
 def sigmoid(x: np.ndarray) -> np.ndarray:
     """Sigmoid activation function."""
@@ -41,19 +55,31 @@ def compute_visible_activation(W, a, b, visible_model, h, logit_pi=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--weights", type=str, default="weights/zinb_sigmoid_L7_seed9_best.npz", help="npz weights path")
-    parser.add_argument("--archetypes", type=str, default="Cheng/Data/archetypes_k5_profiles.csv", help="archetypes csv path")
-    parser.add_argument("--out", type=str, default="analysis/results/archetype_closest_rbm.png", help="output plot path")
+    parser.add_argument("--weights", type=Path, default=None,
+                        help="npz weights path (default: resolved from --family/--L/--split)")
+    parser.add_argument("--family", default="zinb_sigmoid", help="Model family (default: zinb_sigmoid)")
+    parser.add_argument("--L", type=int, default=7, help="Hidden unit count (default: 7)")
+    parser.add_argument("--split", choices=SPLITS, default=CHRONO, help="Split strategy (default: chrono)")
+    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT)
+    parser.add_argument("--archetypes", type=Path, default=ROOT / "prof" / "archetypes_k5_profiles.csv",
+                        help="archetypes csv path")
+    parser.add_argument("--out", type=Path, default=None, help="output plot path")
     parser.add_argument("--metric", type=str, choices=["euclidean", "cosine"], default="cosine", help="distance metric")
     parser.add_argument("--top_k", type=int, default=3, help="number of closest RBM hidden units to show")
     args = parser.parse_args()
 
+    weights = args.weights or resolve_weights(args.family, args.L, args.split, args.runs_root)
+    out = args.out or (
+        DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype"
+        / f"archetype_closest_rbm_{args.family}_L{args.L}{split_suffix(args.split)}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+
     # Load Archetypes
     df_arch = pd.read_csv(args.archetypes, index_col=0)
     arch_taxa = df_arch.columns.values
-    
+
     # Load RBM weights
-    d = np.load(args.weights, allow_pickle=True)
+    d = np.load(weights, allow_pickle=True)
     W = d['W']
     rbm_taxa = d['taxa']
     a = d['a'] if 'a' in d else np.zeros(W.shape[0])
@@ -157,8 +183,8 @@ def main():
         ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig(args.out, dpi=150)
-    print(f"Plot saved to {args.out}")
+    plt.savefig(out, dpi=150)
+    print(f"Plot saved to {out}")
 
 if __name__ == "__main__":
     main()

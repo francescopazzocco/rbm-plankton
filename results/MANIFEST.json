@@ -24,315 +24,480 @@
     "commit": "179e190",
     "published_at": "2026-09-22T19:06:03+00:00"
   },
-  "02_model_analysis/cross_model_correlation.png": {
+  "02_model_analysis/archetype/archetype_closest_rbm_nb_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/dominant_state_L6.csv": {
+  "02_model_analysis/archetype/archetype_closest_rbm_nb_L6_shuffled.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/hidden_patterns/pattern_frequency_threshold.csv": {
+  "02_model_analysis/archetype/archetype_closest_rbm_zinb_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/hidden_patterns/pattern_histogram_threshold.png": {
+  "02_model_analysis/archetype/archetype_closest_rbm_zinb_L6_shuffled.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/hidden_patterns/pattern_timeline_threshold.csv": {
+  "02_model_analysis/archetype/distance_heatmap_nb_L6.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/hidden_patterns/pattern_timeline_threshold.png": {
+  "02_model_analysis/archetype/distance_heatmap_nb_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/hidden_stackplot_nb_L6.png": {
+  "02_model_analysis/archetype/distance_heatmap_nb_L6_shuffled.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/mean_activation_bernoulli_median.png": {
+  "02_model_analysis/archetype/distance_heatmap_nb_L6_shuffled.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/mean_activation_bernoulli_zero.png": {
+  "02_model_analysis/archetype/distance_heatmap_zinb_L6.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/mean_activation_nb.png": {
+  "02_model_analysis/archetype/distance_heatmap_zinb_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/mean_activation_summary.csv": {
+  "02_model_analysis/archetype/distance_heatmap_zinb_L6_shuffled.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/mean_activation_zinb.png": {
+  "02_model_analysis/archetype/distance_heatmap_zinb_L6_shuffled.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/nb_pattern_frequency.png": {
+  "02_model_analysis/archetype/overlap_heatmap_nb_L6.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/seasonal_profiles.png": {
+  "02_model_analysis/archetype/overlap_heatmap_nb_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/cross_model_correlation.png": {
+  "02_model_analysis/archetype/overlap_heatmap_nb_L6_shuffled.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/dominant_state_L6_shuffled.csv": {
+  "02_model_analysis/archetype/overlap_heatmap_nb_L6_shuffled.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_bernoulli_median.png": {
+  "02_model_analysis/archetype/overlap_heatmap_zinb_L6.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_bernoulli_zero.png": {
+  "02_model_analysis/archetype/overlap_heatmap_zinb_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_nb.png": {
+  "02_model_analysis/archetype/overlap_heatmap_zinb_L6_shuffled.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_nb_relu.png": {
+  "02_model_analysis/archetype/overlap_heatmap_zinb_L6_shuffled.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_nb_sigmoid.png": {
+  "02_model_analysis/hidden/cross_model_correlation_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_nb_softmax.png": {
+  "02_model_analysis/hidden/dominant_state_L6.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_summary_shuffled.csv": {
+  "02_model_analysis/hidden/hidden_stackplot_nb_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_zinb.png": {
+  "02_model_analysis/hidden/mean_activation_bernoulli_median.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_zinb_relu.png": {
+  "02_model_analysis/hidden/mean_activation_bernoulli_zero.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_zinb_sigmoid.png": {
+  "02_model_analysis/hidden/mean_activation_nb.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/mean_activation_zinb_softmax.png": {
+  "02_model_analysis/hidden/mean_activation_summary.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/nb_pattern_frequency.png": {
+  "02_model_analysis/hidden/mean_activation_zinb.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/seasonal_profiles.png": {
+  "02_model_analysis/hidden/nb_pattern_frequency_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_frequency_shuffled.csv": {
+  "02_model_analysis/hidden/patterns/pattern_frequency_nb_L6_threshold.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_bernoulli_median.png": {
+  "02_model_analysis/hidden/patterns/pattern_histogram_nb_L6_threshold.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_bernoulli_zero.png": {
+  "02_model_analysis/hidden/patterns/pattern_timeline_nb_L6_threshold.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_nb.png": {
+  "02_model_analysis/hidden/patterns/pattern_timeline_nb_L6_threshold.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_nb_relu.png": {
+  "02_model_analysis/hidden/patterns/shuffled/pattern_frequency_nb_softmax_L7_winner.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_nb_sigmoid.png": {
+  "02_model_analysis/hidden/patterns/shuffled/pattern_histogram_nb_softmax_L7_winner.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_nb_softmax.png": {
+  "02_model_analysis/hidden/patterns/shuffled/pattern_timeline_nb_softmax_L7_winner.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_zinb.png": {
+  "02_model_analysis/hidden/patterns/shuffled/pattern_timeline_nb_softmax_L7_winner.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_zinb_relu.png": {
+  "02_model_analysis/hidden/seasonal_profiles_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_zinb_sigmoid.png": {
+  "02_model_analysis/hidden/shuffled/cross_model_correlation_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/state_timeline_zinb_softmax.png": {
+  "02_model_analysis/hidden/shuffled/dominant_state_L6_shuffled.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_bernoulli_median.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_bernoulli_median.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_bernoulli_zero.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_bernoulli_zero.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_nb.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_nb.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_nb_relu.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_nb_relu.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_nb_sigmoid.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_nb_sigmoid.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_nb_softmax.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_nb_softmax.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_zinb.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_summary_shuffled.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_zinb_relu.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_zinb.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_zinb_sigmoid.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_zinb_relu.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/shuffled/weight_profiles_zinb_softmax.png": {
+  "02_model_analysis/hidden/shuffled/mean_activation_zinb_sigmoid.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/state_frequency.csv": {
+  "02_model_analysis/hidden/shuffled/mean_activation_zinb_softmax.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/state_timeline_bernoulli_median.png": {
+  "02_model_analysis/hidden/shuffled/nb_pattern_frequency_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/state_timeline_bernoulli_zero.png": {
+  "02_model_analysis/hidden/shuffled/seasonal_profiles_L6.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/state_timeline_nb.png": {
+  "02_model_analysis/hidden/shuffled/state_frequency_shuffled.csv": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/state_timeline_zinb.png": {
+  "02_model_analysis/hidden/shuffled/state_timeline_bernoulli_median.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/visible_by_hidden/visible_by_hidden_zinb.csv": {
+  "02_model_analysis/hidden/shuffled/state_timeline_bernoulli_zero.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/visible_by_hidden/visible_by_hidden_zinb_freq.csv": {
+  "02_model_analysis/hidden/shuffled/state_timeline_nb.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/visible_by_hidden/visible_by_hidden_zinb_rows.png": {
+  "02_model_analysis/hidden/shuffled/state_timeline_nb_relu.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/weight_profiles_bernoulli_median.png": {
+  "02_model_analysis/hidden/shuffled/state_timeline_nb_sigmoid.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/weight_profiles_bernoulli_zero.png": {
+  "02_model_analysis/hidden/shuffled/state_timeline_nb_softmax.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/weight_profiles_nb.png": {
+  "02_model_analysis/hidden/shuffled/state_timeline_zinb.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
-  "02_model_analysis/weight_profiles_zinb.png": {
+  "02_model_analysis/hidden/shuffled/state_timeline_zinb_relu.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:31:17+00:00"
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/state_timeline_zinb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/state_timeline_zinb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_nb.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_nb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_nb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_nb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_zinb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_zinb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/shuffled/weight_profiles_zinb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/state_frequency.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/state_timeline_bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/state_timeline_bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/state_timeline_nb.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/state_timeline_zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_seed_8_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_seed_8_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_seed_8_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_shuffled_seed_9_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_shuffled_seed_9_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_shuffled_seed_9_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_seed_7_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_seed_7_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_seed_7_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_shuffled_seed_9_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_shuffled_seed_9_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_shuffled_seed_9_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/weight_profiles_bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/weight_profiles_bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/weight_profiles_nb.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
+  },
+  "02_model_analysis/hidden/weight_profiles_zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
+    "commit": "408d071",
+    "published_at": "2026-09-22T20:56:11+00:00"
   },
   "03_evaluation/nan_eval_bars.png": {
     "produced_by": "code/scripts/diagnostic/nan_test_eval.py",

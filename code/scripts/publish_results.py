@@ -10,7 +10,7 @@ Usage:
     python code/scripts/publish_results.py 01_exploratory
     python code/scripts/publish_results.py --all
     python code/scripts/publish_results.py --src reconstruction_plots --dst reconstruction_plots \\
-        --by "code/scripts/analysis/use_trained_rbm.py" --pattern "*.png"
+        --by "code/scripts/analysis/reconstruction/use_trained_rbm.py" --pattern "*.png"
 """
 
 from __future__ import annotations
@@ -31,12 +31,13 @@ CATEGORIES = {
         "code/scripts/train/dataset_analysis.py"),
     "02_model_analysis": (
         "02_model_analysis", "02_model_analysis", "**/*",
-        "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, "
+        "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, "
         "hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, "
-        "plot_visible_by_hidden.py"),
+        "plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, "
+        "distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)"),
     "tables": (
         "tables", "tables", "**/*",
-        "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py"),
+        "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py"),
     "03_evaluation": (
         "03_evaluation", "03_evaluation", "**/*",
         "code/scripts/diagnostic/split_comparison.py"),

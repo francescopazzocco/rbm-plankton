@@ -1,10 +1,39 @@
 import argparse
 from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, run_dir, split_suffix
+from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import PROJECT_ROOT as ROOT
 from scipy.spatial.distance import euclidean
+
+
+def resolve_weights(family: str, n_hidden: int, split: str, runs_root: Path) -> Path:
+    """Best-converged seed's weights.npz for one (family, L, split) run."""
+    seed_dir = best_seed_dir(run_dir(family, n_hidden, split, runs_root), METRIC_COL[family])
+    if seed_dir is None:
+        raise FileNotFoundError(
+            f"No converged seed for {family} L={n_hidden} ({split}) in {runs_root}")
+    return seed_dir / "weights.npz"
+
+
+def plot_heatmap(ax, matrix, xticklabels, yticklabels, cmap, vmin, vmax, fmt="{:.2f}"):
+    """Matplotlib-only annotated heatmap (no seaborn dependency)."""
+    im = ax.imshow(matrix, cmap=cmap, vmin=vmin, vmax=vmax, aspect="auto")
+    ax.set_xticks(range(len(xticklabels)))
+    ax.set_xticklabels(xticklabels, rotation=45, ha="right", fontsize=8)
+    ax.set_yticks(range(len(yticklabels)))
+    ax.set_yticklabels(yticklabels, fontsize=8)
+    thresh = matrix.min() + (matrix.max() - matrix.min()) / 2
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            ax.text(j, i, fmt.format(matrix[i, j]), ha="center", va="center",
+                    fontsize=7, color="white" if matrix[i, j] < thresh else "black")
+    plt.colorbar(im, ax=ax, shrink=0.8)
+    return im
+
 
 def sigmoid(x: np.ndarray) -> np.ndarray:
     """Sigmoid activation function."""
@@ -41,16 +70,27 @@ def compute_visible_activation(W, a, b, visible_model, h, logit_pi=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--weights", type=str, default="weights/zinb_sigmoid_L7_seed9_best.npz", help="npz weights path (Model 1)")
-    parser.add_argument("--archetypes", type=str, default="Cheng/Data/archetypes_k5_profiles.csv", help="archetypes csv path (defaults to used if weights2 is not provided)")
+    parser.add_argument("--weights", type=Path, default=None,
+                        help="npz weights path (Model 1); default: resolved from --family/--L/--split")
+    parser.add_argument("--family", default="zinb_sigmoid", help="Model family (default: zinb_sigmoid)")
+    parser.add_argument("--L", type=int, default=7, help="Hidden unit count (default: 7)")
+    parser.add_argument("--split", choices=SPLITS, default=CHRONO, help="Split strategy (default: chrono)")
+    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT)
+    parser.add_argument("--archetypes", type=Path, default=ROOT / "prof" / "archetypes_k5_profiles.csv",
+                        help="archetypes csv path (used if weights2 is not provided)")
     parser.add_argument("--weights2", type=str, default=None, help="optional second npz weights path (Model 2) to compare RBM vs RBM")
-    parser.add_argument("--out", type=str, default="analysis/results/distance_heatmap.png", help="output plot path")
+    parser.add_argument("--out", type=Path, default=None, help="output plot path")
     parser.add_argument("--metric", type=str, choices=["euclidean", "cosine"], default="euclidean", help="distance metric")
     args = parser.parse_args()
 
+    weights = args.weights or resolve_weights(args.family, args.L, args.split, args.runs_root)
+    out = args.out or (
+        DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype"
+        / f"distance_heatmap_{args.family}_L{args.L}{split_suffix(args.split)}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+
     # Load RBM weights 1
-    # Load RBM weights
-    d = np.load(args.weights, allow_pickle=True)
+    d = np.load(weights, allow_pickle=True)
     W = d['W']
     rbm_taxa = d['taxa']
     a = d['a'] if 'a' in d else np.zeros(W.shape[0])
@@ -106,9 +146,7 @@ def main():
     # Align W (Model 1) and a
     taxa_to_idx = {t: i for i, t in enumerate(rbm_taxa)}
     idx_keep = [taxa_to_idx[t] for t in common_taxa]
-    W_aligned = W[idx_keep, :]
-    a_aligned = a[idx_keep]
-    
+
     # Compute visible activations for each hidden unit (Model 1)
     W_vis = np.zeros((len(common_taxa), n_hidden))
     for h in range(n_hidden):
@@ -133,11 +171,8 @@ def main():
                 res_metric[i, j] = np.dot(A_mat[i], W_vis[:, j])
                 
     # Plot heatmap
-    out_path = Path(args.out)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    plt.figure(figsize=(10, 6))
-    
+    fig, ax = plt.subplots(figsize=(10, 6))
+
     if args.metric == "euclidean":
         cmap = "cividis_r"  # Reverse so low distance (close) is darker/yellow depending on cividis
         title = f"{title_prefix} Euclidean Distance\n(L2 Normalized Vectors)"
@@ -146,18 +181,18 @@ def main():
         cmap = "cividis"
         title = f"{title_prefix} Cosine Similarity\n(L2 Normalized Vectors)"
         vmin, vmax = 0, 1
-        
-    sns.heatmap(res_metric, annot=True, cmap=cmap, xticklabels=hidden_names, yticklabels=arch_names, fmt=".2f", vmin=vmin, vmax=vmax)
-    plt.title(title)
-    plt.xlabel("Model 1 Hidden Units" if args.weights2 else "RBM Hidden Units")
-    plt.ylabel(y_label)
-    plt.tight_layout()
-    plt.savefig(args.out)
-    print(f"Heatmap saved to {args.out}")
-    
-    # Save CSV 
+
+    plot_heatmap(ax, res_metric, hidden_names, arch_names, cmap, vmin, vmax)
+    ax.set_title(title)
+    ax.set_xlabel("Model 1 Hidden Units" if args.weights2 else "RBM Hidden Units")
+    ax.set_ylabel(y_label)
+    fig.tight_layout()
+    fig.savefig(out)
+    print(f"Heatmap saved to {out}")
+
+    # Save CSV
     df_res = pd.DataFrame(res_metric, index=arch_names, columns=hidden_names)
-    csv_out = out_path.with_suffix('.csv')
+    csv_out = out.with_suffix('.csv')
     df_res.to_csv(csv_out)
     print(f"CSV saved to {csv_out}")
 

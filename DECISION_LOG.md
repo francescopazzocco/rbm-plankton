@@ -597,3 +597,78 @@ the blanket `results/*` pattern, the same class of gap that hid
 themselves) gets no equivalent provenance ledger — raised in conversation,
 scoped out as a separate tier with a different lifecycle (gitignored, never
 published, owned solely by `train.py`/`paths.RUNS_ROOT`).
+
+---
+
+## LOG-030 · `code/scripts/analysis/` split into `hidden/`/`archetype/`/`reconstruction/`; output filenames made self-describing
+
+**Context:** All 13 `analysis/` scripts sat flat in one directory spanning
+three unrelated jobs (hidden-unit interpretation, archetype comparison,
+cross-family reconstruction), raised directly as "sparsi a caso" (scattered
+randomly). Investigating turned up a second, more consequential problem:
+several outputs under `results/02_model_analysis/` had filenames that didn't
+encode the run they came from. `hidden_pattern_analysis.py`'s
+`pattern_frequency_{mode}.csv` (mode = threshold/winner, not family/L/split)
+and `plot_visible_by_hidden.py`'s `visible_by_hidden_{mode}.csv` (mode =
+bernoulli/zinb, same visible-distribution label for e.g. `nb` and
+`nb_softmax`) meant re-running either for a different family/L/split
+silently overwrote the previous output with no way to tell, after the fact,
+which run a given file represented — the `nb_sigmoid_L6` vs. "something
+else" question that started this. `hidden_cross_model.py`'s three figures
+had `--L` configurable but not reflected in the filename, same failure mode.
+`results/MANIFEST.json` didn't help either: `02_model_analysis` is published
+as one category, so `produced_by` lists all six producing scripts for every
+file in it, not the specific one.
+
+Investigating the `archetype*`/`*archetypes*` scripts (never fixed since
+`.claude/REORG_AND_VALIDATION.md` §A-3 flagged them "untouched by request")
+found three of the four pointing at a pre-`training_runs/`/`prof/` layout
+(`weights/*.npz`, `Cheng/Data/*.csv`, `analysis/results/*.png`) that no
+longer exists, and two importing `seaborn`, which is not a project dependency
+and isn't installed — all three would have crashed immediately if run.
+
+**Decision:** `code/scripts/analysis/` split into `hidden/` (six scripts,
+"what do the hidden units mean?"), `archetype/` (four scripts, RBM vs.
+Cheng's k=5 archetypes) and `reconstruction/` (`use_trained_rbm.py` +
+`compare_model_reconstructions.py`, which imports it as a sibling — moved
+together to keep that import working unchanged). `results/02_model_analysis/`
+and `diagnostic_outputs/02_model_analysis/` gained matching `hidden/` and
+`archetype/` subdirectories (mirroring the script split, per explicit
+request) rather than staying flat.
+
+Every filename that depended on a run parameter not otherwise in its path
+now includes it: `pattern_frequency_{family}_L{L}_{mode}.csv`,
+`visible_by_hidden_{family}_L{n}[_shuffled]_seed_{k}_{mode}.csv` (derived
+from the `--weights` path, not a new required flag), `cross_model_correlation_L{L}.png`,
+`nb_pattern_frequency_L{L}.png`, `seasonal_profiles_L{L}.png`.
+`nb_pattern_frequency.png` was separately reworked this session into a
+Pareto/cumulative-coverage plot (unrelated to this entry).
+
+The three broken `archetype*` scripts were repaired rather than archived:
+default `--weights` now resolves via `models.io.best_seed_dir` from
+`--family`/`--L`/`--split` (matching every other single-run script's
+convention), `--archetypes` defaults to `prof/archetypes_k5_profiles.csv`,
+output moves to `diagnostic_outputs/02_model_analysis/archetype/`, and the
+two `seaborn` heatmaps were rewritten with a small `matplotlib.imshow` +
+`ax.text` helper (no new dependency, matching every other heatmap in the
+project). `archetype_rbm_comparison.py`'s `VBH` paths (previously
+`results/nb_chrono_vbh/visible_by_hidden_bernoulli.csv`, pointing nowhere)
+now resolve the same way rather than being hardcoded.
+
+**Consequences:** `results/02_model_analysis/` was emptied and every figure
+regenerated and republished from the moved scripts (95 manifest entries,
+`MANIFEST.json` pruned of stale entries for paths that no longer exist,
+scoped to `02_model_analysis/` only — the rest of `results/` was untouched).
+`README.md`, `ARCHITECTURE.md`, `results/README.md` and
+`publish_results.py`'s category doc-string updated to the new paths.
+
+**Left as a follow-up, not decided here:** `.claude/REORG_AND_VALIDATION.md`
+§A-3 recommends consolidating `distance_archetypes_rbm.py`,
+`overlap_archetypes_rbm.py` and `archetype_closest_rbm_scatter.py` (three
+near-identical takes on the same comparison, `sigmoid()`/
+`compute_visible_activation()` copy-pasted verbatim across all three) into
+one script with a `--mode {distance,overlap,scatter}` flag, retiring two.
+Not done here — this entry only made all three runnable again; the
+duplication itself is unchanged. Same document also still recommends a
+rewrite of `compare_model_reconstructions.py` against the NB/ZINB-only
+comparison perimeter (§0); also untouched.

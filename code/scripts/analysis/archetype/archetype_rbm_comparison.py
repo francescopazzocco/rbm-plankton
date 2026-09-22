@@ -7,7 +7,7 @@ activation summaries.  Prints all tables used in
 doc/archetype_rbm_comparison.md.
 
 Usage:
-    python code/scripts/analysis/archetype_rbm_comparison.py [--top N]
+    python code/scripts/analysis/archetype/archetype_rbm_comparison.py [--top N]
 
 Output goes to stdout; redirect to a file if you want to keep it.
 """
@@ -15,10 +15,12 @@ Output goes to stdout; redirect to a file if you want to keep it.
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 import pandas as pd
-
+from models.io import CHRONO, METRIC_COL, SHUFFLED, best_seed_dir, run_dir, split_suffix
 from models.paths import PROJECT_ROOT as ROOT
+from models.paths import RUNS_ROOT
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -26,17 +28,34 @@ from models.paths import PROJECT_ROOT as ROOT
 PROF_PROFILES   = ROOT / "prof" / "archetypes_k5_profiles.csv"
 PROF_TIMESERIES = ROOT / "prof" / "archetypes_k5_timeseries.csv"
 
+
+def _vbh_path(family: str, mode: str, split: str, n_hidden: int = 6) -> Path:
+    """Path plot_visible_by_hidden.py would have written for this run's best
+    seed -- {family}_L{n}[_shuffled]_seed_{k}, matching its own `_run_tag`.
+    """
+    seed_dir = best_seed_dir(run_dir(family, n_hidden, split, RUNS_ROOT), METRIC_COL[family])
+    if seed_dir is None:
+        raise FileNotFoundError(f"No converged seed for {family} L={n_hidden} ({split})")
+    tag = f"{family}_L{n_hidden}{split_suffix(split)}_{seed_dir.name}"
+    return (ROOT / "results" / "02_model_analysis" / "hidden" / "visible_by_hidden"
+            / f"visible_by_hidden_{tag}_{mode}.csv")
+
+
 VBH = {
-    "nb_chrono":   ROOT / "results/nb_chrono_vbh/visible_by_hidden_bernoulli.csv",
-    "zinb_chrono": ROOT / "results/zinb_chrono_vbh/visible_by_hidden_zinb.csv",
-    "nb_shuffle":  ROOT / "results/nb_shuffle_vbh/visible_by_hidden_bernoulli.csv",
-    "zinb_shuffle":ROOT / "results/zinb_shuffle_vbh/visible_by_hidden_zinb.csv",
+    # mode "zinb" here is plot_visible_by_hidden.py's auto-detected label for
+    # any exp(.)-mean visible distribution (both NB and ZINB have log_theta),
+    # not zero-inflation specifically -- NB has no logit_pi so the (1-pi)
+    # factor in its "zinb"-mode computation is just 1.
+    "nb_chrono":    _vbh_path("nb", "zinb", CHRONO),
+    "zinb_chrono":  _vbh_path("zinb", "zinb", CHRONO),
+    "nb_shuffle":   _vbh_path("nb", "zinb", SHUFFLED),
+    "zinb_shuffle": _vbh_path("zinb", "zinb", SHUFFLED),
 }
 
 SEASONAL_NB = ROOT / "results/tables/hidden/seasonal_profiles_nb.csv"
 SEASONAL_BB = ROOT / "results/tables/hidden/seasonal_profiles_bb.csv"
-STATE_FREQ  = ROOT / "results/02_model_analysis/state_frequency.csv"
-MEAN_ACT    = ROOT / "results/02_model_analysis/mean_activation_summary.csv"
+STATE_FREQ  = ROOT / "results/02_model_analysis/hidden/state_frequency.csv"
+MEAN_ACT    = ROOT / "results/02_model_analysis/hidden/mean_activation_summary.csv"
 
 
 def separator(title: str) -> None:

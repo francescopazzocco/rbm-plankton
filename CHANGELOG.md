@@ -252,3 +252,52 @@ its own loader because the first of those imports it.
   open item" `results/README.md` had carried since Phase A.
 - Recorded as `LOG-029`. `results/README.md` and `ARCHITECTURE.md`
   ("Output tiers") rewritten to describe the tier boundary.
+
+---
+
+## 2026-09-22 (part 3)
+
+**`code/scripts/analysis/` reorganised into `hidden/`/`archetype/`/`reconstruction/`; ambiguous output filenames fixed; three broken archetype scripts repaired**
+
+- Raised directly: the 13 flat `analysis/` scripts were "sparsi a caso"
+  (scattered randomly), and separately, files under
+  `results/02_model_analysis/` couldn't be identified by name alone — e.g.
+  `pattern_frequency_threshold.csv` gives no way to tell whether it came from
+  `nb_sigmoid_L6` or any other run.
+- Scripts split into `hidden/` (six scripts), `archetype/` (four scripts),
+  `reconstruction/` (`use_trained_rbm.py` + `compare_model_reconstructions.py`,
+  moved together to keep their sibling import working). `results/` and
+  `diagnostic_outputs/` under `02_model_analysis/` gained matching `hidden/`
+  and `archetype/` subdirectories, per explicit request to mirror the split.
+- Filenames that depended on family/L/split/mode but didn't encode it now do:
+  `pattern_frequency_{family}_L{L}_{mode}.csv`,
+  `visible_by_hidden_{family}_L{n}[_shuffled]_seed_{k}_{mode}.csv` (tag
+  derived from the `--weights` path), `cross_model_correlation_L{L}.png`,
+  `nb_pattern_frequency_L{L}.png`, `seasonal_profiles_L{L}.png`.
+  `nb_pattern_frequency.png` also separately redesigned this session as a
+  Pareto/cumulative-coverage plot, and `seasonal_profiles.png` restyled to
+  match fig3's marker+faint-dashed-connector convention (both unrelated to
+  the reorg itself).
+- Found while investigating: three of the four `archetype*` scripts
+  (`distance_archetypes_rbm.py`, `overlap_archetypes_rbm.py`,
+  `archetype_closest_rbm_scatter.py`) pointed at a pre-`training_runs/`
+  layout (`weights/*.npz`, `Cheng/Data/*.csv`) that no longer exists, and two
+  imported `seaborn`, not a project dependency and not installed — all three
+  would have crashed immediately. Repaired: default `--weights` now resolves
+  via `models.io.best_seed_dir` from `--family`/`--L`/`--split`, `--archetypes`
+  defaults to `prof/archetypes_k5_profiles.csv`, and the two `seaborn.heatmap`
+  calls were rewritten with plain `matplotlib.imshow` (no new dependency).
+  `archetype_rbm_comparison.py`'s hardcoded `VBH` paths (pointing at a
+  `results/nb_chrono_vbh/` directory that doesn't exist) now resolve the same
+  way instead.
+- `results/02_model_analysis/` emptied and regenerated from the moved
+  scripts end to end (95 manifest entries); `MANIFEST.json` pruned of stale
+  entries for paths no longer produced, scoped to `02_model_analysis/` only.
+  `README.md`, `ARCHITECTURE.md`, `results/README.md` and
+  `publish_results.py`'s category doc-string updated to the new paths.
+- Recorded as `LOG-030`. Not done: `.claude/REORG_AND_VALIDATION.md` §A-3's
+  recommendation to consolidate the three near-identical archetype scripts
+  into one with a `--mode` flag, and its recommended rewrite of
+  `compare_model_reconstructions.py` against the NB/ZINB-only comparison
+  perimeter — both left as open follow-ups, not silently done as part of
+  this pass.
