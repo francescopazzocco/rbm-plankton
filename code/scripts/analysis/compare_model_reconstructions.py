@@ -28,6 +28,7 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from models import io as data_io
 from models.paths import DIAGNOSTIC_ROOT, PROJECT_ROOT as ROOT
+from models.visualization import COLORS
 import use_trained_rbm as trained_loader
 
 MODEL_FAMILIES = [
@@ -203,9 +204,10 @@ def shade_color(color, mix: float):
 
 
 def family_base_color(family_label: str):
-    family_order = [label for _, label in MODEL_FAMILIES]
-    family_idx = family_order.index(family_label)
-    return plt.get_cmap("tab10")(family_idx % 10)
+    # COLORS (models.visualization) is the project-wide canonical family->color
+    # map, not a locally recomputed one, so a family gets the same color here
+    # as in every other figure that colors it (e.g. plot_final_metric).
+    return COLORS[family_label]
 
 
 def evaluate_overall_results(
@@ -393,7 +395,7 @@ def plot_overall_summary(
 
     entries = []
     for family_idx, label in enumerate(family_order):
-        base_color = plt.get_cmap("tab10")(family_idx % 10)
+        base_color = family_base_color(label)
         for rank_idx, entry in enumerate(overall_results[label]["top_l"]):
             entries.append(
                 {
@@ -572,12 +574,7 @@ def main():
             args.raw,
         )
 
-        family_order = sorted(
-            [label for _, label in MODEL_FAMILIES if label in overall_results],
-            key=lambda label: overall_results[label]["family_sort_distance"],
-            reverse=True,
-        )
-        base_color = plt.get_cmap("tab10")(family_order.index(best_family_label) % 10)
+        base_color = family_base_color(best_family_label)
         family_top_l = overall_results[best_family_label]["top_l"]
         residual_color = None
         for rank, entry in enumerate(family_top_l):
@@ -618,7 +615,7 @@ def main():
 
     x_axis = np.arange(len(taxa_cols))
     models = []
-    colors = plt.get_cmap("tab10")(np.linspace(0, 1, len(MODEL_FAMILIES)))
+    colors = [family_base_color(label) for _, label in MODEL_FAMILIES]
 
     for model_name, label in MODEL_FAMILIES:
         model, visible_model, weights_path = load_model_run(model_name, args.Ln, args.seed, args.device)

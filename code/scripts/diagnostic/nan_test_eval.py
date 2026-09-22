@@ -47,6 +47,7 @@ from models.io import (
 )
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 from models.utils import get_device
+from models.visualization import COLORS
 
 
 # -- Config ------------------------------------------------------------------
@@ -138,16 +139,10 @@ PATTERN_LABELS = {
 }
 PATTERNS = ["p3_3miss", "p31_31miss", "p54_54miss"]
 
-FAMILY_COLORS = {
-    "nb":               "#08519c",
-    "nb_sigmoid":       "#3182bd",
-    "nb_softmax":       "#9ecae1",
-    "zinb":             "#006d2c",
-    "zinb_sigmoid":     "#31a354",
-    "zinb_softmax":     "#a1d99b",
-    "bernoulli_median": "#e6550d",
-    "bernoulli_zero":   "#fdae6b",
-}
+# Project-wide canonical family->color map (models.visualization.COLORS), so
+# a family gets the same color here as in plot_final_metric, split_comparison,
+# and compare_model_reconstructions -- not a locally recomputed Brewer scheme.
+FAMILY_COLORS = COLORS
 
 FAMILY_LABELS = {
     "nb":               "NB",

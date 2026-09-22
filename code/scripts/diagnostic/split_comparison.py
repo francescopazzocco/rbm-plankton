@@ -36,6 +36,7 @@ from models.io import (
     CHRONO, COUNT_SCALE, METRIC_COL, SHUFFLED, best_seed_dir, binarise_rows,
     load_model, load_nan_rows, run_dir, scale_counts,
 )
+from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 from models.utils import get_device
 
@@ -62,9 +63,15 @@ PATTERN_LABELS = {
 PATTERNS = ["p3_3miss", "p31_31miss", "p54_54miss"]
 
 
+# Each family already gets its own subplot (see plot_comparison), so color
+# only needs to carry the split, not the family; this is the canonical
+# chrono/shuffled color pair -- reuse SPLIT_COLORS (or this same [CHRONO,
+# SHUFFLED] -> get_palette(2) mapping) wherever else the two splits need to
+# be told apart, so "chrono" and "shuffled" mean the same color project-wide.
+SPLIT_COLORS = dict(zip([CHRONO, SHUFFLED], get_palette(2)))
 FAMILY_COLORS = {
-    "nb":               {CHRONO: "#6baed6", SHUFFLED: "#2171b5"},
-    "bernoulli_median": {CHRONO: "#fdae6b", SHUFFLED: "#e6550d"},
+    "nb":               SPLIT_COLORS,
+    "bernoulli_median": SPLIT_COLORS,
 }
 FAMILY_LABELS = {"nb": "NB-RBM", "bernoulli_median": "Bernoulli-med"}
 

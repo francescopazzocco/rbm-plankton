@@ -24,6 +24,7 @@ import pandas as pd
 from models.io import (
     CHRONO, METRIC_COL, SPLITS, best_seed_dir, load_hidden_activations, run_dir,
 )
+from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
 
 
@@ -54,8 +55,10 @@ def plot_stackplot(df: pd.DataFrame, output_path: Path, title: str) -> None:
     normalized = normalize_rows(df[hidden_cols])
 
     n_hidden = len(hidden_cols)
-    cmap = matplotlib.colormaps["gist_ncar"].resampled(n_hidden)
-    colors = [cmap(x) for x in np.linspace(0, 1, n_hidden)]
+    # get_palette repeats past 8 categories (no marker equivalent for a filled
+    # stackplot band); acceptable here since adjacent bands are still split by
+    # a visible boundary line, unlike overlapping scatter/line series.
+    colors = get_palette(n_hidden)
     fig, ax = plt.subplots(figsize=(18, 9))
     ax.stackplot(
         dates,
