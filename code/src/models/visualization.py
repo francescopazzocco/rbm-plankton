@@ -5,7 +5,7 @@ Sections (in order):
   main_multiseed        export_results_csv, plot_training_curves,
                         plot_weight_heatmap, plot_hidden_activations
   sweep_analysis        plot_final_metric, plot_sweep_curves, plot_nb_diagnostics
-  hidden_coactivation   plot_weight_profiles, plot_state_timeline
+  hidden_dominant_state plot_weight_profiles, plot_state_timeline
   hidden_mean_activation  plot_family
   hidden_cross_model    plot_correlation, plot_pattern_frequency,
                         plot_seasonal_profiles
@@ -400,7 +400,7 @@ def plot_zinb_diagnostics(runs, figures_dir: Path):
 
 
 # =============================================================================
-# hidden_coactivation
+# hidden_dominant_state
 # =============================================================================
 
 TOP_SPECIES_PER_UNIT = 8
@@ -423,8 +423,9 @@ def select_top_species(W: pd.DataFrame) -> pd.DataFrame:
 
 
 def load_activations(csv: Path) -> pd.DataFrame:
-    """Load hidden activations CSV indexed by date."""
-    return pd.read_csv(csv, index_col="date", parse_dates=True)
+    """Load hidden activations CSV indexed by date (io.load_hidden_activations)."""
+    from .io import load_hidden_activations
+    return load_hidden_activations(csv)
 
 
 def dominant_state(activations: pd.DataFrame) -> pd.Series:
@@ -434,6 +435,58 @@ def dominant_state(activations: pd.DataFrame) -> pd.Series:
         index=activations.index,
         name="dominant"
     )
+
+
+PATTERN_THRESHOLD = 0.5
+
+
+def hidden_binary(activations: pd.DataFrame, mode: str = "threshold",
+                  threshold: float = PATTERN_THRESHOLD) -> pd.DataFrame:
+    """Discretise hidden activations into a binary pattern, one bit per unit.
+
+    mode="threshold"  unit is on when its activation >= threshold.  Intended for
+                      Bernoulli and sigmoid hidden units.
+    mode="winner"     one-hot on the argmax unit.  Intended for softmax units,
+                      whose activations sum to 1 so that a fixed cut is
+                      meaningless (at L>=10 every unit sits below 0.5).
+
+    Known weakness of mode="threshold": a unit whose activation never crosses
+    the cut contributes a constant bit, so the resulting pattern set can be an
+    artefact of the threshold rather than a property of the model.  Tracked as
+    item 17 in .claude/REORG_AND_VALIDATION.md (Phase B).
+    """
+    values = activations.to_numpy(dtype=float)
+
+    if mode == "threshold":
+        binary = (values >= threshold).astype(np.int8)
+    elif mode == "winner":
+        binary = np.zeros_like(values, dtype=np.int8)
+        binary[np.arange(len(values)), values.argmax(axis=1)] = 1
+    else:
+        raise ValueError(f"Unknown mode={mode!r}; expected 'threshold' or 'winner'.")
+
+    return pd.DataFrame(binary, columns=activations.columns, index=activations.index)
+
+
+def pattern_labels(binary: pd.DataFrame) -> pd.Series:
+    """Binary-string label per row, e.g. '010101'.
+
+    Leftmost digit is the first hidden unit (h0), rightmost the last.
+    """
+    return binary.astype(int).astype(str).agg("".join, axis=1).rename("pattern")
+
+
+def pattern_frequency(binary: pd.DataFrame) -> pd.DataFrame:
+    """Count how often each binary pattern occurs, most frequent first."""
+    labels = pattern_labels(binary)
+    counts = labels.value_counts()
+    df = pd.DataFrame({
+        "pattern":  counts.index,
+        "n_days":   counts.values,
+        "fraction": (counts.values / len(labels)).round(4),
+    })
+    df["n_units_on"] = df["pattern"].apply(lambda p: p.count("1"))
+    return df.reset_index(drop=True)
 
 
 def plot_weight_profiles(family: str, family_runs: dict, out_dir: Path):
@@ -514,7 +567,7 @@ ABSORBER_LO = 0.10
 
 def mean_activations(csv: Path) -> pd.Series:
     """Mean activation per hidden unit over all samples."""
-    return pd.read_csv(csv, index_col="date").mean()
+    return load_activations(csv).mean()
 
 
 def plot_family(family: str, family_runs: dict, out_dir: Path):

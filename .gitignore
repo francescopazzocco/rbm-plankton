@@ -56,20 +56,21 @@ doc/*.pdf
 # Superseded experimental runs
 archive/
 
-# Legacy training/weights directories (still on disk, don't re-track)
+# Training runs (weights, CSVs, logs) — large, regeneratable by code/train/train.py.
+# This is the canonical run directory: models.paths.RUNS_ROOT points here.
 training_runs/
+
+# Superseded run/weight directories (still on disk, don't re-track)
 training_runs_v1/
 training_runs_v2/
 training_runs_v3/
 training_runs_CD1/
+trained_models/
 weights/
 weights.zip
 
 # Legacy generated figures
 figures/
-
-# Training run data (weights, CSVs, logs) — large, regeneratable
-trained_models/
 
 # Diagnostic outputs (regeneratable evaluation artifacts)
 diagnostic_outputs/
@@ -83,6 +84,7 @@ tmp/
 # Results: track analysis outputs, ignore everything else
 results/*
 !results/README.md
+!results/MANIFEST.json
 !results/01_exploratory/
 !results/01_exploratory/**
 !results/02_model_analysis/
