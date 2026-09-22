@@ -1,28 +1,28 @@
 {
   "01_exploratory/fig1_rowsum_timeseries.png": {
     "produced_by": "code/scripts/train/dataset_analysis.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T19:06:03+00:00"
   },
   "01_exploratory/fig2_lombscargle.png": {
     "produced_by": "code/scripts/train/dataset_analysis.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T19:06:03+00:00"
   },
   "01_exploratory/fig3_annual_seasonal.png": {
     "produced_by": "code/scripts/train/dataset_analysis.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T19:06:03+00:00"
   },
   "01_exploratory/fig4_distributions.png": {
     "produced_by": "code/scripts/train/dataset_analysis.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T19:06:03+00:00"
   },
   "01_exploratory/fig5_nan_structure.png": {
     "produced_by": "code/scripts/train/dataset_analysis.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T19:06:03+00:00"
   },
   "02_model_analysis/cross_model_correlation.png": {
     "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
@@ -351,18 +351,48 @@
   },
   "04_model_selection/all_final_val_nll.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
   },
-  "04_model_selection/shuffled/sweep_final_metric.png": {
+  "04_model_selection/shuffled/sweep_final_metric_bernoulli_median.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
   },
-  "04_model_selection/sweep_final_metric.png": {
+  "04_model_selection/shuffled/sweep_final_metric_bernoulli_zero.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
+  },
+  "04_model_selection/shuffled/sweep_final_metric_nb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
+  },
+  "04_model_selection/shuffled/sweep_final_metric_zinb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
+  },
+  "04_model_selection/sweep_final_metric_bernoulli_median.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
+  },
+  "04_model_selection/sweep_final_metric_bernoulli_zero.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
+  },
+  "04_model_selection/sweep_final_metric_nb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
+  },
+  "04_model_selection/sweep_final_metric_zinb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "179e190",
+    "published_at": "2026-09-22T18:40:00+00:00"
   },
   "diagnostics/softmax_train_nll_curves.png": {
     "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
