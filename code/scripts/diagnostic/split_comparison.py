@@ -38,6 +38,7 @@ from models.io import (
 )
 from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
+from models.visualization import display_name
 from models.utils import get_device
 
 OUT_DIR     = DIAGNOSTIC_ROOT / "tables"
@@ -73,7 +74,6 @@ FAMILY_COLORS = {
     "nb":               SPLIT_COLORS,
     "bernoulli_median": SPLIT_COLORS,
 }
-FAMILY_LABELS = {"nb": "NB-RBM", "bernoulli_median": "Bernoulli-med"}
 
 
 def plot_comparison(summary: pd.DataFrame, out: Path):
@@ -99,7 +99,7 @@ def plot_comparison(summary: pd.DataFrame, out: Path):
         ax.set_xticklabels([PATTERN_LABELS[p] for p in PATTERNS])
         ax.set_xlabel("Missingness pattern")
         ax.set_ylabel("Test NLL (observed taxa only)")
-        ax.set_title(FAMILY_LABELS[family])
+        ax.set_title(display_name(family))
         ax.set_ylim(bottom=0)
         ax.legend(fontsize=8)
 

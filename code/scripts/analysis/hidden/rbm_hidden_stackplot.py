@@ -31,6 +31,7 @@ from models.io import (
 )
 from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
+from models.visualization import display_name
 
 
 def resolve_seed_dir(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
@@ -43,6 +44,10 @@ def resolve_seed_dir(family: str, n_hidden: int, split: str, models_root: Path) 
     return seed_dir
 
 
+# Sampling gaps longer than this many days are left blank in the stackplot.
+GAP_DAYS = 7
+
+
 def normalize_rows(hidden_df: pd.DataFrame) -> pd.DataFrame:
     values = hidden_df.to_numpy(dtype=float)
     row_sums = values.sum(axis=1)
@@ -53,11 +58,30 @@ def normalize_rows(hidden_df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(normalized, columns=hidden_df.columns, index=hidden_df.index)
 
 
+def break_at_gaps(df: pd.DataFrame, max_gap_days: int = GAP_DAYS) -> pd.DataFrame:
+    """Insert an all-NaN row after every sampling gap longer than max_gap_days.
+
+    stackplot/fill_between break the filled area at NaN, so a missing stretch
+    of data is left blank instead of being bridged by a flat band that reads
+    as a stable hidden state.
+    """
+    dates = df["date"]
+    gap_starts = dates[dates.diff().shift(-1) > pd.Timedelta(days=max_gap_days)]
+    if gap_starts.empty:
+        return df
+    breaks = pd.DataFrame({"date": gap_starts + pd.Timedelta(days=1)})
+    return (pd.concat([df, breaks], ignore_index=True)
+            .sort_values("date").reset_index(drop=True))
+
+
 def plot_stackplot(df: pd.DataFrame, output_path: Path, title: str) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    dates = df["date"]
     hidden_cols = [col for col in df.columns if col.startswith("h")]
-    normalized = normalize_rows(df[hidden_cols])
+    df = df.copy()
+    df[hidden_cols] = normalize_rows(df[hidden_cols])
+    df = break_at_gaps(df)
+    dates = df["date"]
+    normalized = df[hidden_cols]
 
     n_hidden = len(hidden_cols)
     # get_palette repeats past 8 categories (no marker equivalent for a filled
@@ -123,7 +147,7 @@ def main() -> None:
         split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden" / "hidden_stackplot", args.split)
         / f"{args.family}_L{args.L}.png")
     title = args.title or (
-        f"{args.family} L={args.L} ({args.split}) — "
+        f"{display_name(args.family)} L={args.L} ({args.split}) — "
         f"hidden activation composition over time")
 
     df = load_hidden_activations(seed_dir / "rbm_hidden_activations.csv", indexed=False)

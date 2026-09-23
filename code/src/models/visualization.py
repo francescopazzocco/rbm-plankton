@@ -282,18 +282,28 @@ def _profile_of(family: str, base: str) -> str:
     return "" if family == base else family[len(base) + 1:]
 
 
-# Short display name for the hidden_cross_model plots (title + filename), one
-# per NB hidden-unit variant. Matches ARCHITECTURE.md's per-family headings
-# ("NB-Sigmoid-RBM" etc). "nb" stays the unsuffixed default everywhere so
-# existing chrono/shuffled L6 outputs (built before nb_sigmoid was selected
-# as the recommended hidden-unit type, LOG-021) are never overwritten by a
-# run for a different family -- see hidden_cross_model.py's --family flag.
-FAMILY_SHORT_LABEL = {
-    "nb":         "NB",
-    "nb_relu":    "NB-ReLU",
-    "nb_sigmoid": "NB-Sigmoid",
-    "nb_softmax": "NB-Softmax",
+# Display name for every family, "<visible>-<hidden>", used in every plot
+# title, legend and tick label in place of the raw directory name
+# ("nb_sigmoid" -> "NB-Sigmoid"). A bare "nb"/"zinb" family has Bernoulli
+# hidden units (ARCHITECTURE.md), so it is spelled out rather than left as
+# "NB", which would not say which hidden-unit type it is.
+FAMILY_DISPLAY_NAME = {
+    "bernoulli_median": "BB-median",
+    "bernoulli_zero":   "BB-zero",
+    "nb":               "NB-Bernoulli",
+    "nb_relu":          "NB-ReLU",
+    "nb_sigmoid":       "NB-Sigmoid",
+    "nb_softmax":       "NB-Softmax",
+    "zinb":             "ZINB-Bernoulli",
+    "zinb_relu":        "ZINB-ReLU",
+    "zinb_sigmoid":     "ZINB-Sigmoid",
+    "zinb_softmax":     "ZINB-Softmax",
 }
+
+
+def display_name(family: str) -> str:
+    """Clean plot label for a family directory name; unknown names pass through."""
+    return FAMILY_DISPLAY_NAME.get(family, family)
 
 
 def _plot_final_metric_panel(ax, title: str, families: list[str], runs) -> set[int]:
@@ -326,7 +336,7 @@ def _plot_final_metric_panel(ax, title: str, families: list[str], runs) -> set[i
         ax.fill_between(xs, mins, maxs, color=color, alpha=0.12, zorder=0)
         ax.errorbar(xs, means, yerr=stds, fmt=f"{marker}-", color=color,
                     linewidth=2, markersize=7, capsize=4,
-                    label=PROFILE_LABEL.get(profile, family) if len(families) > 1 else family)
+                    label=PROFILE_LABEL.get(profile, family) if len(families) > 1 else display_name(family))
         if len(families) == 1:
             for x, y, s in zip(xs, means, stds):
                 ax.annotate(f"{y:.3f}±{s:.3f}", (x, y), textcoords="offset points",
@@ -440,7 +450,7 @@ def plot_sweep_curves(runs, figures_dir: Path):
                             mean_curve.values - std_curve.values,
                             mean_curve.values + std_curve.values,
                             color=color, alpha=0.2)
-        ax.set_title(family)
+        ax.set_title(display_name(family))
         ax.set_xlabel("Epoch")
         ax.set_ylabel(meta["label"])
         ax.legend(fontsize=8)
@@ -461,7 +471,7 @@ def plot_nb_diagnostics(runs, figures_dir: Path):
     cmap = plt.colormaps["viridis"]
 
     fig, (ax_nll, ax_theta) = plt.subplots(1, 2, figsize=(12, 4))
-    fig.suptitle("NB-RBM: NLL and θ trajectories by L (mean ± 1σ over seeds)", fontsize=13)
+    fig.suptitle("NB-Bernoulli: NLL and θ trajectories by L (mean ± 1σ over seeds)", fontsize=13)
 
     for i, l_val in enumerate(l_values):
         color = cmap(i / max(n - 1, 1))
@@ -512,7 +522,7 @@ def plot_zinb_diagnostics(runs, figures_dir: Path):
     cmap = plt.colormaps["viridis"]
 
     fig, (ax_nll, ax_theta, ax_pi) = plt.subplots(1, 3, figsize=(15, 4))
-    fig.suptitle("ZINB-RBM: NLL, θ, and π trajectories by L (mean ± 1σ over seeds)", fontsize=13)
+    fig.suptitle("ZINB-Bernoulli: NLL, θ, and π trajectories by L (mean ± 1σ over seeds)", fontsize=13)
 
     for i, l_val in enumerate(l_values):
         color = cmap(i / max(n - 1, 1))
@@ -665,7 +675,7 @@ def plot_weight_profiles(family: str, family_runs: dict, out_dir: Path):
     if n_l == 1:
         axes = [axes]
     fig.suptitle(
-        f"{family} - weight profiles (top-{TOP_SPECIES_PER_UNIT} species per unit)",
+        f"{display_name(family)} - weight profiles (top-{TOP_SPECIES_PER_UNIT} species per unit)",
         fontsize=11
     )
     for ax, l_val in zip(axes, l_values):
@@ -694,7 +704,7 @@ def plot_state_timeline(family: str, family_runs: dict, out_dir: Path):
     fig, axes = plt.subplots(n_l, 1, figsize=(14, 2.2 * n_l), sharex=True)
     if n_l == 1:
         axes = [axes]
-    fig.suptitle(f"{family} - dominant hidden state over time", fontsize=11)
+    fig.suptitle(f"{display_name(family)} - dominant hidden state over time", fontsize=11)
     max_l  = max(l_values)
     unit_colors = get_palette(max_l)
 
@@ -752,7 +762,7 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
     fig, axes = plt.subplots(1, n, figsize=(3 * n, 3.5), sharey=True)
     if n == 1:
         axes = [axes]
-    fig.suptitle(f"{family} - mean hidden activation per unit", fontsize=12)
+    fig.suptitle(f"{display_name(family)} - mean hidden activation per unit", fontsize=12)
 
     for ax, l_val in zip(axes, l_values):
         means = mean_activations(family_runs[l_val])
@@ -794,7 +804,7 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
 # =============================================================================
 
 def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6, family: str = "nb"):
-    label  = FAMILY_SHORT_LABEL.get(family, family)
+    label  = display_name(family)
     suffix = "_" + p if (p := _profile_of(family, "nb")) else ""
     fig, ax = plt.subplots(figsize=(7, 6))
     vmax = corr.abs().values.max()
@@ -829,7 +839,7 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
     patterns are needed to account for X% of observed days -- analogous to a
     PCA scree plot's cumulative-explained-variance cutoff.
     """
-    label  = FAMILY_SHORT_LABEL.get(family, family)
+    label  = display_name(family)
     suffix = "_" + p if (p := _profile_of(family, "nb")) else ""
     freq = freq.sort_values("fraction", ascending=False).reset_index(drop=True)
     cumulative = freq["fraction"].cumsum().clip(upper=1.0)
@@ -850,9 +860,13 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
     ax1.set_xticklabels(freq["pattern"], fontsize=7, rotation=90,
                         fontfamily="monospace")
     ax1.set_ylabel("fraction of days (this pattern)")
-    ax1.set_xlabel("binary pattern (h0...h5, 1=ON), ranked by frequency")
-    ax1.set_title(f"{label} L={target_l} - activation-pattern coverage "
-                 f"(threshold=0.5, {n} distinct patterns of {2 ** target_l} possible)")
+    ax1.set_xlabel(f"binary pattern (h0...h{target_l - 1}, 1=ON), ranked by frequency")
+    ax1.set_title(f"{label} L={target_l} - activation-pattern coverage",
+                  fontweight="bold", pad=22)
+    ax1.text(0.5, 1.015,
+             rf"unit on iff $p(h_j=1 \mid v) \geq {PATTERN_THRESHOLD}$, "
+             f"{n} distinct patterns of {2 ** target_l} possible",
+             transform=ax1.transAxes, ha="center", va="bottom")
 
     ax2 = ax1.twinx()
     ax2.plot(range(n), cumulative, color=OKABE_ITO[0], marker="o", ms=3, lw=1.5,
@@ -879,7 +893,7 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
 
 def plot_seasonal_profiles(nb_prof: pd.DataFrame, bb_prof: pd.DataFrame,
                            out_dir: Path, target_l: int = 6, family: str = "nb"):
-    label  = FAMILY_SHORT_LABEL.get(family, family)
+    label  = display_name(family)
     suffix = "_" + p if (p := _profile_of(family, "nb")) else ""
     n_units = nb_prof.shape[1]
     fig, axes = plt.subplots(2, 1, figsize=(11, 7), sharex=True)

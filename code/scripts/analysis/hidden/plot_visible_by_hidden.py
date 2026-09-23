@@ -73,6 +73,12 @@ def load_weights(path: Path):
     return W, a, b, extras, taxa
 
 
+# Title wording per mode. "zinb" stays the internal/filename key (read back by
+# archetype_rbm_comparison.py) but covers every count model, NB included, so
+# the title names the quantity instead of a family.
+MODE_DESC = {"bernoulli": "P(v=1 | h)", "zinb": "expected count"}
+
+
 def compute_visible_probs_for_hidden(W, a, b, extras, mode: str, H_vec: np.ndarray) -> np.ndarray:
     """Compute visible probabilities/means given hidden activation vector H_vec.
 
@@ -352,13 +358,13 @@ def main():
     # per-hidden-row plot (renormalizes each hidden node to frequency [0,1])
     if args.layout in ["rows", "both"]:
         plot_path = out_dir / f"visible_by_hidden_{tag}_{mode}_rows.png"
-        plot_per_hidden_rows(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs by hidden ({mode})",
+        plot_per_hidden_rows(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs by hidden ({MODE_DESC[mode]})",
                              normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
         print(f"Saved plot {plot_path}")
         
     if args.layout in ["grid", "both"]:
         plot_path = out_dir / f"visible_by_hidden_{tag}_{mode}_grid.png"
-        plot_per_species_grid(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs per species ({mode})",
+        plot_per_species_grid(species, probs_list, labels, plot_path, f"{args.title_prefix} visible probs per species ({MODE_DESC[mode]})",
                               normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
         print(f"Saved plot {plot_path}")
 
@@ -395,14 +401,14 @@ def main():
         if args.layout in ["rows", "both"]:
             plot_path2 = out_dir / f"visible_by_patterns_{tag}_{mode}_rows.png"
             plot_per_hidden_rows(species, probs_patterns, labels_pat, plot_path2,
-                 f"{args.title_prefix} visible by hidden patterns ({mode})",
+                 f"{args.title_prefix} visible by hidden patterns ({MODE_DESC[mode]})",
                  normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
             print(f"Saved plot {plot_path2}")
                  
         if args.layout in ["grid", "both"]:
             plot_path2 = out_dir / f"visible_by_patterns_{tag}_{mode}_grid.png"
             plot_per_species_grid(species, probs_patterns, labels_pat, plot_path2,
-                 f"{args.title_prefix} visible per species by pattern ({mode})",
+                 f"{args.title_prefix} visible per species by pattern ({MODE_DESC[mode]})",
                  normalize=(not args.no_normalize), log_y=args.log_y, mode=mode)
             print(f"Saved plot {plot_path2}")
 

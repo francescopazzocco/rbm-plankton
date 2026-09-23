@@ -8,6 +8,7 @@ import pandas as pd
 from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, model_dir, split_out_dir
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.paths import PROJECT_ROOT as ROOT
+from models.visualization import display_name
 from scipy.spatial.distance import euclidean
 
 
@@ -69,6 +70,8 @@ def main():
     args = parser.parse_args()
 
     weights = args.weights or resolve_weights(args.family, args.L, args.split, args.models_root)
+    model_tag = (f"{display_name(args.family)} L={args.L} ({args.split})"
+                 if args.weights is None else str(weights))
     out = args.out or (
         split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype" / "archetype_closest_rbm",
                      args.split)
@@ -183,6 +186,7 @@ def main():
         
         ax.grid(True, alpha=0.3)
     
+    fig.suptitle(f"Archetypes vs closest hidden units - {model_tag}", fontweight="bold")
     plt.tight_layout()
     plt.savefig(out, dpi=150)
     print(f"Plot saved to {out}")

@@ -301,3 +301,40 @@ its own loader because the first of those imports it.
   `compare_model_reconstructions.py` against the NB/ZINB-only comparison
   perimeter — both left as open follow-ups, not silently done as part of
   this pass.
+
+---
+
+## 2026-09-23
+
+**nb_softmax L9/L10 sweep, clean family names in every figure, final-model figures**
+
+- Trained `nb_softmax` at L=9 and L=10 (10 seeds each, shuffled split, same
+  hyperparameters as the rest of the sweep); 20/20 runs converged, no NaN.
+  Final val NLL (mean over seeds): L8 0.468, L9 0.462, L10 0.460. Only 5–7
+  hidden units carry more than 2% of the days as argmax winner at any L >= 7:
+  the extra softmax units stay dead, so the capacity saturates at ~6 archetypes.
+- Every plot title/legend/tick now uses one family-name map
+  (`FAMILY_DISPLAY_NAME` / `display_name()` in `visualization.py`, e.g.
+  `nb` -> NB-Bernoulli, `nb_sigmoid` -> NB-Sigmoid, `bernoulli_median` ->
+  BB-median) instead of the raw directory name. Replaces `FAMILY_SHORT_LABEL`
+  and the diverging local `FAMILY_LABELS` tables in `nan_test_eval.py` and
+  `split_comparison.py`. Archetype heatmaps/scatter now state which model they
+  show (previously no model name, or `Weights: weights.npz`).
+- Pattern-coverage plot: bold title plus a normal-weight subtitle stating the
+  binarisation rule as $p(h_j=1 \mid v) \geq 0.5$; x-axis label no longer
+  hardcodes `h0...h5`.
+- `rbm_hidden_stackplot.py`: sampling gaps longer than 7 days are left blank
+  instead of bridged by flat bands that read as a stable hidden state.
+- `plot_visible_by_hidden.py`: titles name the plotted quantity (`expected
+  count` / `P(v=1 | h)`) instead of the internal `zinb` mode key, which also
+  applies to NB models. Filenames unchanged (read by `archetype_rbm_comparison.py`).
+- Generated the full single-model figure set for the selected final model
+  (NB-Sigmoid L=6, shuffled, seed_9): stackplot, pattern histogram/timeline,
+  visible-by-hidden, the three archetype comparisons, plus the existing
+  cross-model/pattern-coverage/seasonal figures. All `02_model_analysis/`,
+  `04_model_selection/` and `diagnostics/` figures regenerated with the new
+  titles and republished to `results/`.
+- Not republished: `03_evaluation/` and the NaN/split evaluation tables. Their
+  scripts score by unseeded Gibbs sampling, so a rerun shifts the published
+  NLLs by ~1e-3 for a label-only change; the committed numbers were kept and
+  the new labels will appear on their next deliberate rerun.
