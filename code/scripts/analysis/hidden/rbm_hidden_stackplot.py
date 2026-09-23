@@ -26,16 +26,16 @@ from models.io import (
     SPLITS,
     best_seed_dir,
     load_hidden_activations,
-    run_dir,
+    model_dir,
     split_out_dir,
 )
 from models.palette import get_palette
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 
 
-def resolve_seed_dir(family: str, n_hidden: int, split: str, runs_root: Path) -> Path:
+def resolve_seed_dir(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
     """Best-converged seed directory of one run, by the family's val metric."""
-    family_l_dir = run_dir(family, n_hidden, split, runs_root)
+    family_l_dir = model_dir(family, n_hidden, split, models_root)
     seed_dir = best_seed_dir(family_l_dir, METRIC_COL[family])
     if seed_dir is None:
         raise FileNotFoundError(
@@ -100,15 +100,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--L", type=int, default=6, help="Hidden unit count (default: 6)")
     parser.add_argument("--split", choices=SPLITS, default=CHRONO,
                         help="Split strategy of the run (default: chrono)")
-    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT,
-                        help="Directory holding the {family}_L{n} run directories")
+    parser.add_argument("--models-root", type=Path, default=MODELS_ROOT,
+                        help="Directory holding artifacts/models/{family}/{split}/L{n} directories")
     parser.add_argument("--seed-dir", type=Path, default=None,
                         help="Use this seed directory directly, ignoring --family/--L/--split")
     parser.add_argument("--output", type=Path, default=None,
                         help="Where to save the stackplot "
                              "(default: results/02_model_analysis/hidden/"
-                             "hidden_stackplot_{family}_L{n}.png, "
-                             "or .../shuffled/... for --split shuffled)")
+                             "hidden_stackplot/{chrono,shuffled}/{family}_L{n}.png)")
     parser.add_argument("--title", default=None, help="Figure title")
     return parser
 
@@ -117,12 +116,12 @@ def main() -> None:
     args = build_parser().parse_args()
 
     seed_dir = args.seed_dir or resolve_seed_dir(
-        args.family, args.L, args.split, args.runs_root)
+        args.family, args.L, args.split, args.models_root)
     print(f"Reading {seed_dir}")
 
     output = args.output or (
-        split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden", args.split)
-        / f"hidden_stackplot_{args.family}_L{args.L}.png")
+        split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden" / "hidden_stackplot", args.split)
+        / f"{args.family}_L{args.L}.png")
     title = args.title or (
         f"{args.family} L={args.L} ({args.split}) — "
         f"hidden activation composition over time")

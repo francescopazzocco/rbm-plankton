@@ -11,7 +11,7 @@ Usage:
 """
 
 # noqa: F401 — CHRONO is a valid SPLIT value, DATA_PATH is re-exported to train.py
-from models.paths import CHRONO, DATA_PATH, RUNS_ROOT, SHUFFLED  # noqa: F401
+from models.paths import CHRONO, DATA_PATH, MODELS_ROOT, SHUFFLED  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Data locations
@@ -22,9 +22,9 @@ from models.paths import CHRONO, DATA_PATH, RUNS_ROOT, SHUFFLED  # noqa: F401
 #
 #   DATA_PATH   raw CSV: daily plankton counts, 83 taxa, organisms/uL
 #               (gitignored — user must provide)
-#   OUT_ROOT    training runs: {OUT_ROOT}/{family}_L{L}{split}/seed_{k}/
+#   OUT_ROOT    trained model weights: {OUT_ROOT}/{family}/{split}/L{L}/seed_{k}/
 
-OUT_ROOT = RUNS_ROOT
+OUT_ROOT = MODELS_ROOT
 
 
 # ---------------------------------------------------------------------------

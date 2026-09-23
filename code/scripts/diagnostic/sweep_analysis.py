@@ -1,12 +1,12 @@
 """
 sweep_analysis.py - NLL/PLL vs L sweep analysis across all trained models.
 
-Reads training_runs/{family}_L{n}{split}/seed_*/rbm_training_curves.csv and
+Reads artifacts/models/{family}/{split}/L{n}/seed_*/rbm_training_curves.csv and
 produces figures in:
-  diagnostic_outputs/04_model_selection/ — final val metric vs L per model family
-  diagnostic_outputs/diagnostics/sweep/ — training curves, NB/ZINB diagnostics
+  diagnostic_outputs/04_model_selection/{split}/ — final val metric vs L per model family
+  diagnostic_outputs/diagnostics/sweep/{split}/ — training curves, NB/ZINB diagnostics
 
-Shuffled-split runs write to a shuffled/ subdirectory of each, so the two
+Each split writes to its own chrono/ or shuffled/ subdirectory, so the two
 splits cannot overwrite each other's figures.
 
 Usage:
@@ -18,11 +18,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from models.io import CHRONO, SPLITS, discover_run_dirs, split_out_dir
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.io import CHRONO, SPLITS, discover_model_dirs, split_out_dir
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import (
     FAMILY_META, aggregate_curves,
-    plot_final_metric, plot_sweep_curves, plot_nb_diagnostics, plot_zinb_diagnostics,
+    plot_final_metric, plot_final_metric_overview, plot_final_metric_individual,
+    plot_sweep_curves, plot_nb_diagnostics, plot_zinb_diagnostics,
 )
 
 
@@ -30,8 +31,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="NLL/PLL vs L sweep analysis.")
     parser.add_argument("--split", choices=SPLITS, default=CHRONO,
                         help="Which split strategy's runs to analyse (default: chrono)")
-    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT,
-                        help="Directory holding the {family}_L{n} run directories")
+    parser.add_argument("--models-root", type=Path, default=MODELS_ROOT,
+                        help="Directory holding artifacts/models/{family}/{split}/L{n} directories")
     return parser.parse_args(argv)
 
 
@@ -42,7 +43,7 @@ def main():
     diag_dir.mkdir(parents=True, exist_ok=True)
     metric_dir.mkdir(parents=True, exist_ok=True)
 
-    all_dirs = discover_run_dirs(args.runs_root, args.split)
+    all_dirs = discover_model_dirs(args.models_root, args.split)
     runs: dict[str, dict[int, list[Path]]] = {}
     for family, ls in all_dirs.items():
         for l_val, seed_dirs in ls.items():
@@ -83,6 +84,8 @@ def main():
         print()
 
     plot_final_metric(runs, metric_dir)
+    plot_final_metric_overview(runs, metric_dir)
+    plot_final_metric_individual(runs, metric_dir)
     plot_sweep_curves(runs, diag_dir)
     plot_nb_diagnostics(runs, diag_dir)
     plot_zinb_diagnostics(runs, diag_dir)

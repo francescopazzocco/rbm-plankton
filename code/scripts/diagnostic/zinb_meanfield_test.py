@@ -31,9 +31,9 @@ import pandas as pd
 from models._eval_utils import loss_zinb, meanfield_zinb, sample_zinb, score_row_gibbs
 from models.io import (
     COUNT_SCALE, METRIC_COL, SHUFFLED, best_seed_dir, load_model, load_nan_rows,
-    run_dir, scale_counts,
+    model_dir, scale_counts,
 )
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.utils import get_device
 
 OUT_DIR = DIAGNOSTIC_ROOT / "zinb_meanfield_test"
@@ -87,7 +87,7 @@ def main():
 
     all_rows = []
     for family, n_hidden, split in _SPECS:
-        fam_dir = run_dir(family, n_hidden, split, RUNS_ROOT)
+        fam_dir = model_dir(family, n_hidden, split, MODELS_ROOT)
         if not fam_dir.exists():
             print(f"[SKIP] {fam_dir.name} not found")
             continue
@@ -109,7 +109,7 @@ def main():
             print(f"  {variant:10s}: mean NLL = {df['nll'].mean():.4f}")
 
     if not all_rows:
-        print("\nNo runs evaluated -- nothing found under", RUNS_ROOT)
+        print("\nNo runs evaluated -- nothing found under", MODELS_ROOT)
         return
 
     df = pd.concat(all_rows, ignore_index=True)

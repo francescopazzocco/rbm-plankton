@@ -1,5 +1,5 @@
 """
-plot_training_runs.py — Plot every trained run in training_runs/
+plot_training_runs.py — Plot every trained model in artifacts/models/
 =============================================================================
 
 Reads the CSV files saved in each seed folder and generates plots:
@@ -7,7 +7,7 @@ Reads the CSV files saved in each seed folder and generates plots:
 - Weight heatmaps
 - Hidden activation time series
 
-Both splits are processed: the run directory name carries the split.
+Both splits are processed: artifacts/models/<family>/<split>/L<n>/seed_*/.
 Saves figures to diagnostic_outputs/training_curves/
 """
 
@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 from models.io import load_hidden_activations
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import plot_training_curves, plot_weight_heatmap
 
 
@@ -85,17 +85,16 @@ def plot_hidden_activations_from_csv(activations_csv: Path, out_dir: Path):
     print(f"[Plot]  saved {path}")
 
 
-def process_training_run(run_dir: Path, figures_dir: Path):
-    """Process all seeds in a training run directory"""
-    run_name = run_dir.name
-    print(f"\nProcessing: {run_name}")
+def process_training_run(model_run_dir: Path, figures_dir: Path, run_label: str):
+    """Process all seeds in one (family, split, L) directory under artifacts/models/."""
+    print(f"\nProcessing: {run_label}")
 
-    for seed_dir in sorted(run_dir.glob("seed_*")):
+    for seed_dir in sorted(model_run_dir.glob("seed_*")):
         seed_num = seed_dir.name
         print(f"  Seed: {seed_num}")
 
         # Create output directory for this seed
-        out_dir = figures_dir / run_name / seed_num
+        out_dir = figures_dir / run_label / seed_num
         out_dir.mkdir(parents=True, exist_ok=True)
 
         # Plot training curves
@@ -117,19 +116,27 @@ def process_training_run(run_dir: Path, figures_dir: Path):
 
 
 def main():
-    runs_root = RUNS_ROOT
+    models_root = MODELS_ROOT
     figures_dir = DIAGNOSTIC_ROOT / "training_curves"
 
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    if not runs_root.exists():
-        print(f"Error: {runs_root} does not exist")
+    if not models_root.exists():
+        print(f"Error: {models_root} does not exist")
         return
 
-    # Process all training runs, both splits
-    for run_dir in sorted(runs_root.iterdir()):
-        if run_dir.is_dir():
-            process_training_run(run_dir, figures_dir)
+    # Process every (family, split, L) directory, both splits.
+    for family_dir in sorted(models_root.iterdir()):
+        if not family_dir.is_dir():
+            continue
+        for split_dir in sorted(family_dir.iterdir()):
+            if not split_dir.is_dir():
+                continue
+            for l_dir in sorted(split_dir.iterdir()):
+                if not l_dir.is_dir():
+                    continue
+                run_label = f"{family_dir.name}_{split_dir.name}_{l_dir.name}"
+                process_training_run(l_dir, figures_dir, run_label)
 
     print(f"\nAll plots saved to: {figures_dir}")
 

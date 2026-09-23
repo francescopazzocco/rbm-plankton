@@ -28,7 +28,7 @@ from config import (
     SINGLE_RUN_FAMILY, SINGLE_RUN_L, SINGLE_RUN_SEED, SPLIT,
     THETA_INIT_LOG, USE_PCD, VAL_FRAC,
 )
-from models.paths import run_dir
+from models.paths import model_dir
 
 
 PCD_FAMILIES = {"nb", "zinb", "nb_relu", "zinb_relu",
@@ -157,7 +157,7 @@ def build_jobs() -> list[tuple]:
         for l_val in l_list:
             for seed in range(n_seeds):
                 seed_id = seed if not SINGLE_RUN else SINGLE_RUN_SEED
-                out_dir = run_dir(family, l_val, SPLIT, OUT_ROOT) / f"seed_{seed_id}"
+                out_dir = model_dir(family, l_val, SPLIT, OUT_ROOT) / f"seed_{seed_id}"
                 if (out_dir / "rbm_training_curves.csv").exists():
                     continue
                 jobs.append((family, l_val, seed_id, str(out_dir)))

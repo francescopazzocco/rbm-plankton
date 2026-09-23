@@ -1,27 +1,37 @@
 """
-hidden_cross_model.py - Cross-model comparison: NB-RBM vs BB-median at L=6.
+hidden_cross_model.py - Cross-model comparison: NB-family RBM vs BB-median.
+
+--family selects which NB hidden-unit variant to compare (nb / nb_relu /
+nb_sigmoid / nb_softmax). Default is "nb" (Bernoulli hidden) for
+backward-compatible output paths, NOT the model DECISION_LOG LOG-021
+recommends (nb_sigmoid) -- pass --family nb_sigmoid explicitly for that.
 
 Three analyses:
-  1. Pairwise Pearson correlation between NB and BB-median hidden unit activation
-     timeseries - identifies which units encode the same seasonal signal.
-  2. NB binary pattern frequency - 6-unit activation vector thresholded at 0.5;
-     counts distinct patterns (effective state usage out of 2^6=64).
+  1. Pairwise Pearson correlation between the chosen NB variant and BB-median
+     hidden unit activation timeseries - identifies which units encode the
+     same seasonal signal.
+  2. Binary pattern frequency - L-unit activation vector thresholded at 0.5;
+     counts distinct patterns (effective state usage out of 2^L).
   3. Seasonal profiles - mean activation per month per unit for both models.
 
-Outputs (CSVs) in results/tables/hidden/:
-  cross_model_correlation.csv    - 6x6 Pearson matrix
-  cross_model_matched_pairs.csv  - best NB<->BB match per unit
-  nb_pattern_frequency.csv       - binary pattern counts
-  seasonal_profiles_nb.csv       - mean activation by month
-  seasonal_profiles_bb.csv       - mean activation by month
+Outputs (CSVs) in results/tables/hidden/{split}/, unsuffixed for the default
+family="nb" (nb_sigmoid etc. get a "_sigmoid" suffix instead of overwriting
+the nb= Bernoulli baseline's tables -- see archetype_rbm_comparison.py, which
+hardcodes the unsuffixed nb paths):
+  cross_model_correlation[_<profile>].csv    - LxL Pearson matrix
+  cross_model_matched_pairs[_<profile>].csv  - best NB<->BB match per unit
+  nb_pattern_frequency[_<profile>].csv       - binary pattern counts
+  seasonal_profiles_nb[_<profile>].csv       - mean activation by month
+  seasonal_profiles_bb.csv                   - mean activation by month (family-independent)
 
-Outputs (plots) in results/02_model_analysis/hidden/:
-  cross_model_correlation_L{L}.png
-  nb_pattern_frequency_L{L}.png
-  seasonal_profiles_L{L}.png
+Outputs (plots), one kind-subfolder per analysis:
+  results/02_model_analysis/hidden/cross_model_correlation/{split}/[<profile>_]L{L}.png
+  results/02_model_analysis/hidden/nb_pattern_frequency/{split}/[<profile>_]L{L}.png
+  results/02_model_analysis/hidden/seasonal_profiles/{split}/[<profile>_]L{L}.png
 
 Usage:
-    python code/scripts/analysis/hidden/hidden_cross_model.py [--split chrono|shuffled] [--L 6]
+    python code/scripts/analysis/hidden/hidden_cross_model.py \\
+        [--split chrono|shuffled] [--L 6] [--family nb|nb_relu|nb_sigmoid|nb_softmax]
 """
 
 import argparse
@@ -34,10 +44,10 @@ from models.io import (
     SPLITS,
     best_seed_dir,
     load_hidden_activations,
-    run_dir,
+    model_dir,
     split_out_dir,
 )
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import (
     hidden_binary,
     pattern_frequency,
@@ -54,14 +64,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="Which split strategy's runs to compare (default: chrono)")
     parser.add_argument("--L", type=int, default=6,
                         help="Hidden unit count to compare (default: 6)")
-    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT,
-                        help="Directory holding the {family}_L{n} run directories")
+    parser.add_argument("--family", default="nb",
+                        choices=["nb", "nb_relu", "nb_sigmoid", "nb_softmax"],
+                        help="NB hidden-unit variant to compare against BB-median "
+                             "(default: nb, i.e. Bernoulli hidden -- NOT the "
+                             "LOG-021-recommended variant; pass nb_sigmoid for that)")
+    parser.add_argument("--models-root", type=Path, default=MODELS_ROOT,
+                        help="Directory holding artifacts/models/{family}/{split}/L{n} directories")
     return parser.parse_args(argv)
 
 
 def load_activations(family: str, n_hidden: int, split: str,
-                     runs_root: Path) -> pd.DataFrame:
-    family_l_dir = run_dir(family, n_hidden, split, runs_root)
+                     models_root: Path) -> pd.DataFrame:
+    family_l_dir = model_dir(family, n_hidden, split, models_root)
     seed_dir = best_seed_dir(family_l_dir, METRIC_COL[family])
     if seed_dir is None:
         raise FileNotFoundError(f"No converged seed for {family} L={n_hidden} ({split})")
@@ -99,47 +114,58 @@ def seasonal_profile(act: pd.DataFrame) -> pd.DataFrame:
 
 def main():
     args = parse_args()
+    hidden_base = DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden"
     csv_dir = split_out_dir(DIAGNOSTIC_ROOT / "tables" / "hidden", args.split)
-    fig_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden", args.split)
-    csv_dir.mkdir(parents=True, exist_ok=True)
-    fig_dir.mkdir(parents=True, exist_ok=True)
+    correlation_dir  = split_out_dir(hidden_base / "cross_model_correlation", args.split)
+    pattern_freq_dir = split_out_dir(hidden_base / "nb_pattern_frequency", args.split)
+    seasonal_dir     = split_out_dir(hidden_base / "seasonal_profiles", args.split)
+    for d in (csv_dir, correlation_dir, pattern_freq_dir, seasonal_dir):
+        d.mkdir(parents=True, exist_ok=True)
 
-    nb = load_activations("nb", args.L, args.split, args.runs_root)
-    bb = load_activations("bernoulli_median", args.L, args.split, args.runs_root)
+    # Output filenames stay unsuffixed for the default family="nb" (Bernoulli
+    # hidden) so existing chrono/shuffled L6 outputs -- and
+    # archetype_rbm_comparison.py's hardcoded paths to seasonal_profiles_nb.csv
+    # -- are untouched. A non-default family (e.g. nb_sigmoid, LOG-021's
+    # recommended NB hidden-unit type) gets its own suffixed files instead of
+    # silently overwriting the nb= Bernoulli baseline's tables.
+    suffix = "" if args.family == "nb" else "_" + args.family[len("nb") + 1:]
+
+    nb = load_activations(args.family, args.L, args.split, args.models_root)
+    bb = load_activations("bernoulli_median", args.L, args.split, args.models_root)
 
     shared = nb.index.intersection(bb.index)
     print(f"Shared dates: {len(shared)}")
 
     # 1. Correlation
     corr = compute_correlation(nb, bb)
-    corr.to_csv(csv_dir / "cross_model_correlation.csv")
-    print(f"Saved: {csv_dir}/cross_model_correlation.csv")
+    corr.to_csv(csv_dir / f"cross_model_correlation{suffix}.csv")
+    print(f"Saved: {csv_dir}/cross_model_correlation{suffix}.csv")
 
     pairs = matched_pairs(corr)
-    pairs.to_csv(csv_dir / "cross_model_matched_pairs.csv", index=False)
-    print(f"Saved: {csv_dir}/cross_model_matched_pairs.csv")
-    print("\nBest NB<->BB matches:")
+    pairs.to_csv(csv_dir / f"cross_model_matched_pairs{suffix}.csv", index=False)
+    print(f"Saved: {csv_dir}/cross_model_matched_pairs{suffix}.csv")
+    print(f"\nBest {args.family}<->BB matches:")
     print(pairs.to_string(index=False))
 
-    plot_correlation(corr, fig_dir, target_l=args.L)
+    plot_correlation(corr, correlation_dir, target_l=args.L, family=args.family)
 
     # 2. NB pattern frequency
     freq = pattern_frequency(hidden_binary(nb))
-    freq.to_csv(csv_dir / "nb_pattern_frequency.csv", index=False)
-    print(f"\nSaved: {csv_dir}/nb_pattern_frequency.csv")
-    print(f"Distinct NB patterns used: {len(freq)} / {2 ** args.L}")
+    freq.to_csv(csv_dir / f"nb_pattern_frequency{suffix}.csv", index=False)
+    print(f"\nSaved: {csv_dir}/nb_pattern_frequency{suffix}.csv")
+    print(f"Distinct {args.family} patterns used: {len(freq)} / {2 ** args.L}")
     print(freq.head(10).to_string(index=False))
 
-    plot_pattern_frequency(freq, fig_dir, target_l=args.L)
+    plot_pattern_frequency(freq, pattern_freq_dir, target_l=args.L, family=args.family)
 
     # 3. Seasonal profiles
     nb_prof = seasonal_profile(nb)
     bb_prof = seasonal_profile(bb)
-    nb_prof.to_csv(csv_dir / "seasonal_profiles_nb.csv")
+    nb_prof.to_csv(csv_dir / f"seasonal_profiles_nb{suffix}.csv")
     bb_prof.to_csv(csv_dir / "seasonal_profiles_bb.csv")
     print("\nSaved seasonal profiles.")
 
-    plot_seasonal_profiles(nb_prof, bb_prof, fig_dir, target_l=args.L)
+    plot_seasonal_profiles(nb_prof, bb_prof, seasonal_dir, target_l=args.L, family=args.family)
 
 
 if __name__ == "__main__":

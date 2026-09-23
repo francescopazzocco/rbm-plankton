@@ -18,9 +18,9 @@ import argparse
 from pathlib import Path
 
 import pandas as pd
-from models.io import CHRONO, METRIC_COL, SHUFFLED, best_seed_dir, run_dir, split_suffix
+from models.io import CHRONO, METRIC_COL, SHUFFLED, best_seed_dir, model_dir
 from models.paths import PROJECT_ROOT as ROOT
-from models.paths import RUNS_ROOT
+from models.paths import MODELS_ROOT
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -31,13 +31,13 @@ PROF_TIMESERIES = ROOT / "prof" / "archetypes_k5_timeseries.csv"
 
 def _vbh_path(family: str, mode: str, split: str, n_hidden: int = 6) -> Path:
     """Path plot_visible_by_hidden.py would have written for this run's best
-    seed -- {family}_L{n}[_shuffled]_seed_{k}, matching its own `_run_tag`.
+    seed -- {family}_L{n}_seed_{k}, matching its own `_run_tag`.
     """
-    seed_dir = best_seed_dir(run_dir(family, n_hidden, split, RUNS_ROOT), METRIC_COL[family])
+    seed_dir = best_seed_dir(model_dir(family, n_hidden, split, MODELS_ROOT), METRIC_COL[family])
     if seed_dir is None:
         raise FileNotFoundError(f"No converged seed for {family} L={n_hidden} ({split})")
-    tag = f"{family}_L{n_hidden}{split_suffix(split)}_{seed_dir.name}"
-    return (ROOT / "results" / "02_model_analysis" / "hidden" / "visible_by_hidden"
+    tag = f"{family}_L{n_hidden}_{seed_dir.name}"
+    return (ROOT / "results" / "02_model_analysis" / "hidden" / "visible_by_hidden" / split
             / f"visible_by_hidden_{tag}_{mode}.csv")
 
 
@@ -52,10 +52,10 @@ VBH = {
     "zinb_shuffle": _vbh_path("zinb", "zinb", SHUFFLED),
 }
 
-SEASONAL_NB = ROOT / "results/tables/hidden/seasonal_profiles_nb.csv"
-SEASONAL_BB = ROOT / "results/tables/hidden/seasonal_profiles_bb.csv"
-STATE_FREQ  = ROOT / "results/02_model_analysis/hidden/state_frequency.csv"
-MEAN_ACT    = ROOT / "results/02_model_analysis/hidden/mean_activation_summary.csv"
+SEASONAL_NB = ROOT / "results/tables/hidden/chrono/seasonal_profiles_nb.csv"
+SEASONAL_BB = ROOT / "results/tables/hidden/chrono/seasonal_profiles_bb.csv"
+STATE_FREQ  = ROOT / "results/02_model_analysis/hidden/state_frequency/chrono/state_frequency.csv"
+MEAN_ACT    = ROOT / "results/02_model_analysis/hidden/mean_activation/chrono/summary.csv"
 
 
 def separator(title: str) -> None:

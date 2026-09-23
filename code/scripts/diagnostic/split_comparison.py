@@ -34,10 +34,10 @@ import pandas as pd
 from models._eval_utils import score_row_gibbs, loss_nb, loss_bern
 from models.io import (
     CHRONO, COUNT_SCALE, METRIC_COL, SHUFFLED, best_seed_dir, binarise_rows,
-    load_model, load_nan_rows, run_dir, scale_counts,
+    load_model, load_nan_rows, model_dir, scale_counts,
 )
 from models.palette import get_palette
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.utils import get_device
 
 OUT_DIR     = DIAGNOSTIC_ROOT / "tables"
@@ -122,7 +122,7 @@ def main():
         tag = f"{family}  {split}  L={L}"
         print(f"\n=== {tag} ===")
 
-        rdir = run_dir(family, L, split, RUNS_ROOT)
+        rdir = model_dir(family, L, split, MODELS_ROOT)
         if not rdir.exists():
             print(f"  ! directory not found: {rdir}  — skipping")
             continue

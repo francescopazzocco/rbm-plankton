@@ -9,9 +9,10 @@ Two figures per model family:
   1. Weight profiles: species x hidden unit heatmap (species sorted by dominant unit)
   2. Dominant state timeline: each date assigned to its argmax hidden unit, one row per L
 
-Output: results/02_model_analysis/hidden/weight_profiles_{family}.png
-        results/02_model_analysis/hidden/state_timeline_{family}.png
-        (shuffled-split runs under results/02_model_analysis/hidden/shuffled/)
+Output: results/02_model_analysis/hidden/weight_profiles/{chrono,shuffled}/{family}.png
+        results/02_model_analysis/hidden/state_timeline/{chrono,shuffled}/{family}.png
+        results/02_model_analysis/hidden/state_frequency/{chrono,shuffled}/state_frequency.csv
+        results/02_model_analysis/hidden/dominant_state/{chrono,shuffled}/L6.csv
 
 Usage:
     python code/scripts/analysis/hidden/hidden_dominant_state.py [--split chrono|shuffled]
@@ -27,11 +28,10 @@ from models.io import (
     METRIC_COL,
     SPLITS,
     best_seed_dir,
-    discover_run_dirs,
+    discover_model_dirs,
     split_out_dir,
-    split_suffix,
 )
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import (
     dominant_state,
     load_activations,
@@ -45,16 +45,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         description="Dominant hidden state per date, with supporting weight profiles.")
     parser.add_argument("--split", choices=SPLITS, default=CHRONO,
                         help="Which split strategy's runs to analyse (default: chrono)")
-    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT,
-                        help="Directory holding the {family}_L{n} run directories")
+    parser.add_argument("--models-root", type=Path, default=MODELS_ROOT,
+                        help="Directory holding artifacts/models/{family}/{split}/L{n} directories")
     return parser.parse_args(argv)
 
 
 def main():
     args = parse_args()
-    out_dir = split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden", args.split)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    all_dirs = discover_run_dirs(args.runs_root, args.split)
+    hidden_base = DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden"
+    weight_profiles_dir = split_out_dir(hidden_base / "weight_profiles", args.split)
+    state_timeline_dir  = split_out_dir(hidden_base / "state_timeline", args.split)
+    state_frequency_dir = split_out_dir(hidden_base / "state_frequency", args.split)
+    dominant_state_dir  = split_out_dir(hidden_base / "dominant_state", args.split)
+    for d in (weight_profiles_dir, state_timeline_dir, state_frequency_dir, dominant_state_dir):
+        d.mkdir(parents=True, exist_ok=True)
+    all_dirs = discover_model_dirs(args.models_root, args.split)
 
     runs: dict[str, dict[int, dict[str, Path]]] = {}
     for family in ALL_FAMILIES:
@@ -79,10 +84,8 @@ def main():
             print(f"No runs found for {family}, skipping.")
             continue
         print(f"\n-- {family} --")
-        plot_weight_profiles(family, runs[family], out_dir)
-        plot_state_timeline(family, runs[family], out_dir)
-
-    suffix = split_suffix(args.split)
+        plot_weight_profiles(family, runs[family], weight_profiles_dir)
+        plot_state_timeline(family, runs[family], state_timeline_dir)
 
     rows = []
     for family, family_runs in runs.items():
@@ -96,7 +99,7 @@ def main():
                 rows.append({"family": family, "L": l_val, "unit": f"h{unit}",
                              "n_days": int(n), "fraction": round(n / total, 4)})
     df_state = pd.DataFrame(rows)
-    out = out_dir / f"state_frequency{suffix}.csv"
+    out = state_frequency_dir / "state_frequency.csv"
     df_state.to_csv(out, index=False)
     print(f"Saved: {out}")
 
@@ -110,7 +113,7 @@ def main():
     if frames:
         df_dom = pd.concat(frames, axis=1)
         df_dom.index.name = "date"
-        out = out_dir / f"dominant_state_L6{suffix}.csv"
+        out = dominant_state_dir / "L6.csv"
         df_dom.to_csv(out)
         print(f"Saved: {out}")
 
