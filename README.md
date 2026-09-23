@@ -235,7 +235,7 @@ python code/scripts/diagnostic/split_comparison.py      # Chrono vs shuffled →
 python code/scripts/diagnostic/nan_test_eval.py         # NaN imputation → diagnostic_outputs/nan_eval_extended/
 python code/scripts/diagnostic/plot_training_runs.py    # Training curves → diagnostic_outputs/
 python code/scripts/diagnostic/plot_nll_curves.py       # NB-Bernoulli vs NB-Sigmoid NLL curves → diagnostic_outputs/diagnostics/training_curves/family_comparison_fixed_L/
-python code/scripts/diagnostic/plot_train_nll_curves.py --families nb_softmax  # one family across L → .../training_curves/single_family_by_L/
+python code/scripts/diagnostic/plot_train_nll_curves.py --split shuffled  # every family across L → .../training_curves/single_family_by_L/
 ```
 
 Scripts that read one split at a time take `--split chrono|shuffled` (default

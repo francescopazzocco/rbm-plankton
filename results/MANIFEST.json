@@ -774,20 +774,75 @@
     "commit": "869b925",
     "published_at": "2026-09-23T19:17:34+00:00"
   },
+  "diagnostics/training_curves/single_family_by_L/chrono/bernoulli_median_train_pll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/chrono/bernoulli_zero_train_pll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/chrono/nb_train_nll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/chrono/zinb_train_nll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/shuffled/bernoulli_median_train_pll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/shuffled/bernoulli_zero_train_pll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/shuffled/nb_relu_train_nll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/shuffled/nb_sigmoid_train_nll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
   "diagnostics/training_curves/single_family_by_L/shuffled/nb_softmax_train_nll.png": {
     "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
-    "commit": "869b925",
-    "published_at": "2026-09-23T19:17:33+00:00"
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/shuffled/nb_train_nll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/shuffled/zinb_relu_train_nll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
   },
   "diagnostics/training_curves/single_family_by_L/shuffled/zinb_sigmoid_train_nll.png": {
     "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
-    "commit": "869b925",
-    "published_at": "2026-09-23T19:17:33+00:00"
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
   },
   "diagnostics/training_curves/single_family_by_L/shuffled/zinb_softmax_train_nll.png": {
     "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
-    "commit": "869b925",
-    "published_at": "2026-09-23T19:17:33+00:00"
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
+  },
+  "diagnostics/training_curves/single_family_by_L/shuffled/zinb_train_nll.png": {
+    "produced_by": "code/scripts/diagnostic/plot_train_nll_curves.py",
+    "commit": "01596cb",
+    "published_at": "2026-09-23T19:23:34+00:00"
   },
   "reconstruction_plots/compare_generation_L6_seed_0.png": {
     "produced_by": "code/scripts/analysis/reconstruction/ (use_trained_rbm.py, compare_model_reconstructions.py)",
