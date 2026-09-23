@@ -18,18 +18,27 @@ import pandas as pd
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from models.paths import DIAGNOSTIC_ROOT
+from models.paths import DIAGNOSTIC_ROOT, SPLITS, split_out_dir
 
 
 def _run_tag(weights_path: Path) -> str:
-    """Identify a weights file by its run: '{family}_L{n}[_shuffled]/seed_k' ->
-    '{family}_L{n}[_shuffled]_seed_k'. Falls back to the file stem for a path
-    that doesn't follow the training_runs/ convention (e.g. a bare .csv).
+    """Identify a weights file by its run: artifacts/models/<family>/<split>/L<n>/seed_k ->
+    '<family>_L<n>_seed_k' (split is carried by the output directory, not repeated
+    here). Falls back to the file stem for a path that doesn't follow the
+    artifacts/models/ convention (e.g. a bare .csv).
     """
-    seed_dir, family_l_dir = weights_path.resolve().parent, weights_path.resolve().parent.parent
-    if seed_dir.name.startswith("seed_"):
-        return f"{family_l_dir.name}_{seed_dir.name}"
+    p = weights_path.resolve()
+    seed_dir, l_dir, split_dir, family_dir = p.parent, p.parent.parent, p.parent.parent.parent, p.parent.parent.parent.parent
+    if seed_dir.name.startswith("seed_") and split_dir.name in SPLITS:
+        return f"{family_dir.name}_{l_dir.name}_{seed_dir.name}"
     return weights_path.stem
+
+
+def _infer_split(weights_path: Path) -> str | None:
+    """Read the <split> segment from artifacts/models/<family>/<split>/L<n>/seed_k/weights.npz."""
+    p = weights_path.resolve()
+    split_dir = p.parent.parent.parent
+    return split_dir.name if split_dir.name in SPLITS else None
 
 
 def sigmoid(x: np.ndarray) -> np.ndarray:
@@ -294,8 +303,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", type=Path, required=True,
                         help="Path to weights .npz or rbm_weights.csv")
-    parser.add_argument("--output-dir", type=Path,
-                        default=DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden" / "visible_by_hidden")
+    parser.add_argument("--output-dir", type=Path, default=None,
+                        help="Directory for plots and tables (default: "
+                             "diagnostic_outputs/02_model_analysis/hidden/visible_by_hidden/"
+                             "{chrono,shuffled}/, split inferred from --weights)")
     parser.add_argument("--mode", choices=["bernoulli", "zinb"], default=None,
                         help="Interpretation for visible units. Auto-detect if omitted.")
     parser.add_argument("--patterns-csv", type=Path, default=None,
@@ -320,7 +331,12 @@ def main():
     species = taxa if taxa is not None else [f"s{i}" for i in range(D)]
     tag = _run_tag(args.weights)
 
-    out_dir = Path(args.output_dir)
+    if args.output_dir is not None:
+        out_dir = Path(args.output_dir)
+    else:
+        vbh_base = DIAGNOSTIC_ROOT / "02_model_analysis" / "hidden" / "visible_by_hidden"
+        split = _infer_split(args.weights)
+        out_dir = split_out_dir(vbh_base, split) if split else vbh_base
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # --- single-hidden-node activations ---

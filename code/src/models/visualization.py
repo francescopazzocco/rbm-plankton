@@ -254,59 +254,166 @@ PANEL_GROUPS = [
 
 PROFILE_MARKERS = {"": "o", "relu": "^", "sigmoid": "s", "softmax": "D"}
 
+# Hidden-unit type per PROFILE_MARKERS suffix, i.e. what varies *within* a
+# PANEL_GROUPS entry (nb/nb_relu/nb_sigmoid/nb_softmax all share NB visible
+# units; only the hidden-unit type differs). Used for legend labels so a line
+# reads "Sigmoid hidden" instead of the bare family string "nb_sigmoid" --
+# see ARCHITECTURE.md's per-family tables and DECISION_LOG LOG-020/021/022.
+PROFILE_LABEL = {
+    "":        "Bernoulli hidden",
+    "relu":    "ReLU hidden",
+    "sigmoid": "Sigmoid hidden",
+    "softmax": "Softmax hidden",
+}
+
+# Visible-unit distribution per PANEL_GROUPS title key, i.e. what is fixed
+# *across* a panel group. Combined with PROFILE_LABEL in the panel title so
+# every plot states both halves of the model name (visible x hidden) instead
+# of relying on the reader already knowing the family-name convention.
+PANEL_VISIBLE_LABEL = {
+    "bernoulli_median": "BB visible units (binarised at per-taxon median)",
+    "bernoulli_zero":   "BB visible units (binarised at zero)",
+    "nb":               "NB visible units",
+    "zinb":             "ZINB visible units",
+}
+
 
 def _profile_of(family: str, base: str) -> str:
     return "" if family == base else family[len(base) + 1:]
 
 
+# Short display name for the hidden_cross_model plots (title + filename), one
+# per NB hidden-unit variant. Matches ARCHITECTURE.md's per-family headings
+# ("NB-Sigmoid-RBM" etc). "nb" stays the unsuffixed default everywhere so
+# existing chrono/shuffled L6 outputs (built before nb_sigmoid was selected
+# as the recommended hidden-unit type, LOG-021) are never overwritten by a
+# run for a different family -- see hidden_cross_model.py's --family flag.
+FAMILY_SHORT_LABEL = {
+    "nb":         "NB",
+    "nb_relu":    "NB-ReLU",
+    "nb_sigmoid": "NB-Sigmoid",
+    "nb_softmax": "NB-Softmax",
+}
+
+
+def _plot_final_metric_panel(ax, title: str, families: list[str], runs) -> set[int]:
+    """Draw one panel_groups entry (one family bundle) onto an existing axis.
+
+    Returns the set of L values plotted, so callers can set shared xticks.
+    """
+    all_xs: set[int] = set()
+    for family in families:
+        meta = FAMILY_META[family]
+        col = meta["col"]
+        family_runs = runs.get(family, {})
+        xs, means, stds, mins, maxs = [], [], [], [], []
+        for l_val in sorted(family_runs):
+            agg = aggregate_curves_extrema(family_runs[l_val], col)
+            if agg is None:
+                continue
+            mean_curve, std_curve, min_curve, max_curve = agg
+            xs.append(l_val)
+            means.append(mean_curve.iloc[-1])
+            stds.append(std_curve.iloc[-1])
+            mins.append(min_curve.iloc[-1])
+            maxs.append(max_curve.iloc[-1])
+        if not xs:
+            continue
+        all_xs.update(xs)
+        color   = COLORS[family]
+        profile = _profile_of(family, title)
+        marker  = PROFILE_MARKERS.get(profile, "o")
+        ax.fill_between(xs, mins, maxs, color=color, alpha=0.12, zorder=0)
+        ax.errorbar(xs, means, yerr=stds, fmt=f"{marker}-", color=color,
+                    linewidth=2, markersize=7, capsize=4,
+                    label=PROFILE_LABEL.get(profile, family) if len(families) > 1 else family)
+        if len(families) == 1:
+            for x, y, s in zip(xs, means, stds):
+                ax.annotate(f"{y:.3f}±{s:.3f}", (x, y), textcoords="offset points",
+                            xytext=(0, 8), ha="center", fontsize=7)
+
+    visible_label = PANEL_VISIBLE_LABEL.get(title, title)
+    if len(families) > 1:
+        panel_title = f"{visible_label} — final val metric vs L, by hidden-unit type"
+    else:
+        hidden_label = PROFILE_LABEL[_profile_of(families[0], title)]
+        panel_title = f"{visible_label}, {hidden_label} — final val metric vs L"
+    ax.set_title(panel_title, fontsize=10)
+    ax.set_xlabel("L (hidden units)")
+    ax.set_ylabel(FAMILY_META[families[0]]["label"])
+    if all_xs:
+        ax.set_xticks(sorted(all_xs))
+    ax.grid(True, alpha=0.3)
+    if len(families) > 1:
+        ax.legend(fontsize=8)
+    return all_xs
+
+
 def plot_final_metric(runs, figures_dir: Path):
     for title, families in PANEL_GROUPS:
         fig, ax = plt.subplots(1, 1, figsize=(6, 4.5))
-        all_xs: set[int] = set()
-
-        for family in families:
-            meta = FAMILY_META[family]
-            col = meta["col"]
-            family_runs = runs.get(family, {})
-            xs, means, stds, mins, maxs = [], [], [], [], []
-            for l_val in sorted(family_runs):
-                agg = aggregate_curves_extrema(family_runs[l_val], col)
-                if agg is None:
-                    continue
-                mean_curve, std_curve, min_curve, max_curve = agg
-                xs.append(l_val)
-                means.append(mean_curve.iloc[-1])
-                stds.append(std_curve.iloc[-1])
-                mins.append(min_curve.iloc[-1])
-                maxs.append(max_curve.iloc[-1])
-            if not xs:
-                continue
-            all_xs.update(xs)
-            color  = COLORS[family]
-            marker = PROFILE_MARKERS.get(_profile_of(family, title), "o")
-            ax.fill_between(xs, mins, maxs, color=color, alpha=0.12, zorder=0)
-            ax.errorbar(xs, means, yerr=stds, fmt=f"{marker}-", color=color,
-                        linewidth=2, markersize=7, capsize=4, label=family)
-            if len(families) == 1:
-                for x, y, s in zip(xs, means, stds):
-                    ax.annotate(f"{y:.3f}±{s:.3f}", (x, y), textcoords="offset points",
-                                xytext=(0, 8), ha="center", fontsize=7)
-
-        ax.set_title(f"{title} — final val metric vs L\n(last epoch, mean ± std, shaded = min/max over seeds)",
+        _plot_final_metric_panel(ax, title, families, runs)
+        ax.set_title(ax.get_title() + "\n(last epoch, mean ± std, shaded = min/max over seeds)",
                      fontsize=10)
-        ax.set_xlabel("L (hidden units)")
-        ax.set_ylabel(FAMILY_META[families[0]]["label"])
-        if all_xs:
-            ax.set_xticks(sorted(all_xs))
-        ax.grid(True, alpha=0.3)
-        if len(families) > 1:
-            ax.legend(fontsize=8)
 
         fig.tight_layout()
         out = figures_dir / f"sweep_final_metric_{title}.png"
         fig.savefig(out, dpi=150)
         print(f"Saved: {out}")
         plt.close(fig)
+
+
+def plot_final_metric_overview(runs, figures_dir: Path):
+    """Side-by-side NB / ZINB hidden-unit-type comparison: each panel fixes
+    the visible distribution (NB or ZINB) and overlays all four hidden-unit
+    types (Bernoulli/ReLU/Sigmoid/Softmax) tested for it, so the two count
+    model families -- and the hidden-unit-type choice within each -- are
+    directly comparable in one figure. Bernoulli-visible families have only
+    one hidden-unit type (no ReLU/Sigmoid/Softmax variant was trained for
+    them), so they are left to their own single-line plot_final_metric panels.
+    """
+    count_groups = [(t, f) for t, f in PANEL_GROUPS if t in ("nb", "zinb")]
+    fig, axes = plt.subplots(1, len(count_groups), figsize=(6 * len(count_groups), 4.5))
+    for ax, (title, families) in zip(axes, count_groups):
+        _plot_final_metric_panel(ax, title, families, runs)
+
+    fig.suptitle("Hidden-unit-type comparison — final val NLL vs L "
+                 "(mean ± std, shaded = min/max over seeds)",
+                 fontsize=12)
+    fig.tight_layout()
+    out = figures_dir / "sweep_final_metric_overview.png"
+    fig.savefig(out, dpi=150)
+    print(f"Saved: {out}")
+    plt.close(fig)
+
+
+def plot_final_metric_individual(runs, figures_dir: Path):
+    """One standalone, annotated figure per hidden-unit type within the NB and
+    ZINB groups (nb, nb_relu, nb_sigmoid, nb_softmax, zinb, zinb_relu,
+    zinb_sigmoid, zinb_softmax) -- the single-line view of what plot_final_metric
+    bundles into one multi-line panel per visible family. Bernoulli families
+    (bernoulli_median/bernoulli_zero) have only one hidden-unit type each, so
+    plot_final_metric's own panel for them already is this standalone view;
+    they are not duplicated here.
+    """
+    out_dir = figures_dir / "individual"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for base, families in PANEL_GROUPS:
+        if len(families) == 1:
+            continue
+        for family in families:
+            fig, ax = plt.subplots(1, 1, figsize=(6, 4.5))
+            all_xs = _plot_final_metric_panel(ax, base, [family], runs)
+            if not all_xs:
+                plt.close(fig)
+                continue
+            ax.set_title(ax.get_title() + "\n(last epoch, mean ± std, shaded = min/max over seeds)",
+                         fontsize=10)
+            fig.tight_layout()
+            out = out_dir / f"sweep_final_metric_{family}.png"
+            fig.savefig(out, dpi=150)
+            print(f"Saved: {out}")
+            plt.close(fig)
 
 
 def plot_sweep_curves(runs, figures_dir: Path):
@@ -575,7 +682,7 @@ def plot_weight_profiles(family: str, family_runs: dict, out_dir: Path):
         ax.set_yticklabels(W_top.index, fontsize=7)
         plt.colorbar(im, ax=ax, fraction=0.03, pad=0.04, label="weight")
     fig.tight_layout()
-    out = out_dir / f"weight_profiles_{family}.png"
+    out = out_dir / f"{family}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
@@ -613,7 +720,7 @@ def plot_state_timeline(family: str, family_runs: dict, out_dir: Path):
 
     axes[-1].set_xlabel("date", fontsize=9)
     fig.tight_layout()
-    out = out_dir / f"state_timeline_{family}.png"
+    out = out_dir / f"{family}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
@@ -676,7 +783,7 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
     fig.legend(handles=legend, loc="lower center", ncol=3, fontsize=8,
                bbox_to_anchor=(0.5, -0.05))
     fig.tight_layout()
-    out = out_dir / f"mean_activation_{family}.png"
+    out = out_dir / f"{family}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
@@ -686,7 +793,9 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
 # hidden_cross_model
 # =============================================================================
 
-def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6):
+def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6, family: str = "nb"):
+    label  = FAMILY_SHORT_LABEL.get(family, family)
+    suffix = "_" + p if (p := _profile_of(family, "nb")) else ""
     fig, ax = plt.subplots(figsize=(7, 6))
     vmax = corr.abs().values.max()
     im = ax.imshow(corr.values.astype(float), cmap="RdBu_r",
@@ -694,10 +803,10 @@ def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6):
     ax.set_xticks(range(len(corr.columns)))
     ax.set_xticklabels([f"BB {c}" for c in corr.columns], fontsize=9)
     ax.set_yticks(range(len(corr.index)))
-    ax.set_yticklabels([f"NB {r}" for r in corr.index], fontsize=9)
+    ax.set_yticklabels([f"{label} {r}" for r in corr.index], fontsize=9)
     ax.set_xlabel("bernoulli_median units", fontsize=10)
-    ax.set_ylabel("NB units", fontsize=10)
-    ax.set_title(f"NB vs BB-median activation correlation  (L={target_l})", fontsize=11)
+    ax.set_ylabel(f"{label} units", fontsize=10)
+    ax.set_title(f"{label} vs BB-median activation correlation  (L={target_l})", fontsize=11)
     for i in range(len(corr.index)):
         for j in range(len(corr.columns)):
             v = float(corr.iloc[i, j])
@@ -705,28 +814,36 @@ def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6):
                     fontsize=8, color="black" if abs(v) < 0.6 else "white")
     plt.colorbar(im, ax=ax, shrink=0.8, label="Pearson r")
     fig.tight_layout()
-    out = out_dir / f"cross_model_correlation_L{target_l}.png"
+    stem = f"{suffix[1:]}_L{target_l}" if suffix else f"L{target_l}"
+    out = out_dir / f"{stem}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
 
 def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
+                           family: str = "nb",
                            coverage_thresholds: tuple[float, ...] = (0.8, 0.9)):
     """Pareto-style plot: bars are per-pattern frequency (ranked, all patterns
     shown), overlaid with a cumulative-coverage line marking how many distinct
     patterns are needed to account for X% of observed days -- analogous to a
     PCA scree plot's cumulative-explained-variance cutoff.
     """
+    label  = FAMILY_SHORT_LABEL.get(family, family)
+    suffix = "_" + p if (p := _profile_of(family, "nb")) else ""
     freq = freq.sort_values("fraction", ascending=False).reset_index(drop=True)
     cumulative = freq["fraction"].cumsum().clip(upper=1.0)
     n = len(freq)
 
     fig, ax1 = plt.subplots(figsize=(max(10, n * 0.32), 5))
-    # n_units_on in [0, 6] for a 6-bit pattern -- 7 values, so cycle the 6-color
-    # safe PALETTE (index 0 and 6 repeat) rather than escalating to the 8-color
-    # OKABE_ITO set, which would put poor-contrast yellow on one of the bars.
-    n_units_colors = [PALETTE[i % len(PALETTE)] for i in range(7)]
+    # n_units_on in [0, target_l] for an L-bit pattern -- target_l+1 distinct
+    # values. get_palette(target_l+1) escalates from the 6-color safe subset
+    # to the full 8-color Okabe-Ito set once target_l+1 > 6, so L<=7 gets a
+    # color per category with no collisions. A hand-cycled 6-color-only list
+    # (this module's earlier approach) collides once target_l+1 > 6 -- e.g.
+    # at L=7, "6 of 7 units on" would silently wrap onto the same black used
+    # for "0 units on", reading as a meaningful color when it's an accident.
+    n_units_colors = get_palette(target_l + 1)
     ax1.bar(range(n), freq["fraction"],
             color=[n_units_colors[int(u)] for u in freq["n_units_on"]])
     ax1.set_xticks(range(n))
@@ -734,7 +851,7 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
                         fontfamily="monospace")
     ax1.set_ylabel("fraction of days (this pattern)")
     ax1.set_xlabel("binary pattern (h0...h5, 1=ON), ranked by frequency")
-    ax1.set_title(f"NB L={target_l} - activation-pattern coverage "
+    ax1.set_title(f"{label} L={target_l} - activation-pattern coverage "
                  f"(threshold=0.5, {n} distinct patterns of {2 ** target_l} possible)")
 
     ax2 = ax1.twinx()
@@ -753,14 +870,17 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
                      fontsize=8, color=cutoff_color)
 
     fig.tight_layout()
-    out = out_dir / f"nb_pattern_frequency_L{target_l}.png"
+    stem = f"{suffix[1:]}_L{target_l}" if suffix else f"L{target_l}"
+    out = out_dir / f"{stem}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
 
 def plot_seasonal_profiles(nb_prof: pd.DataFrame, bb_prof: pd.DataFrame,
-                           out_dir: Path, target_l: int = 6):
+                           out_dir: Path, target_l: int = 6, family: str = "nb"):
+    label  = FAMILY_SHORT_LABEL.get(family, family)
+    suffix = "_" + p if (p := _profile_of(family, "nb")) else ""
     n_units = nb_prof.shape[1]
     fig, axes = plt.subplots(2, 1, figsize=(11, 7), sharex=True)
     months = range(1, 13)
@@ -769,7 +889,7 @@ def plot_seasonal_profiles(nb_prof: pd.DataFrame, bb_prof: pd.DataFrame,
 
     for ax, prof, title in zip(axes,
                                 [nb_prof, bb_prof],
-                                [f"NB-RBM  (L={target_l})",
+                                [f"{label}-RBM  (L={target_l})",
                                  f"BB-median  (L={target_l})"]):
         for j, col in enumerate(prof.columns):
             y = prof.loc[months, col]
@@ -790,9 +910,10 @@ def plot_seasonal_profiles(nb_prof: pd.DataFrame, bb_prof: pd.DataFrame,
                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                               fontsize=8)
     axes[-1].set_xlabel("month")
-    fig.suptitle("Seasonal activation profiles - NB vs BB-median", fontsize=11)
+    fig.suptitle(f"Seasonal activation profiles - {label} vs BB-median", fontsize=11)
     fig.tight_layout()
-    out = out_dir / f"seasonal_profiles_L{target_l}.png"
+    stem = f"{suffix[1:]}_L{target_l}" if suffix else f"L{target_l}"
+    out = out_dir / f"{stem}.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)

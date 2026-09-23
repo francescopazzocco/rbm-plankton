@@ -4,7 +4,7 @@ from models.io import (
     METRIC_COL,
     SHUFFLED,
     best_seed_dir,
-    discover_run_dirs,
+    discover_model_dirs,
     load_hidden_activations,
 )
 
@@ -18,25 +18,34 @@ def _make_seed_dir(base, family_l_name, seed, val_pll):
     return seed_dir
 
 
-def test_discover_run_dirs_groups_by_family_and_l(tmp_path):
-    _make_seed_dir(tmp_path, "bernoulli_median_L4", seed=0, val_pll=0.5)
-    _make_seed_dir(tmp_path, "bernoulli_median_L6", seed=0, val_pll=0.4)
-    _make_seed_dir(tmp_path, "nb_L4", seed=0, val_pll=0.3)
-    (tmp_path / "not_a_run_dir").mkdir()
+def _make_model_seed_dir(base, family, split, n_hidden, seed, val_pll):
+    seed_dir = base / family / split / f"L{n_hidden}" / f"seed_{seed}"
+    seed_dir.mkdir(parents=True)
+    pd.DataFrame({"val_pll": [val_pll * 2, val_pll]}).to_csv(
+        seed_dir / "rbm_training_curves.csv", index=False
+    )
+    return seed_dir
 
-    runs = discover_run_dirs(tmp_path, CHRONO)
+
+def test_discover_model_dirs_groups_by_family_and_l(tmp_path):
+    _make_model_seed_dir(tmp_path, "bernoulli_median", CHRONO, 4, seed=0, val_pll=0.5)
+    _make_model_seed_dir(tmp_path, "bernoulli_median", CHRONO, 6, seed=0, val_pll=0.4)
+    _make_model_seed_dir(tmp_path, "nb", CHRONO, 4, seed=0, val_pll=0.3)
+    (tmp_path / "not_a_model_dir").mkdir()
+
+    runs = discover_model_dirs(tmp_path, CHRONO)
 
     assert set(runs.keys()) == {"bernoulli_median", "nb"}
     assert set(runs["bernoulli_median"].keys()) == {4, 6}
     assert len(runs["nb"][4]) == 1
 
 
-def test_discover_run_dirs_selects_only_the_requested_split(tmp_path):
-    _make_seed_dir(tmp_path, "nb_L4_shuffled", seed=0, val_pll=0.3)
-    _make_seed_dir(tmp_path, "nb_L6", seed=0, val_pll=0.3)
+def test_discover_model_dirs_selects_only_the_requested_split(tmp_path):
+    _make_model_seed_dir(tmp_path, "nb", SHUFFLED, 4, seed=0, val_pll=0.3)
+    _make_model_seed_dir(tmp_path, "nb", CHRONO, 6, seed=0, val_pll=0.3)
 
-    shuffled = discover_run_dirs(tmp_path, SHUFFLED)
-    chrono   = discover_run_dirs(tmp_path, CHRONO)
+    shuffled = discover_model_dirs(tmp_path, SHUFFLED)
+    chrono   = discover_model_dirs(tmp_path, CHRONO)
 
     assert list(shuffled["nb"].keys()) == [4]
     assert list(chrono["nb"].keys()) == [6]

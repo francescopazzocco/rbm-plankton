@@ -8,7 +8,7 @@ The discretisation itself lives in models.visualization (hidden_binary,
 pattern_frequency) and is shared with hidden_cross_model.py, so the threshold
 rule exists in exactly one place.
 
-Outputs (results/02_model_analysis/hidden/patterns/[shuffled/] by default):
+Outputs (results/02_model_analysis/hidden/patterns/{chrono,shuffled}/ by default):
   pattern_frequency_{family}_L{L}_{mode}.csv   pattern -> n_days, fraction, n_units_on
   pattern_timeline_{family}_L{L}_{mode}.csv    date -> pattern
   pattern_histogram_{family}_L{L}_{mode}.png
@@ -38,17 +38,17 @@ from models.io import (
     SPLITS,
     best_seed_dir,
     load_hidden_activations,
-    run_dir,
+    model_dir,
     split_out_dir,
 )
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import hidden_binary, pattern_frequency, pattern_labels
 from scipy.cluster.hierarchy import leaves_list, linkage
 
 
-def resolve_seed_dir(family: str, n_hidden: int, split: str, runs_root: Path) -> Path:
+def resolve_seed_dir(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
     """Best-converged seed directory of one run, by the family's val metric."""
-    family_l_dir = run_dir(family, n_hidden, split, runs_root)
+    family_l_dir = model_dir(family, n_hidden, split, models_root)
     seed_dir = best_seed_dir(family_l_dir, METRIC_COL[family])
     if seed_dir is None:
         raise FileNotFoundError(
@@ -149,15 +149,15 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Hidden unit count (default: 6)")
     parser.add_argument("--split", choices=SPLITS, default=CHRONO,
                         help="Split strategy of the run (default: chrono)")
-    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT,
-                        help="Directory holding the {family}_L{n} run directories")
+    parser.add_argument("--models-root", type=Path, default=MODELS_ROOT,
+                        help="Directory holding artifacts/models/{family}/{split}/L{n} directories")
     parser.add_argument("--seed-dir", type=Path, default=None,
                         help="Use this seed directory directly, ignoring "
                              "--family/--L/--split")
     parser.add_argument("--output-dir", type=Path, default=None,
                         help="Directory where plots and tables are saved "
                              "(default: diagnostic_outputs/02_model_analysis/hidden/patterns/"
-                             "[shuffled/], split-aware)")
+                             "{chrono,shuffled}/, split-aware)")
     parser.add_argument("--mode", choices=["threshold", "winner"], default="threshold",
                         help="threshold: each unit on above 0.5 (Bernoulli/sigmoid units); "
                              "winner: one-hot argmax (softmax units)")
@@ -168,7 +168,7 @@ def main() -> None:
     args = build_parser().parse_args()
 
     seed_dir = args.seed_dir or resolve_seed_dir(
-        args.family, args.L, args.split, args.runs_root)
+        args.family, args.L, args.split, args.models_root)
     title_prefix = f"{args.family} L={args.L} ({args.split})" \
         if args.seed_dir is None else str(seed_dir)
     print(f"Reading {seed_dir}")

@@ -13,8 +13,8 @@ Held-out NaN rows (called by the diagnostic scripts):
   scale_counts        count-family view of those rows
   binarise_rows       Bernoulli-family view, using the run's own thresholds
 
-Run navigation (CHRONO / SHUFFLED / run_dir come from paths.py, re-exported here):
-  discover_run_dirs   scan RUNS_ROOT for every (family, L) of one split
+Run navigation (CHRONO / SHUFFLED / model_dir come from paths.py, re-exported here):
+  discover_model_dirs   scan MODELS_ROOT for every (family, L) of one split
   METRIC_COL          canonical val metric column per model family
   best_seed_dir       best-converged seed directory for a (family, L) run
 
@@ -34,10 +34,10 @@ from .nb_rbm import NB_RBM, NB_ReLU_RBM, NBSigmoidRBM, NBSoftmaxRBM
 from .paths import (  # noqa: F401 — re-exported so scripts have one import site
     CHRONO,
     DATA_PATH,
-    RUNS_ROOT,
+    MODELS_ROOT,
     SHUFFLED,
     SPLITS,
-    run_dir,
+    model_dir,
     split_out_dir,
     split_suffix,
 )
@@ -182,7 +182,7 @@ def binarise_rows(rows: pd.DataFrame, taxa: list[str],
 
     UNIT HAZARD, unresolved: rows are in organisms/uL and are compared to the
     stored thresholds as-is.  That is correct for the Bernoulli runs currently in
-    training_runs/, whose thresholds are also in organisms/uL — they were trained
+    artifacts/models/, whose thresholds are also in organisms/uL — they were trained
     before COUNT_SCALE reached load_and_binarise.  Retraining a Bernoulli family
     with today's train.py stores thresholds multiplied by COUNT_SCALE, and this
     comparison would then binarise almost everything to 0.  Binarisation is
@@ -206,25 +206,29 @@ def binarise_rows(rows: pd.DataFrame, taxa: list[str],
 
 # -- Run navigation ------------------------------------------------------------
 
-def discover_run_dirs(runs_root: Path = RUNS_ROOT,
-                      split: str = CHRONO) -> dict[str, dict[int, list[Path]]]:
-    """Scan runs_root for {family}_L{n}{split}/seed_* directories.
+def discover_model_dirs(models_root: Path = MODELS_ROOT,
+                        split: str = CHRONO) -> dict[str, dict[int, list[Path]]]:
+    """Scan models_root for <family>/<split>/L<n>/seed_* directories.
 
     Returns {family: {L: [seed_dir_paths]}} sorted by family name and L value.
     """
-    suffix = split_suffix(split)
-    pattern = re.compile(rf"^(.+)_L(\d+){re.escape(suffix)}$")
+    if split not in SPLITS:
+        raise ValueError(f"Unknown split={split!r}; expected one of {SPLITS}.")
+    pattern = re.compile(r"^L(\d+)$")
     runs: dict[str, dict[int, list[Path]]] = {}
-    for d in sorted(Path(runs_root).iterdir()):
-        if not d.is_dir():
+    for family_dir in sorted(Path(models_root).iterdir()):
+        if not family_dir.is_dir():
             continue
-        m = pattern.match(d.name)
-        if not m:
+        split_dir = family_dir / split
+        if not split_dir.is_dir():
             continue
-        family, l_val = m.group(1), int(m.group(2))
-        seed_dirs = sorted(d.glob("seed_*"))
-        if seed_dirs:
-            runs.setdefault(family, {})[l_val] = seed_dirs
+        for l_dir in sorted(split_dir.iterdir()):
+            m = pattern.match(l_dir.name)
+            if not m:
+                continue
+            seed_dirs = sorted(l_dir.glob("seed_*"))
+            if seed_dirs:
+                runs.setdefault(family_dir.name, {})[int(m.group(1))] = seed_dirs
     return runs
 
 

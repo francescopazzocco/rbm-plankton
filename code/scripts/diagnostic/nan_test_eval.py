@@ -43,9 +43,9 @@ from models._eval_utils import (
 )
 from models.io import (
     CHRONO, COUNT_SCALE, METRIC_COL, SHUFFLED, best_seed_dir, binarise_rows,
-    load_model, load_nan_rows, run_dir, scale_counts,
+    load_model, load_nan_rows, model_dir, scale_counts,
 )
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.utils import get_device
 from models.visualization import COLORS
 
@@ -54,7 +54,7 @@ from models.visualization import COLORS
 
 @dataclass
 class EvalConfig:
-    runs_root:   Path   = RUNS_ROOT
+    models_root:   Path   = MODELS_ROOT
     out_root:    Path   = field(default_factory=lambda:
                                 DIAGNOSTIC_ROOT / "nan_eval_extended")
     n_samples:   int    = 100
@@ -260,7 +260,7 @@ def main():
     run_meta: dict[str, dict] = {}
     for family, n_hidden, split in _SPECS:
         key = run_key(family, n_hidden, split)
-        fam_dir = run_dir(family, n_hidden, split, config.runs_root)
+        fam_dir = model_dir(family, n_hidden, split, config.models_root)
         if not fam_dir.exists():
             print(f"\n[SKIP] {fam_dir.name} not found")
             continue
@@ -290,7 +290,7 @@ def main():
         print(f"  evaluated {len(df_run)} rows")
 
     if not all_dfs:
-        print(f"\nNo runs evaluated — nothing found under {config.runs_root}.")
+        print(f"\nNo runs evaluated — nothing found under {config.models_root}.")
         return
 
     df = pd.concat(all_dfs, ignore_index=True)

@@ -27,7 +27,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from models import io as data_io
-from models.paths import DIAGNOSTIC_ROOT, PROJECT_ROOT as ROOT
+from models.paths import DIAGNOSTIC_ROOT, SHUFFLED, model_dir
 from models.visualization import COLORS
 import use_trained_rbm as trained_loader
 
@@ -89,9 +89,7 @@ def normalize_profile(values, eps: float = 1e-6):
 
 def load_model_run(model_name: str, hidden_units: int, seed: int, device: str):
     weights_path = (
-        ROOT
-        / "training_runs"
-        / f"{model_name}_L{hidden_units}_shuffled"
+        model_dir(model_name, hidden_units, SHUFFLED)
         / f"seed_{seed}"
         / "weights.npz"
     )

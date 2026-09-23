@@ -4,17 +4,17 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, run_dir, split_suffix
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, model_dir, split_out_dir
+from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.paths import PROJECT_ROOT as ROOT
 
 
-def resolve_weights(family: str, n_hidden: int, split: str, runs_root: Path) -> Path:
+def resolve_weights(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
     """Best-converged seed's weights.npz for one (family, L, split) run."""
-    seed_dir = best_seed_dir(run_dir(family, n_hidden, split, runs_root), METRIC_COL[family])
+    seed_dir = best_seed_dir(model_dir(family, n_hidden, split, models_root), METRIC_COL[family])
     if seed_dir is None:
         raise FileNotFoundError(
-            f"No converged seed for {family} L={n_hidden} ({split}) in {runs_root}")
+            f"No converged seed for {family} L={n_hidden} ({split}) in {models_root}")
     return seed_dir / "weights.npz"
 
 
@@ -99,17 +99,18 @@ def main():
     parser.add_argument("--family", default="zinb_sigmoid", help="Model family (default: zinb_sigmoid)")
     parser.add_argument("--L", type=int, default=7, help="Hidden unit count (default: 7)")
     parser.add_argument("--split", choices=SPLITS, default=CHRONO, help="Split strategy (default: chrono)")
-    parser.add_argument("--runs-root", type=Path, default=RUNS_ROOT)
+    parser.add_argument("--models-root", type=Path, default=MODELS_ROOT)
     parser.add_argument("--archetypes", type=Path, default=ROOT / "prof" / "archetypes_k5_profiles.csv",
                         help="archetypes csv path")
     parser.add_argument("--out", type=Path, default=None, help="output plot path")
     parser.add_argument("--pct", type=float, default=0.98, help="fraction of mass to cover")
     args = parser.parse_args()
 
-    weights = args.weights or resolve_weights(args.family, args.L, args.split, args.runs_root)
+    weights = args.weights or resolve_weights(args.family, args.L, args.split, args.models_root)
     out = args.out or (
-        DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype"
-        / f"overlap_heatmap_{args.family}_L{args.L}{split_suffix(args.split)}.png")
+        split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype" / "overlap_heatmap",
+                     args.split)
+        / f"{args.family}_L{args.L}.png")
     out.parent.mkdir(parents=True, exist_ok=True)
 
     # Load Archetypes

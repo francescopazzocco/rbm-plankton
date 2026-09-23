@@ -24,480 +24,495 @@
     "commit": "179e190",
     "published_at": "2026-09-22T19:06:03+00:00"
   },
-  "02_model_analysis/archetype/archetype_closest_rbm_nb_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/archetype_closest_rbm/chrono/nb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/archetype_closest_rbm_nb_L6_shuffled.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/archetype_closest_rbm/chrono/zinb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/archetype_closest_rbm_zinb_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/archetype_closest_rbm/shuffled/nb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/archetype_closest_rbm_zinb_L6_shuffled.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/archetype_closest_rbm/shuffled/zinb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_nb_L6.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/chrono/nb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_nb_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/chrono/nb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_nb_L6_shuffled.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/chrono/zinb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_nb_L6_shuffled.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/chrono/zinb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_zinb_L6.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/shuffled/nb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_zinb_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/shuffled/nb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_zinb_L6_shuffled.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/shuffled/zinb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/distance_heatmap_zinb_L6_shuffled.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/distance_heatmap/shuffled/zinb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_nb_L6.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/chrono/nb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_nb_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/chrono/nb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_nb_L6_shuffled.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/chrono/zinb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_nb_L6_shuffled.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/chrono/zinb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_zinb_L6.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/shuffled/nb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_zinb_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/shuffled/nb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_zinb_L6_shuffled.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/shuffled/zinb_L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/archetype/overlap_heatmap_zinb_L6_shuffled.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/archetype/overlap_heatmap/shuffled/zinb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/cross_model_correlation_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/cross_model_correlation/chrono/L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/dominant_state_L6.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/cross_model_correlation/shuffled/L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/hidden_stackplot_nb_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/cross_model_correlation/shuffled/sigmoid_L7.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/mean_activation_bernoulli_median.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/dominant_state/chrono/L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/mean_activation_bernoulli_zero.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/dominant_state/shuffled/L6.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/mean_activation_nb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/hidden_stackplot/chrono/nb_L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/mean_activation_summary.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/mean_activation/chrono/bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/mean_activation_zinb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/mean_activation/chrono/bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/nb_pattern_frequency_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/mean_activation/chrono/nb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/patterns/pattern_frequency_nb_L6_threshold.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/mean_activation/chrono/summary.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/patterns/pattern_histogram_nb_L6_threshold.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/mean_activation/chrono/zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/patterns/pattern_timeline_nb_L6_threshold.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/mean_activation/shuffled/bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/patterns/pattern_timeline_nb_L6_threshold.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/mean_activation/shuffled/bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/nb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/nb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/nb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/nb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/summary.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/zinb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/zinb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/mean_activation/shuffled/zinb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/nb_pattern_frequency/chrono/L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/nb_pattern_frequency/shuffled/L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/nb_pattern_frequency/shuffled/sigmoid_L7.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/patterns/chrono/pattern_frequency_nb_L6_threshold.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/patterns/chrono/pattern_histogram_nb_L6_threshold.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/patterns/chrono/pattern_timeline_nb_L6_threshold.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
+  },
+  "02_model_analysis/hidden/patterns/chrono/pattern_timeline_nb_L6_threshold.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
   "02_model_analysis/hidden/patterns/shuffled/pattern_frequency_nb_softmax_L7_winner.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
   "02_model_analysis/hidden/patterns/shuffled/pattern_histogram_nb_softmax_L7_winner.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
   "02_model_analysis/hidden/patterns/shuffled/pattern_timeline_nb_softmax_L7_winner.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
   "02_model_analysis/hidden/patterns/shuffled/pattern_timeline_nb_softmax_L7_winner.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/seasonal_profiles_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/seasonal_profiles/chrono/L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/cross_model_correlation_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/seasonal_profiles/shuffled/L6.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/dominant_state_L6_shuffled.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/seasonal_profiles/shuffled/sigmoid_L7.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_bernoulli_median.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_frequency/chrono/state_frequency.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_bernoulli_zero.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_frequency/shuffled/state_frequency.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_nb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/chrono/bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_nb_relu.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/chrono/bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_nb_sigmoid.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/chrono/nb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_nb_softmax.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/chrono/zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_summary_shuffled.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_zinb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_zinb_relu.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/nb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_zinb_sigmoid.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/nb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/mean_activation_zinb_softmax.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/nb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/nb_pattern_frequency_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/nb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/seasonal_profiles_L6.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_frequency_shuffled.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/zinb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_bernoulli_median.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/zinb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_bernoulli_zero.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/state_timeline/shuffled/zinb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_nb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/chrono/visible_by_hidden_nb_L6_seed_8_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_nb_relu.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/chrono/visible_by_hidden_nb_L6_seed_8_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_nb_sigmoid.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/chrono/visible_by_hidden_nb_L6_seed_8_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_nb_softmax.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/chrono/visible_by_hidden_zinb_L6_seed_7_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_zinb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/chrono/visible_by_hidden_zinb_L6_seed_7_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_zinb_relu.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/chrono/visible_by_hidden_zinb_L6_seed_7_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_zinb_sigmoid.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/shuffled/visible_by_hidden_nb_L6_seed_9_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/state_timeline_zinb_softmax.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/shuffled/visible_by_hidden_nb_L6_seed_9_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_bernoulli_median.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/shuffled/visible_by_hidden_nb_L6_seed_9_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_bernoulli_zero.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/shuffled/visible_by_hidden_zinb_L6_seed_9_zinb.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_nb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/shuffled/visible_by_hidden_zinb_L6_seed_9_zinb_freq.csv": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_nb_relu.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/visible_by_hidden/shuffled/visible_by_hidden_zinb_L6_seed_9_zinb_rows.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_nb_sigmoid.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/chrono/bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_nb_softmax.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/chrono/bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_zinb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/chrono/nb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_zinb_relu.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/chrono/zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_zinb_sigmoid.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/bernoulli_median.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/shuffled/weight_profiles_zinb_softmax.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/bernoulli_zero.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/state_frequency.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/nb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/state_timeline_bernoulli_median.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/nb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/state_timeline_bernoulli_zero.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/nb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/state_timeline_nb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/nb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/state_timeline_zinb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/zinb.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_seed_8_zinb.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/zinb_relu.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_seed_8_zinb_freq.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/zinb_sigmoid.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_seed_8_zinb_rows.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_shuffled_seed_9_zinb.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_shuffled_seed_9_zinb_freq.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_nb_L6_shuffled_seed_9_zinb_rows.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_seed_7_zinb.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_seed_7_zinb_freq.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_seed_7_zinb_rows.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_shuffled_seed_9_zinb.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_shuffled_seed_9_zinb_freq.csv": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/visible_by_hidden/visible_by_hidden_zinb_L6_shuffled_seed_9_zinb_rows.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/weight_profiles_bernoulli_median.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/weight_profiles_bernoulli_zero.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/weight_profiles_nb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
-  },
-  "02_model_analysis/hidden/weight_profiles_zinb.png": {
-    "produced_by": "code/scripts/analysis/hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py",
-    "commit": "408d071",
-    "published_at": "2026-09-22T20:56:11+00:00"
+  "02_model_analysis/hidden/weight_profiles/shuffled/zinb_softmax.png": {
+    "produced_by": "code/scripts/analysis/hidden/ (hidden_dominant_state.py, hidden_mean_activation.py, hidden_cross_model.py, hidden_pattern_analysis.py, rbm_hidden_stackplot.py, plot_visible_by_hidden.py), code/scripts/analysis/archetype/ (archetype_rbm_comparison.py, distance_archetypes_rbm.py, overlap_archetypes_rbm.py, archetype_closest_rbm_scatter.py)",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:33+00:00"
   },
   "03_evaluation/nan_eval_bars.png": {
     "produced_by": "code/scripts/diagnostic/nan_test_eval.py",
@@ -514,52 +529,127 @@
     "commit": "b221494",
     "published_at": "2026-09-22T19:29:30+00:00"
   },
-  "04_model_selection/all_final_val_nll.png": {
+  "04_model_selection/chrono/all_final_val_nll.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
     "commit": "b221494",
     "published_at": "2026-09-22T19:35:52+00:00"
+  },
+  "04_model_selection/chrono/individual/sweep_final_metric_nb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/chrono/individual/sweep_final_metric_zinb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/chrono/sweep_final_metric_bernoulli_median.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/chrono/sweep_final_metric_bernoulli_zero.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/chrono/sweep_final_metric_nb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/chrono/sweep_final_metric_overview.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/chrono/sweep_final_metric_zinb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_nb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_nb_relu.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_nb_sigmoid.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_nb_softmax.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_zinb.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_zinb_relu.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_zinb_sigmoid.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/individual/sweep_final_metric_zinb_softmax.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
   },
   "04_model_selection/shuffled/sweep_final_metric_bernoulli_median.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
   },
   "04_model_selection/shuffled/sweep_final_metric_bernoulli_zero.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
   },
   "04_model_selection/shuffled/sweep_final_metric_nb.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
+  },
+  "04_model_selection/shuffled/sweep_final_metric_overview.png": {
+    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
   },
   "04_model_selection/shuffled/sweep_final_metric_zinb.png": {
     "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
-  },
-  "04_model_selection/sweep_final_metric_bernoulli_median.png": {
-    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
-  },
-  "04_model_selection/sweep_final_metric_bernoulli_zero.png": {
-    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
-  },
-  "04_model_selection/sweep_final_metric_nb.png": {
-    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
-  },
-  "04_model_selection/sweep_final_metric_zinb.png": {
-    "produced_by": "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T19:35:52+00:00"
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:00:54+00:00"
   },
   "diagnostics/softmax_train_nll_curves.png": {
+    "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
+    "commit": "e415e31",
+    "published_at": "2026-09-22T17:43:38+00:00"
+  },
+  "diagnostics/sweep/chrono/sweep_nb_diagnostics.png": {
+    "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
+    "commit": "e415e31",
+    "published_at": "2026-09-22T17:43:38+00:00"
+  },
+  "diagnostics/sweep/chrono/sweep_training_curves.png": {
+    "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
+    "commit": "e415e31",
+    "published_at": "2026-09-22T17:43:38+00:00"
+  },
+  "diagnostics/sweep/chrono/sweep_zinb_diagnostics.png": {
     "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
     "commit": "e415e31",
     "published_at": "2026-09-22T17:43:38+00:00"
@@ -579,21 +669,6 @@
     "commit": "e415e31",
     "published_at": "2026-09-22T17:43:38+00:00"
   },
-  "diagnostics/sweep/sweep_nb_diagnostics.png": {
-    "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
-  },
-  "diagnostics/sweep/sweep_training_curves.png": {
-    "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
-  },
-  "diagnostics/sweep/sweep_zinb_diagnostics.png": {
-    "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
-    "commit": "e415e31",
-    "published_at": "2026-09-22T17:43:38+00:00"
-  },
   "diagnostics/zinb_sigmoid_train_nll_curves.png": {
     "produced_by": "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py (diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)",
     "commit": "e415e31",
@@ -604,55 +679,75 @@
     "commit": "e415e31",
     "published_at": "2026-09-22T17:43:38+00:00"
   },
-  "tables/hidden/cross_model_correlation.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+  "tables/hidden/chrono/cross_model_correlation.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
-  "tables/hidden/cross_model_matched_pairs.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+  "tables/hidden/chrono/cross_model_matched_pairs.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
-  "tables/hidden/nb_pattern_frequency.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+  "tables/hidden/chrono/nb_pattern_frequency.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
-  "tables/hidden/seasonal_profiles_bb.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+  "tables/hidden/chrono/seasonal_profiles_bb.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
-  "tables/hidden/seasonal_profiles_nb.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+  "tables/hidden/chrono/seasonal_profiles_nb.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
   "tables/hidden/shuffled/cross_model_correlation.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
+  },
+  "tables/hidden/shuffled/cross_model_correlation_sigmoid.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
   "tables/hidden/shuffled/cross_model_matched_pairs.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
+  },
+  "tables/hidden/shuffled/cross_model_matched_pairs_sigmoid.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
   "tables/hidden/shuffled/nb_pattern_frequency.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
+  },
+  "tables/hidden/shuffled/nb_pattern_frequency_sigmoid.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
   "tables/hidden/shuffled/seasonal_profiles_bb.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
   "tables/hidden/shuffled/seasonal_profiles_nb.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
+  },
+  "tables/hidden/shuffled/seasonal_profiles_nb_sigmoid.csv": {
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   },
   "tables/nan_eval_rows.csv": {
     "produced_by": "code/scripts/diagnostic/nan_test_eval.py",
@@ -665,8 +760,8 @@
     "published_at": "2026-09-22T19:38:46+00:00"
   },
   "tables/split_comparison.csv": {
-    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden_cross_model.py",
-    "commit": "b221494",
-    "published_at": "2026-09-22T20:29:12+00:00"
+    "produced_by": "code/scripts/diagnostic/split_comparison.py, code/scripts/analysis/hidden/hidden_cross_model.py",
+    "commit": "17bdaa4",
+    "published_at": "2026-09-23T09:14:34+00:00"
   }
 }

@@ -56,9 +56,11 @@ doc/*.pdf
 # Superseded experimental runs
 archive/
 
-# Training runs (weights, CSVs, logs) — large, regeneratable by code/train/train.py.
-# This is the canonical run directory: models.paths.RUNS_ROOT points here.
-training_runs/
+# Trained model weights (weights.npz, CSVs, logs) — large, regeneratable by
+# code/train/train.py. This is the canonical directory: models.paths.MODELS_ROOT
+# points here. Promoted out of a plain "runs" tier because every seed's
+# weights.npz is consumed by many downstream analysis scripts.
+artifacts/models/
 
 # Superseded run/weight directories (still on disk, don't re-track)
 training_runs_v1/

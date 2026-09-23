@@ -6,14 +6,15 @@ model class from `models` so you can evaluate or inspect it.
 
 Example usage:
   conda activate Vision
-  python scripts/use_trained_rbm.py --weights training_runs/nb_L6/seed_0/weights.npz
+  python scripts/use_trained_rbm.py --weights artifacts/models/nb/chrono/L6/seed_0/weights.npz
 
 Or specify family+seed:
   python scripts/use_trained_rbm.py --family nb_L6 --seed 0
 
 Options:
     --weights PATH     explicit path to weights.npz (overrides --family/--seed)
-    --family NAME      family directory under training_runs (use with --seed)
+    --family NAME      '<family>_L<n>[_shuffled]', e.g. nb_L6 (use with --seed);
+                       resolved under artifacts/models/<family>/<split>/L<n>/
     --seed INT         seed index (0-based) or folder name (seed_0, use with --family)
     --CD [N]           run N chained reconstruction steps (default: 5)
     --progressive      plot per-step traces for reconstruction error and distance
@@ -23,6 +24,7 @@ Options:
 
 import argparse
 import importlib
+import re
 from pathlib import Path
 
 import numpy as np
@@ -33,7 +35,18 @@ import matplotlib.pyplot as plt
 from models import utils as model_utils
 from models import io as data_io
 from models.palette import get_palette
-from models.paths import DIAGNOSTIC_ROOT, RUNS_ROOT
+from models.paths import CHRONO, DIAGNOSTIC_ROOT, SHUFFLED, model_dir
+
+_FAMILY_DIR_RE = re.compile(r"^(?P<family>.+)_L(?P<n_hidden>\d+)(?P<shuffled>_shuffled)?$")
+
+
+def parse_family_dir(name: str) -> tuple[str, int, str]:
+    """Parse a legacy '<family>_L<n>[_shuffled]' --family value into (family, L, split)."""
+    m = _FAMILY_DIR_RE.match(name)
+    if not m:
+        raise ValueError(f"--family {name!r} doesn't match '<family>_L<n>[_shuffled]'")
+    split = SHUFFLED if m.group("shuffled") else CHRONO
+    return m.group("family"), int(m.group("n_hidden")), split
 
 # NOTE: instantiate_model_from_weights below is a second implementation of what
 # models.io.load_model now does.  Retiring it (A-3 in .claude/REORG_AND_VALIDATION.md)
@@ -196,8 +209,8 @@ def main():
         "Examples:\n"
         "  python scripts/use_trained_rbm.py --family nb_L6 --seed 0 --shuffle\n\n"
         "  python scripts/use_trained_rbm.py --family nb_L6 --seed 0 --CD 5 --progressive\n\n"
-        "  python scripts/use_trained_rbm.py --weights training_runs/nb_L6/seed_0/weights.npz --reps 100\n\n"
-        "  python scripts/use_trained_rbm.py --weights training_runs/bernoulli_median_L6/seed_2/weights.npz --print-n-summary\n\n"
+        "  python scripts/use_trained_rbm.py --weights artifacts/models/nb/chrono/L6/seed_0/weights.npz --reps 100\n\n"
+        "  python scripts/use_trained_rbm.py --weights artifacts/models/bernoulli_median/chrono/L6/seed_2/weights.npz --print-n-summary\n\n"
     )
 
     class HelpFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
@@ -209,7 +222,7 @@ def main():
         formatter_class=HelpFormatter,
     )
     p.add_argument('--weights', type=str, help='Path to weights.npz file')
-    p.add_argument('--family', type=str, help='Family folder under training_runs (e.g. nb_L6)')
+    p.add_argument('--family', type=str, help="Legacy '<family>_L<n>[_shuffled]' name, e.g. nb_L6")
     p.add_argument('--seed', type=str, help='Seed index (0) or folder name (seed_0)', default=None)
     p.add_argument('--class-name', type=str, help='Override class name or Module:Class', default=None)
     p.add_argument('--device', type=str, choices=['cpu','cuda'], default='cpu')
@@ -227,7 +240,8 @@ def main():
         if not args.family or args.seed is None:
             p.error('Either --weights or both --family and --seed must be provided')
         seed_part = args.seed if args.seed.startswith('seed_') else f'seed_{args.seed}'
-        weights_path = RUNS_ROOT / args.family / seed_part / 'weights.npz'
+        family, n_hidden, split = parse_family_dir(args.family)
+        weights_path = model_dir(family, n_hidden, split) / seed_part / 'weights.npz'
 
     if not weights_path.exists():
         raise FileNotFoundError(f"weights file not found: {weights_path}")

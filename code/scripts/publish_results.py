@@ -47,7 +47,7 @@ CATEGORIES = {
     "diagnostics": (
         "diagnostics", "diagnostics", "**/*",
         "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py "
-        "(diagnostics/sweep/, sweep_shuffled/: code/scripts/diagnostic/sweep_analysis.py)"),
+        "(diagnostics/sweep/{chrono,shuffled}/: code/scripts/diagnostic/sweep_analysis.py)"),
     "nan_eval_tables": (
         "nan_eval_extended", "tables", "*.csv",
         "code/scripts/diagnostic/nan_test_eval.py"),
