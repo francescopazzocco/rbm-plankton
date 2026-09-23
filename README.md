@@ -77,7 +77,8 @@ root/
 │   │   ├── sweep_analysis.py     # L-sweep metrics → diagnostic_outputs/04_model_selection/
 │   │   ├── split_comparison.py   # Chrono vs shuffled split → results/tables/
 │   │   ├── nan_test_eval.py      # NaN imputation → diagnostic_outputs/nan_eval_extended/
-│   │   └── plot_training_runs.py # Training curves from artifacts/models/
+│   │   ├── plot_training_runs.py # Training curves from artifacts/models/
+│   │   └── plot_nll_curves.py    # Train/val NLL curves, families overlaid at one L
 │   │
 │   ├── analysis/             # Ecological interpretation
 │   │   ├── hidden/                       # "What do the hidden units mean?"
@@ -233,6 +234,8 @@ python code/scripts/diagnostic/sweep_analysis.py --split shuffled  # L-sweep →
 python code/scripts/diagnostic/split_comparison.py      # Chrono vs shuffled → results/tables/
 python code/scripts/diagnostic/nan_test_eval.py         # NaN imputation → diagnostic_outputs/nan_eval_extended/
 python code/scripts/diagnostic/plot_training_runs.py    # Training curves → diagnostic_outputs/
+python code/scripts/diagnostic/plot_nll_curves.py       # NB-Bernoulli vs NB-Sigmoid NLL curves → diagnostic_outputs/diagnostics/training_curves/family_comparison_fixed_L/
+python code/scripts/diagnostic/plot_train_nll_curves.py --families nb_softmax  # one family across L → .../training_curves/single_family_by_L/
 ```
 
 Scripts that read one split at a time take `--split chrono|shuffled` (default

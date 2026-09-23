@@ -44,10 +44,18 @@ CATEGORIES = {
     "04_model_selection": (
         "04_model_selection", "04_model_selection", "**/*",
         "code/scripts/diagnostic/sweep_analysis.py, code/scripts/archive/plot_final_metric_nb.py"),
-    "diagnostics": (
-        "diagnostics", "diagnostics", "**/*",
-        "code/scripts/archive/plot_sigmoid_nll.py, plot_zinb_nll.py "
-        "(diagnostics/sweep/{chrono,shuffled}/: code/scripts/diagnostic/sweep_analysis.py)"),
+    "diagnostics_all_families": (
+        "diagnostics/training_curves/all_families_by_L", "diagnostics/training_curves/all_families_by_L", "**/*",
+        "code/scripts/diagnostic/sweep_analysis.py"),
+    "diagnostics_nb_zinb_parameters": (
+        "diagnostics/nb_zinb_parameters", "diagnostics/nb_zinb_parameters", "**/*",
+        "code/scripts/diagnostic/sweep_analysis.py"),
+    "diagnostics_single_family": (
+        "diagnostics/training_curves/single_family_by_L", "diagnostics/training_curves/single_family_by_L", "**/*",
+        "code/scripts/diagnostic/plot_train_nll_curves.py"),
+    "diagnostics_family_comparison": (
+        "diagnostics/training_curves/family_comparison_fixed_L", "diagnostics/training_curves/family_comparison_fixed_L", "**/*",
+        "code/scripts/diagnostic/plot_nll_curves.py"),
     "nan_eval_tables": (
         "nan_eval_extended", "tables", "*.csv",
         "code/scripts/diagnostic/nan_test_eval.py"),

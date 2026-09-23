@@ -338,3 +338,28 @@ its own loader because the first of those imports it.
   scripts score by unseeded Gibbs sampling, so a rerun shifts the published
   NLLs by ~1e-3 for a label-only change; the committed numbers were kept and
   the new labels will appear on their next deliberate rerun.
+
+**Presentation material re-synced with current results**
+
+- `materiale_presentazione/` audited file by file (hash match against `results/`).
+  Slides 24–30 switched from `nb` (and a chrono fallback stackplot) to the final
+  model NB-Sigmoid L=6 shuffled seed_9; superseded softmax / overview / training-curve
+  figures replaced with the L≤10 versions; `INDEX.md` rewritten with the
+  slide → source mapping and the skeleton claims the current data contradict
+  (slide 17 "Sigmoid beats NB-Bernoulli": 0.4435 vs 0.4443 val NLL at L=6,
+  within 1/10 of the seed spread; slide 19 L=10 exclusion; slide 29 report
+  still on chrono nb/zinb).
+- New `code/scripts/diagnostic/plot_nll_curves.py`: train/val NLL curves of
+  several families at one L, replacing the archived `plot_*_nll.py` scripts
+  that read the pre-`artifacts/` layout.
+- `compare_model_reconstructions.py`: figure legend listed every model two or
+  three times (collected from all panels); now built from the first panel only.
+- Reconstruction plot for the final model (`use_trained_rbm.py`,
+  `nb_sigmoid_L6_shuffled`, seed_9, shuffled test set) generated in
+  `results/reconstruction_plots/` (gitignored, local only).
+
+## 2026-09-23 (diagnostics reorganisation)
+
+- `results/diagnostics/` restructured by figure type (LOG-034): `training_curves/{all_families_by_L,single_family_by_L,family_comparison_fixed_L}/{split}/` and `nb_zinb_parameters/{split}/`; all figures regenerated and republished with fresh manifest entries.
+- New `code/scripts/diagnostic/plot_train_nll_curves.py` (one family across L); `plot_sweep_curves` now draws a 2x5 grid instead of one row of ten panels.
+- `materiale_presentazione/`: figures 16/17/21 and INDEX paths refreshed to the republished versions.
