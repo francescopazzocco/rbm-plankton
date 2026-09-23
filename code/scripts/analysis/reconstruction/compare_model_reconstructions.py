@@ -811,7 +811,12 @@ def main():
         ax_pll.plot(sorted_pll_positions, sorted_pll_values, color="0.35", linewidth=1.0, alpha=0.7, zorder=4)
     ax_pll.set_ylabel("Average pseudo log-likelihood\n(higher is better)")
 
-    fig.legend(loc="upper center", ncol=5, fontsize=8, frameon=False, bbox_to_anchor=(0.5, 0.945))
+    # Take handles from the first panel only: every panel draws one line per
+    # model under the same label, so collecting the whole figure lists each
+    # model two or three times.
+    handles, legend_labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, legend_labels, loc="upper center", ncol=5, fontsize=8,
+               frameon=False, bbox_to_anchor=(0.5, 0.945))
     fig.tight_layout(rect=(0, 0, 1, 0.88))
 
     if args.plot_out is None:

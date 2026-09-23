@@ -34,7 +34,10 @@ python code/scripts/publish_results.py --all         # everything at once
 | `02_model_analysis/archetype/<kind>/{chrono,shuffled}/` | RBM vs. Cheng's k=5 archetypes, one subfolder per kind (`distance_heatmap`, `overlap_heatmap`, `archetype_closest_rbm`) | the `code/scripts/analysis/archetype/` scripts (LOG-033) |
 | `03_evaluation/` | NaN imputation test, chronological vs shuffled split comparison | `code/scripts/diagnostic/nan_test_eval.py`, `split_comparison.py` |
 | `04_model_selection/{chrono,shuffled}/` | Final validation metrics vs L | `code/scripts/diagnostic/sweep_analysis.py`, `code/scripts/archive/plot_final_metric_nb.py` |
-| `diagnostics/sweep/{chrono,shuffled}/` | Train-NLL curves and sweep diagnostics | `code/scripts/archive/plot_*_nll.py`, `sweep_analysis.py` |
+| `diagnostics/training_curves/all_families_by_L/{split}/` | Val metric vs epoch, every family, one line per L | `code/scripts/diagnostic/sweep_analysis.py` |
+| `diagnostics/training_curves/single_family_by_L/{split}/` | Train NLL vs epoch of one family, one line per L (mean ± 1σ over seeds) | `code/scripts/diagnostic/plot_train_nll_curves.py` |
+| `diagnostics/training_curves/family_comparison_fixed_L/{split}/` | Train/val NLL of several families at one L (mean ± 1σ over seeds) | `code/scripts/diagnostic/plot_nll_curves.py` |
+| `diagnostics/nb_zinb_parameters/{split}/` | NB/ZINB val NLL with θ (and π) trajectories by L | `code/scripts/diagnostic/sweep_analysis.py` |
 
 Every split-aware directory holds a `chrono/` and a `shuffled/` subdirectory,
 symmetrically — neither split gets an unlabelled default location.

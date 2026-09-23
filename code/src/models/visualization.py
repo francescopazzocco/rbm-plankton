@@ -427,11 +427,17 @@ def plot_final_metric_individual(runs, figures_dir: Path):
 
 
 def plot_sweep_curves(runs, figures_dir: Path):
-    fig, axes = plt.subplots(1, len(FAMILY_META), figsize=(15, 4), sharey=False)
-    fig.suptitle("Val metric training curves by L (mean ± 1σ over seeds)", fontsize=13)
+    n_cols = 5
+    n_rows = -(-len(FAMILY_META) // n_cols)
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.6 * n_cols, 3.8 * n_rows),
+                             sharey=False, squeeze=False)
+    fig.suptitle("Val metric training curves by L (mean ± 1σ over seeds)", fontsize=14)
     cmap = plt.colormaps["viridis"]
+    axes_flat = axes.ravel()
+    for ax in axes_flat[len(FAMILY_META):]:
+        ax.set_visible(False)
 
-    for ax, (family, meta) in zip(axes, FAMILY_META.items()):
+    for ax, (family, meta) in zip(axes_flat, FAMILY_META.items()):
         col = meta["col"]
         family_runs = runs.get(family, {})
         l_values = sorted(family_runs)
@@ -453,11 +459,11 @@ def plot_sweep_curves(runs, figures_dir: Path):
         ax.set_title(display_name(family))
         ax.set_xlabel("Epoch")
         ax.set_ylabel(meta["label"])
-        ax.legend(fontsize=8)
+        ax.legend(fontsize=7, ncol=2, loc="upper right")
         ax.grid(True, alpha=0.3)
 
     fig.tight_layout()
-    out = figures_dir / "sweep_training_curves.png"
+    out = figures_dir / "val_metric_by_family.png"
     fig.savefig(out, dpi=150)
     print(f"Saved: {out}")
     plt.close(fig)
@@ -508,7 +514,7 @@ def plot_nb_diagnostics(runs, figures_dir: Path):
     ax_theta.grid(True, alpha=0.3)
 
     fig.tight_layout()
-    out = figures_dir / "sweep_nb_diagnostics.png"
+    out = figures_dir / "nb_nll_theta_by_L.png"
     fig.savefig(out, dpi=150)
     print(f"Saved: {out}")
     plt.close(fig)
@@ -572,7 +578,7 @@ def plot_zinb_diagnostics(runs, figures_dir: Path):
     ax_pi.grid(True, alpha=0.3)
 
     fig.tight_layout()
-    out = figures_dir / "sweep_zinb_diagnostics.png"
+    out = figures_dir / "zinb_nll_theta_pi_by_L.png"
     fig.savefig(out, dpi=150)
     print(f"Saved: {out}")
     plt.close(fig)

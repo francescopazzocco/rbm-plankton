@@ -4,7 +4,8 @@ sweep_analysis.py - NLL/PLL vs L sweep analysis across all trained models.
 Reads artifacts/models/{family}/{split}/L{n}/seed_*/rbm_training_curves.csv and
 produces figures in:
   diagnostic_outputs/04_model_selection/{split}/ — final val metric vs L per model family
-  diagnostic_outputs/diagnostics/sweep/{split}/ — training curves, NB/ZINB diagnostics
+  diagnostic_outputs/diagnostics/training_curves/all_families_by_L/{split}/ — val metric vs epoch, all families
+  diagnostic_outputs/diagnostics/nb_zinb_parameters/{split}/ — NB/ZINB val NLL + theta (+ pi) trajectories by L
 
 Each split writes to its own chrono/ or shuffled/ subdirectory, so the two
 splits cannot overwrite each other's figures.
@@ -38,9 +39,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    diag_dir   = split_out_dir(DIAGNOSTIC_ROOT / "diagnostics" / "sweep", args.split)
+    curves_dir = split_out_dir(DIAGNOSTIC_ROOT / "diagnostics" / "training_curves" / "all_families_by_L", args.split)
+    params_dir = split_out_dir(DIAGNOSTIC_ROOT / "diagnostics" / "nb_zinb_parameters", args.split)
     metric_dir = split_out_dir(DIAGNOSTIC_ROOT / "04_model_selection", args.split)
-    diag_dir.mkdir(parents=True, exist_ok=True)
+    curves_dir.mkdir(parents=True, exist_ok=True)
+    params_dir.mkdir(parents=True, exist_ok=True)
     metric_dir.mkdir(parents=True, exist_ok=True)
 
     all_dirs = discover_model_dirs(args.models_root, args.split)
@@ -86,9 +89,9 @@ def main():
     plot_final_metric(runs, metric_dir)
     plot_final_metric_overview(runs, metric_dir)
     plot_final_metric_individual(runs, metric_dir)
-    plot_sweep_curves(runs, diag_dir)
-    plot_nb_diagnostics(runs, diag_dir)
-    plot_zinb_diagnostics(runs, diag_dir)
+    plot_sweep_curves(runs, curves_dir)
+    plot_nb_diagnostics(runs, params_dir)
+    plot_zinb_diagnostics(runs, params_dir)
 
 
 if __name__ == "__main__":
