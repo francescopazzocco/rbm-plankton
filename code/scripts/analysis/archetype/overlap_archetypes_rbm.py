@@ -7,6 +7,7 @@ import pandas as pd
 from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, model_dir, split_out_dir
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.paths import PROJECT_ROOT as ROOT
+from models.visualization import display_name
 
 
 def resolve_weights(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
@@ -107,6 +108,8 @@ def main():
     args = parser.parse_args()
 
     weights = args.weights or resolve_weights(args.family, args.L, args.split, args.models_root)
+    model_tag = (f"{display_name(args.family)} L={args.L} ({args.split})"
+                 if args.weights is None else str(weights))
     out = args.out or (
         split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype" / "overlap_heatmap",
                      args.split)
@@ -151,7 +154,7 @@ def main():
     fig, ax = plt.subplots(figsize=(10, 6))
     # Heatmap colors based on fraction (res_frac), numbers printed based on count (res_counts)
     plot_heatmap(ax, res_frac, res_counts, hidden_names, arch_names, cmap="YlGnBu")
-    ax.set_title(f"Archetype vs Hidden Unit Overlap\n(Color = Fraction of Archetype, Text = Common Species Count)\nTop {args.pct*100:.0f}% Mass | Weights: {weights.name}")
+    ax.set_title(f"Archetype vs Hidden Unit Overlap\n(Color = Fraction of Archetype, Text = Common Species Count)\nTop {args.pct*100:.0f}% Mass | {model_tag}")
     ax.set_xlabel("RBM Hidden Units")
     ax.set_ylabel("Archetypes")
     fig.tight_layout()

@@ -47,7 +47,7 @@ from models.io import (
 )
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.utils import get_device
-from models.visualization import COLORS
+from models.visualization import COLORS, display_name
 
 
 # -- Config ------------------------------------------------------------------
@@ -144,18 +144,6 @@ PATTERNS = ["p3_3miss", "p31_31miss", "p54_54miss"]
 # and compare_model_reconstructions -- not a locally recomputed Brewer scheme.
 FAMILY_COLORS = COLORS
 
-FAMILY_LABELS = {
-    "nb":               "NB",
-    "nb_sigmoid":       "NB-Sigmoid",
-    "nb_softmax":       "NB-Softmax",
-    "zinb":             "ZINB",
-    "zinb_sigmoid":     "ZINB-Sigmoid",
-    "zinb_softmax":     "ZINB-Softmax",
-    "bernoulli_median": "Bernoulli-median",
-    "bernoulli_zero":   "Bernoulli-zero",
-}
-
-
 def run_key(family: str, n_hidden: int, split: str) -> str:
     """Identity of one evaluated run.
 
@@ -168,7 +156,7 @@ def run_key(family: str, n_hidden: int, split: str) -> str:
 
 
 def run_label(family: str, n_hidden: int, split: str) -> str:
-    return f"{FAMILY_LABELS[family]} L={n_hidden} ({split})"
+    return f"{display_name(family)} L={n_hidden} ({split})"
 
 
 def plot_bars(summary: pd.DataFrame, out: Path, run_meta: dict):

@@ -7,6 +7,7 @@ import pandas as pd
 from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, model_dir, split_out_dir
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.paths import PROJECT_ROOT as ROOT
+from models.visualization import display_name
 from scipy.spatial.distance import euclidean
 
 
@@ -84,6 +85,8 @@ def main():
     args = parser.parse_args()
 
     weights = args.weights or resolve_weights(args.family, args.L, args.split, args.models_root)
+    model_tag = (f"{display_name(args.family)} L={args.L} ({args.split})"
+                 if args.weights is None else str(weights))
     out = args.out or (
         split_out_dir(DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype" / "distance_heatmap",
                      args.split)
@@ -142,7 +145,7 @@ def main():
         A_mat = A_mat / A_norms
         arch_names = list(df_arch.index)
         y_label = "Archetypes"
-        title_prefix = "Archetype vs Hidden Unit"
+        title_prefix = f"Archetype vs {model_tag} Hidden Unit"
 
     # Align W (Model 1) and a
     taxa_to_idx = {t: i for i, t in enumerate(rbm_taxa)}

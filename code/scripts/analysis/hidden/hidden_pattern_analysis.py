@@ -42,7 +42,12 @@ from models.io import (
     split_out_dir,
 )
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
-from models.visualization import hidden_binary, pattern_frequency, pattern_labels
+from models.visualization import (
+    display_name,
+    hidden_binary,
+    pattern_frequency,
+    pattern_labels,
+)
 from scipy.cluster.hierarchy import leaves_list, linkage
 
 
@@ -169,7 +174,7 @@ def main() -> None:
 
     seed_dir = args.seed_dir or resolve_seed_dir(
         args.family, args.L, args.split, args.models_root)
-    title_prefix = f"{args.family} L={args.L} ({args.split})" \
+    title_prefix = f"{display_name(args.family)} L={args.L} ({args.split})" \
         if args.seed_dir is None else str(seed_dir)
     print(f"Reading {seed_dir}")
 

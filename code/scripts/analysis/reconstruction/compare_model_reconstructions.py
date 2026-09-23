@@ -28,7 +28,7 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from models import io as data_io
 from models.paths import DIAGNOSTIC_ROOT, SHUFFLED, model_dir
-from models.visualization import COLORS
+from models.visualization import COLORS, display_name
 import use_trained_rbm as trained_loader
 
 MODEL_FAMILIES = [
@@ -412,7 +412,7 @@ def plot_overall_summary(
         raise RuntimeError("No overall results available to plot")
 
     x_pos = np.arange(len(entries))
-    x_labels = [f"{entry['family']}\n(L = {entry['L']})" for entry in entries]
+    x_labels = [f"{display_name(entry['family'])}\n(L = {entry['L']})" for entry in entries]
     distances = [entry["distance_mean"] for entry in entries]
     distance_sems = [entry["distance_sem"] for entry in entries]
     plls = [entry["pll_mean"] for entry in entries]
@@ -583,7 +583,7 @@ def main():
             residual_color = base_color
 
         residual_title = (
-            f"Average residuals for best run: {best_family_label} | "
+            f"Average residuals for best run: {display_name(best_family_label)} | "
             f"L={best_run['L']} seed={best_run['seed']}"
         )
 
@@ -644,7 +644,7 @@ def main():
         recon_plot = recon_raw if args.raw else normalize_profile(recon_raw)
         residual = recon_plot - original_profile
 
-        labels.append(info["label"])
+        labels.append(display_name(info["label"]))
         sample_reconstructions.append(recon_plot)
         sample_residuals.append(residual)
         sample_raw_distances.append(raw_distance)
