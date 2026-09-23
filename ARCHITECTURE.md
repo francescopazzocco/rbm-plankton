@@ -179,7 +179,7 @@ code/
       nan_test_eval.py              NaN imputation evaluation → diagnostic_outputs/nan_eval_extended/
       plot_training_runs.py         training curves from artifacts/models/ → diagnostic_outputs/training_curves/
       plot_nll_curves.py            train/val NLL curves of several families at one L → diagnostic_outputs/diagnostics/training_curves/family_comparison_fixed_L/{split}/
-      plot_train_nll_curves.py      train NLL of one family across several L → diagnostic_outputs/diagnostics/training_curves/single_family_by_L/{split}/
+      plot_train_nll_curves.py      train NLL/PLL of every family across L → diagnostic_outputs/diagnostics/training_curves/single_family_by_L/{split}/
     analysis/                     ecological interpretation
       hidden/                        "what do the hidden units mean?" → results/02_model_analysis/hidden/<kind>/{chrono,shuffled}/
         hidden_dominant_state.py      dominant state timelines + weight profiles → weight_profiles/, state_timeline/, state_frequency/, dominant_state/
