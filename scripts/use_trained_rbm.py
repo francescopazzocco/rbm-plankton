@@ -258,7 +258,7 @@ def evaluate_species_metrics(
                 re = float((orig[i] - rec[i]).pow(2).item() ** 0.5)
                 mask = torch.ones(D, device=device, dtype=torch.bool)
                 mask[i] = False
-                rd = float(((orig[mask] - rec[mask]) ** 2).sum().item() ** 0.5)
+                rd = float(torch.abs(orig[mask] - rec[mask]).mean().item())
 
                 masked_orig = orig[i:i + 1]
                 masked_rec = rec[i:i + 1]
@@ -672,7 +672,7 @@ def main():
                     # L2 over other entries
                     mask = torch.ones(D, device=model.device, dtype=torch.bool)
                     mask[i] = False
-                    rd = float(((orig[mask] - rec[mask])**2).sum().item() ** 0.5)
+                    rd = float(torch.abs(orig[mask] - rec[mask]).mean().item())
                     masked_orig = orig[i:i+1]
                     masked_rec = rec_tensor[i:i+1]
 
@@ -693,7 +693,7 @@ def main():
                         for step_idx, step_rec in enumerate(step_recs):
                             step_recon = step_rec.detach()
                             progressive_errs[step_idx].append(float((orig[i] - step_recon[i]).pow(2).item() ** 0.5))
-                            progressive_dists[step_idx].append(float(((orig[mask] - step_recon[mask])**2).sum().item() ** 0.5))
+                            progressive_dists[step_idx].append(float(torch.abs(orig[mask] - step_recon[mask]).mean().item()))
                     errs.append(re)
                     dists.append(rd)
                     cos_masked.append(cs_masked)
@@ -795,28 +795,28 @@ def main():
         axes[0, 0].set_xticks(x)
         axes[0, 0].set_xticklabels(species, rotation=90, fontsize=6)
         axes[0, 0].set_title('Reconstruction Error by Species')
-        axes[0, 0].set_ylabel('L2 error')
+        axes[0, 0].set_ylabel('L1 error')
         axes[0, 0].grid(alpha=0.5)
 
         axes[0, 1].errorbar(x, dist_means, yerr=dist_stds, fmt='o', color='C1')
         axes[0, 1].set_xticks(x)
         axes[0, 1].set_xticklabels(species, rotation=90, fontsize=6)
-        axes[0, 1].set_title('Reconstructed Distance (other entries)')
-        axes[0, 1].set_ylabel('L2 distance')
+        axes[0, 1].set_title('Reconstructed Error (other entries)')
+        axes[0, 1].set_ylabel('Mean L1 error')
         axes[0, 1].grid(alpha=0.5)
 
         axes[1, 0].errorbar(x, cos_masked_means, yerr=cos_masked_stds, fmt='o', color='C2')
         axes[1, 0].set_xticks(x)
         axes[1, 0].set_xticklabels(species, rotation=90, fontsize=6)
         axes[1, 0].set_title('Cosine Similarity (masked entry)')
-        axes[1, 0].set_ylabel('cosine similarity')
+        axes[1, 0].set_ylabel('Cosine similarity')
         axes[1, 0].grid(alpha=0.5)
 
         axes[1, 1].errorbar(x, cos_other_means, yerr=cos_other_stds, fmt='o', color='C3')
         axes[1, 1].set_xticks(x)
         axes[1, 1].set_xticklabels(species, rotation=90, fontsize=6)
         axes[1, 1].set_title('Cosine Similarity (other entries)')
-        axes[1, 1].set_ylabel('cosine similarity')
+        axes[1, 1].set_ylabel('Cosine similarity')
         axes[1, 1].grid(alpha=0.5)
 
         if progressive_enabled:
@@ -853,14 +853,14 @@ def main():
             axes[2, 0].set_xticks(x)
             axes[2, 0].set_xticklabels(species, rotation=90, fontsize=6)
             axes[2, 0].set_title('Progressive Reconstruction Error by Species')
-            axes[2, 0].set_ylabel('L2 error')
+            axes[2, 0].set_ylabel('L1 error')
             axes[2, 0].grid(alpha=0.5)
             axes[2, 0].legend(fontsize=7, ncol=min(args.CD, 4), loc='upper right')
 
             axes[2, 1].set_xticks(x)
             axes[2, 1].set_xticklabels(species, rotation=90, fontsize=6)
-            axes[2, 1].set_title('Progressive Reconstructed Distance (other entries)')
-            axes[2, 1].set_ylabel('L2 distance')
+            axes[2, 1].set_title('Progressive Reconstructed Error (other entries)')
+            axes[2, 1].set_ylabel('Mean L1 error')
             axes[2, 1].grid(alpha=0.5)
             axes[2, 1].legend(fontsize=7, ncol=min(args.CD, 4), loc='upper right')
 
