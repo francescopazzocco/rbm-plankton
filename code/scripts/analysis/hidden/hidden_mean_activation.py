@@ -25,7 +25,7 @@ from models.io import (
     split_out_dir,
 )
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
-from models.visualization import ABSORBER_HI, ABSORBER_LO, mean_activations, plot_family
+from models.visualization import ABSORBER_HI, absorber_lo, mean_activations, plot_family
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -70,7 +70,7 @@ def main():
             means = mean_activations(csv)
             for unit, v in means.items():
                 flag = ("absorber_hi" if v >= ABSORBER_HI
-                        else "absorber_lo" if v <= ABSORBER_LO
+                        else "absorber_lo" if v <= absorber_lo(family)
                         else "active")
                 rows.append({"family": family, "L": l_val,
                              "unit": unit, "mean_activation": round(v, 4),

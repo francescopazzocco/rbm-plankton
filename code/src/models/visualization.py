@@ -748,6 +748,14 @@ def plot_state_timeline(family: str, family_runs: dict, out_dir: Path):
 
 ABSORBER_HI = 0.90
 ABSORBER_LO = 0.10
+# Softmax activations are shares that sum to 1 across units, so at L=10 a
+# uniform share is already 0.10; a lower cut-off is needed to call a unit off.
+ABSORBER_LO_SOFTMAX = 0.05
+
+
+def absorber_lo(family: str) -> float:
+    """Always-off threshold on mean activation for this family."""
+    return ABSORBER_LO_SOFTMAX if family.endswith("softmax") else ABSORBER_LO
 
 # Semantic 3-way color: always-on / always-off / active. Okabe-Ito vermillion
 # and blue (not tab10 red/blue) for consistency with the rest of the project;
@@ -763,6 +771,7 @@ def mean_activations(csv: Path) -> pd.Series:
 
 
 def plot_family(family: str, family_runs: dict, out_dir: Path):
+    lo = absorber_lo(family)
     l_values = sorted(family_runs)
     n = len(l_values)
     fig, axes = plt.subplots(1, n, figsize=(3 * n, 3.5), sharey=True)
@@ -775,13 +784,13 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
         units = np.arange(len(means))
         bar_colors = [
             _COLOR_ALWAYS_ON if v >= ABSORBER_HI else
-            _COLOR_ALWAYS_OFF if v <= ABSORBER_LO else
+            _COLOR_ALWAYS_OFF if v <= lo else
             _COLOR_ACTIVE
             for v in means.values
         ]
         ax.bar(units, means.values, color=bar_colors)
         ax.axhline(ABSORBER_HI, color=_COLOR_ALWAYS_ON, linestyle="--", linewidth=0.8, alpha=0.6)
-        ax.axhline(ABSORBER_LO, color=_COLOR_ALWAYS_OFF, linestyle="--", linewidth=0.8, alpha=0.6)
+        ax.axhline(lo, color=_COLOR_ALWAYS_OFF, linestyle="--", linewidth=0.8, alpha=0.6)
         ax.set_title(f"L={l_val}", fontsize=10)
         ax.set_xlabel("hidden unit")
         ax.set_xticks(units)
@@ -793,7 +802,7 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
 
     legend = [
         mpatches.Patch(color=_COLOR_ALWAYS_ON, label=f"always-on  (>{ABSORBER_HI})"),
-        mpatches.Patch(color=_COLOR_ALWAYS_OFF, label=f"always-off (<{ABSORBER_LO})"),
+        mpatches.Patch(color=_COLOR_ALWAYS_OFF, label=f"always-off (<{lo})"),
         mpatches.Patch(color=_COLOR_ACTIVE, label="active"),
     ]
     fig.legend(handles=legend, loc="lower center", ncol=3, fontsize=8,
