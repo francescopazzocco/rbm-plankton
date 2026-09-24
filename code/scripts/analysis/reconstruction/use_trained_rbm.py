@@ -20,6 +20,7 @@ Options:
     --progressive      plot per-step traces for reconstruction error and distance
     --device DEVICE    'cpu' or 'cuda' (default: auto)
     --print-n-summary  print a small numeric summary (nll/pll) on train set
+    --overall          every family x L=3..8 x seed (use with --shuffle), top-3 per metric
 """
 
 import argparse
@@ -198,6 +199,224 @@ def reconstruct_chain_progressive(model, visible, steps: int):
     return states
 
 
+# --overall: every family x L x seed on the shuffled split, mask-one-species,
+# then the top 3 (family, L) per metric (mean over seeds +- SEM across seeds).
+OVERALL_FAMILIES = [
+    "bernoulli_median", "bernoulli_zero",
+    "nb", "nb_relu", "nb_sigmoid", "nb_softmax",
+    "zinb", "zinb_relu", "zinb_sigmoid", "zinb_softmax",
+]
+OVERALL_HIDDEN_UNITS = range(3, 9)
+OVERALL_SEEDS = range(10)
+OVERALL_METRICS = (
+    # (key, title, ylabel, higher_is_better)
+    ("reconstruction_error", "Reconstruction Error (masked entry)", "L1 error", False),
+    ("reconstructed_distance", "Reconstructed Error (other entries)", "Mean L1 error", False),
+    ("cosine_other", "Cosine Similarity (other entries)", "Cosine similarity", True),
+    # Robustness check: error on log(1+x), i.e. a fold error for abundant taxa
+    # (0.69 = factor 2) and ~ the absolute error for rare ones, so every taxon
+    # weighs the same whatever its abundance.
+    ("log_reconstruction_error", "Log Error (masked entry)", "|log(1+x) - log(1+x_hat)|", False),
+    ("log_reconstructed_distance", "Log Error (other entries)", "Mean |log(1+x) - log(1+x_hat)|", False),
+)
+
+METRIC_KEYS = ('reconstruction_error', 'reconstructed_distance', 'cosine_masked', 'cosine_other',
+               'log_reconstruction_error', 'log_reconstructed_distance')
+
+
+def load_evaluation_split(visible_model: str, device: torch.device, shuffle: bool,
+                          seed: int | None = None):
+    """Validation rows of one trained run.
+
+    The shuffled split is drawn with numpy's global RNG, which train.py seeds
+    with the run's seed right before loading.  Re-seeding here gives back that
+    run's own held-out rows; an unseeded draw would be ~85% training rows.
+    """
+    if shuffle and seed is not None:
+        np.random.seed(seed)
+    if visible_model.startswith('bernoulli'):
+        _, X_val, _, _, taxa_cols, _, _ = data_io.load_and_binarise(device=device, shuffle=shuffle)
+    else:
+        _, X_val, _, _, taxa_cols, _ = data_io.load_raw_counts(device=device, shuffle=shuffle)
+    return X_val.to(device), list(taxa_cols)
+
+
+def _row_cosine(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+    """Row-wise cosine similarity, 0 where either row is all zeros."""
+    denom = a.norm(dim=1) * b.norm(dim=1)
+    dot = (a * b).sum(dim=1)
+    return torch.where(denom > 0, dot / denom.clamp_min(1e-30), torch.zeros_like(dot))
+
+
+def _mean_sem(x: torch.Tensor) -> tuple[float, float]:
+    x = x.double()
+    return float(x.mean()), float(x.std(unbiased=False) / np.sqrt(x.numel()))
+
+
+@torch.no_grad()
+def evaluate_species_metrics(model, X_val: torch.Tensor, reps: int, cd: int | None):
+    """Mask-one-species evaluation, same metrics as the single-run mode.
+
+    For each species i every test row is repeated `reps` times, entry i is set
+    to 0 and the row is reconstructed (cd chained passes, or one).  All rows of
+    one species go through the model as one batch; each row samples its own h,
+    so this is the same estimator as looping row by row.
+    """
+    N, D = X_val.shape
+    base = X_val.repeat_interleave(reps, dim=0)
+    out = {key: {'means': [], 'sems': []} for key in METRIC_KEYS}
+    log_base = torch.log1p(base)
+    for i in range(D):
+        V = base.clone()
+        V[:, i] = 0.0
+        rec = V
+        for _ in range(cd or 1):
+            rec = model.reconstruct(rec)
+        mask = torch.ones(D, dtype=torch.bool, device=X_val.device)
+        mask[i] = False
+        per_row = {
+            'reconstruction_error': (base[:, i] - rec[:, i]).abs(),
+            'reconstructed_distance': (base[:, mask] - rec[:, mask]).abs().mean(dim=1),
+            'cosine_masked': _row_cosine(base[:, i:i + 1], rec[:, i:i + 1]),
+            'cosine_other': _row_cosine(base[:, mask], rec[:, mask]),
+            'log_reconstruction_error': (log_base[:, i] - torch.log1p(rec[:, i])).abs(),
+            'log_reconstructed_distance': (log_base[:, mask] - torch.log1p(rec[:, mask])).abs().mean(dim=1),
+        }
+        for key, vals in per_row.items():
+            m, se = _mean_sem(vals)
+            out[key]['means'].append(m)
+            out[key]['sems'].append(se)
+    for bundle in out.values():
+        bundle['means'] = np.asarray(bundle['means'])
+        bundle['sems'] = np.asarray(bundle['sems'])
+        bundle['score'] = float(bundle['means'].sum())
+    return out
+
+
+def aggregate_family_l_results(run_entries: list[dict]):
+    """Mean over seeds per species, SEM across seeds; score = sum over species."""
+    aggregated = []
+    for entry in run_entries:
+        seed_entries = entry['seed_entries']
+        metric_bundle = {}
+        for metric_key, _, _, higher_is_better in OVERALL_METRICS:
+            stacked = np.stack([se['metrics'][metric_key]['means'] for se in seed_entries], axis=0)
+            mean = stacked.mean(axis=0)
+            sem = (stacked.std(axis=0, ddof=1) / np.sqrt(stacked.shape[0])
+                   if stacked.shape[0] > 1 else np.zeros_like(mean))
+            metric_bundle[metric_key] = {'means': mean, 'sems': sem, 'score': float(mean.sum()),
+                                         'higher_is_better': higher_is_better}
+        aggregated.append({**entry, 'seed_count': len(seed_entries), 'metrics': metric_bundle})
+    return aggregated
+
+
+def select_top_runs(aggregated_runs: list[dict], metric_key: str, k: int = 3):
+    higher_is_better = next(cfg[3] for cfg in OVERALL_METRICS if cfg[0] == metric_key)
+    ranked = sorted(aggregated_runs, key=lambda e: e['metrics'][metric_key]['score'],
+                    reverse=higher_is_better)
+    return ranked[:k]
+
+
+def plot_overall_summary(selected_top: dict[str, list[dict]], taxa_cols: list[str], out_path: Path):
+    fig, axes = plt.subplots(len(OVERALL_METRICS), 1, figsize=(18, 5.8 * len(OVERALL_METRICS)), sharex=True)
+    axes = np.atleast_1d(axes)
+    colors = get_palette(3)
+    x = np.arange(len(taxa_cols))
+    for ax, (metric_key, title, ylabel, _) in zip(axes, OVERALL_METRICS):
+        for idx, entry in enumerate(selected_top[metric_key]):
+            m = entry['metrics'][metric_key]
+            ax.errorbar(x, m['means'], yerr=m['sems'], fmt='-o', linewidth=1.5, markersize=3,
+                        color=colors[idx % len(colors)],
+                        label=f"{entry['family']} | L={entry['L']} (score={m['score']:.2f}, "
+                              f"{entry['seed_count']} seeds)")
+        ax.set_title(title)
+        ax.set_ylabel(ylabel)
+        ax.grid(alpha=0.4)
+        ax.legend(fontsize=8, frameon=False)
+    axes[-1].set_xticks(x)
+    axes[-1].set_xticklabels(taxa_cols, rotation=90, fontsize=6)
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
+    print(f"[Overall] Saved plots to {out_path}")
+
+
+def write_overall_tables(aggregated_runs: list[dict], selected_top: dict[str, list[dict]],
+                         taxa_cols: list[str], out_dir: Path):
+    """scores.csv: one row per (family, L); per_species.csv: long format with seed SEM;
+    per_seed_scores.csv: one row per (family, L, seed); top3.json."""
+    import json
+    import pandas as pd
+    keys = METRIC_KEYS
+    rows, long_rows, seed_rows = [], [], []
+    for e in aggregated_runs:
+        row = {'family': e['family'], 'L': e['L'], 'seeds': e['seed_count']}
+        for key in keys:
+            seed_scores = np.array([se['metrics'][key]['score'] for se in e['seed_entries']])
+            row[f'{key}_score_mean'] = seed_scores.mean()
+            row[f'{key}_score_std'] = seed_scores.std(ddof=1) if seed_scores.size > 1 else 0.0
+        rows.append(row)
+        for se in e['seed_entries']:
+            seed_rows.append({'family': e['family'], 'L': e['L'], 'seed': se['seed'],
+                              **{f'{key}_score': se['metrics'][key]['score'] for key in keys}})
+        for metric_key, m in e['metrics'].items():
+            for t, mean, sem in zip(taxa_cols, m['means'], m['sems']):
+                long_rows.append({'family': e['family'], 'L': e['L'], 'metric': metric_key,
+                                  'taxon': t, 'mean': mean, 'sem_across_seeds': sem})
+    out_dir.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).to_csv(out_dir / 'scores.csv', index=False)
+    pd.DataFrame(seed_rows).to_csv(out_dir / 'per_seed_scores.csv', index=False)
+    pd.DataFrame(long_rows).to_csv(out_dir / 'per_species.csv', index=False)
+    top = {k: [{'family': e['family'], 'L': e['L'], 'score': e['metrics'][k]['score']} for e in v]
+           for k, v in selected_top.items()}
+    (out_dir / 'top3.json').write_text(json.dumps(top, indent=2), encoding='utf-8')
+    print(f"[Overall] Saved tables to {out_dir}")
+
+
+def run_overall(args):
+    device = torch.device('cuda' if (args.device == 'cuda' and torch.cuda.is_available()) else 'cpu')
+    split = SHUFFLED if args.shuffle else CHRONO
+    print(f'\n[Overall] mask-one-species evaluation, split={split}, reps={args.reps}, CD={args.CD}')
+    records, taxa_ref = [], None
+    for family in OVERALL_FAMILIES:
+        for n_hidden in OVERALL_HIDDEN_UNITS:
+            seed_entries = []
+            for seed in OVERALL_SEEDS:
+                weights_path = model_dir(family, n_hidden, split) / f'seed_{seed}' / 'weights.npz'
+                if not weights_path.exists():
+                    continue
+                model, _ = instantiate_model_from_weights(load_weights_npz(weights_path),
+                                                          device_str=args.device)
+                X_val, taxa_cols = load_evaluation_split(family, device, args.shuffle, seed)
+                taxa_ref = taxa_ref or taxa_cols
+                metrics = evaluate_species_metrics(model, X_val, args.reps, args.CD)
+                if not all(np.isfinite(m['score']) for m in metrics.values()):
+                    print(f"[Overall] skip {family} L={n_hidden} seed={seed}: non-finite metrics")
+                    continue
+                seed_entries.append({'seed': seed, 'metrics': metrics})
+            if seed_entries:
+                records.append({'family': family, 'L': n_hidden, 'seed_entries': seed_entries})
+                s = [se['metrics'] for se in seed_entries]
+                print(f"[Overall] {family:17s} L={n_hidden} seeds={len(s):2d}  "
+                      f"recon={np.mean([m['reconstruction_error']['score'] for m in s]):.3f}  "
+                      f"other_L1={np.mean([m['reconstructed_distance']['score'] for m in s]):.3f}  "
+                      f"cos_other={np.mean([m['cosine_other']['score'] for m in s]):.3f}  "
+                      f"log_masked={np.mean([m['log_reconstruction_error']['score'] for m in s]):.3f}  "
+                      f"log_other={np.mean([m['log_reconstructed_distance']['score'] for m in s]):.3f}")
+    if not records:
+        raise RuntimeError('No trained runs were found for overall evaluation')
+
+    aggregated = aggregate_family_l_results(records)
+    selected_top = {key: select_top_runs(aggregated, key) for key, _, _, _ in OVERALL_METRICS}
+    suffix = f"_CD{args.CD}" if args.CD is not None else ""
+    out_path = (Path(args.plot_out) if args.plot_out else
+                DIAGNOSTIC_ROOT / 'reconstruction_plots' / 'overall' / split
+                / f'use_trained_rbm_overall_reps-{args.reps}{suffix}.png')
+    plot_overall_summary(selected_top, taxa_ref, out_path)
+    write_overall_tables(aggregated, selected_top, taxa_ref, out_path.parent)
+
+
 def main():
     epilog = (
         "Tip: Prefer specifying both --family and --seed together to select a trained run\n"
@@ -231,8 +450,13 @@ def main():
     p.add_argument('--CD', nargs='?', const=5, type=int, default=None, help='Number of chained reconstruction steps to run')
     p.add_argument('--progressive', action='store_true', help='Plot per-step traces for CD reconstruction')
     p.add_argument('--reps', type=int, default=20, help='Number of repetitions per mask')
+    p.add_argument('--overall', action='store_true', help='Evaluate every family, L=3..8 and seed, then plot the top-3 (family, L) per metric')
     p.add_argument('--plot-out', type=str, default=None, help='Output PNG path for plots')
     args = p.parse_args()
+
+    if args.overall:
+        run_overall(args)
+        return
 
     if args.weights:
         weights_path = Path(args.weights)
@@ -284,7 +508,11 @@ def main():
         if args.CD is not None:
             print(f'[Eval] Chained reconstruction enabled: CD={args.CD}')
         vm = visible_model
-        # load appropriate data split with shuffle option
+        # load appropriate data split with shuffle option; re-seed so the
+        # shuffled split is this run's own held-out rows (see load_evaluation_split)
+        seed_match = re.fullmatch(r'seed_(\d+)', weights_path.parent.name)
+        if args.shuffle and seed_match:
+            np.random.seed(int(seed_match.group(1)))
         if vm.startswith('bernoulli'):
             X_train, X_val, dates_train, dates_val, taxa_cols, nan_rows, thresholds = \
                 data_io.load_and_binarise(device=model.device, shuffle=args.shuffle)
@@ -341,10 +569,10 @@ def main():
                     rec_tensor = rec.detach().clone()
                     # scalar reconstruction error for entry i (L2 norm -> abs)
                     re = float((orig[i] - rec[i]).pow(2).item() ** 0.5)
-                    # L2 over other entries
+                    # mean L1 error over the other entries
                     mask = torch.ones(D, device=model.device, dtype=torch.bool)
                     mask[i] = False
-                    rd = float(((orig[mask] - rec[mask])**2).sum().item() ** 0.5)
+                    rd = float(torch.abs(orig[mask] - rec[mask]).mean().item())
                     masked_orig = orig[i:i+1]
                     masked_rec = rec_tensor[i:i+1]
 
@@ -365,7 +593,7 @@ def main():
                         for step_idx, step_rec in enumerate(step_recs):
                             step_recon = step_rec.detach()
                             progressive_errs[step_idx].append(float((orig[i] - step_recon[i]).pow(2).item() ** 0.5))
-                            progressive_dists[step_idx].append(float(((orig[mask] - step_recon[mask])**2).sum().item() ** 0.5))
+                            progressive_dists[step_idx].append(float(torch.abs(orig[mask] - step_recon[mask]).mean().item()))
                     errs.append(re)
                     dists.append(rd)
                     cos_masked.append(cs_masked)
@@ -468,28 +696,28 @@ def main():
         axes[0, 0].set_xticks(x)
         axes[0, 0].set_xticklabels(species, rotation=90, fontsize=6)
         axes[0, 0].set_title('Reconstruction Error by Species')
-        axes[0, 0].set_ylabel('L2 error')
+        axes[0, 0].set_ylabel('L1 error')
         axes[0, 0].grid(alpha=0.5)
 
         axes[0, 1].errorbar(x, dist_means, yerr=dist_stds, fmt='o', color=panel_colors[1])
         axes[0, 1].set_xticks(x)
         axes[0, 1].set_xticklabels(species, rotation=90, fontsize=6)
-        axes[0, 1].set_title('Reconstructed Distance (other entries)')
-        axes[0, 1].set_ylabel('L2 distance')
+        axes[0, 1].set_title('Reconstructed Error (other entries)')
+        axes[0, 1].set_ylabel('Mean L1 error')
         axes[0, 1].grid(alpha=0.5)
 
         axes[1, 0].errorbar(x, cos_masked_means, yerr=cos_masked_stds, fmt='o', color=panel_colors[2])
         axes[1, 0].set_xticks(x)
         axes[1, 0].set_xticklabels(species, rotation=90, fontsize=6)
         axes[1, 0].set_title('Cosine Similarity (masked entry)')
-        axes[1, 0].set_ylabel('cosine similarity')
+        axes[1, 0].set_ylabel('Cosine similarity')
         axes[1, 0].grid(alpha=0.5)
 
         axes[1, 1].errorbar(x, cos_other_means, yerr=cos_other_stds, fmt='o', color=panel_colors[3])
         axes[1, 1].set_xticks(x)
         axes[1, 1].set_xticklabels(species, rotation=90, fontsize=6)
         axes[1, 1].set_title('Cosine Similarity (other entries)')
-        axes[1, 1].set_ylabel('cosine similarity')
+        axes[1, 1].set_ylabel('Cosine similarity')
         axes[1, 1].grid(alpha=0.5)
 
         if progressive_enabled:
@@ -526,14 +754,14 @@ def main():
             axes[2, 0].set_xticks(x)
             axes[2, 0].set_xticklabels(species, rotation=90, fontsize=6)
             axes[2, 0].set_title('Progressive Reconstruction Error by Species')
-            axes[2, 0].set_ylabel('L2 error')
+            axes[2, 0].set_ylabel('L1 error')
             axes[2, 0].grid(alpha=0.5)
             axes[2, 0].legend(fontsize=7, ncol=min(args.CD, 4), loc='upper right')
 
             axes[2, 1].set_xticks(x)
             axes[2, 1].set_xticklabels(species, rotation=90, fontsize=6)
-            axes[2, 1].set_title('Progressive Reconstructed Distance (other entries)')
-            axes[2, 1].set_ylabel('L2 distance')
+            axes[2, 1].set_title('Progressive Reconstructed Error (other entries)')
+            axes[2, 1].set_ylabel('Mean L1 error')
             axes[2, 1].grid(alpha=0.5)
             axes[2, 1].legend(fontsize=7, ncol=min(args.CD, 4), loc='upper right')
 
