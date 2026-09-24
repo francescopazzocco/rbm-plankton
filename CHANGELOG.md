@@ -250,7 +250,7 @@ its own loader because the first of those imports it.
   `zinb` family and later `L` values). Removed; superseded copies already
   exist at their correct current path. This resolves the "frozen snapshots —
   open item" `results/README.md` had carried since Phase A.
-- Recorded as `LOG-029`. `results/README.md` and `ARCHITECTURE.md`
+- Recorded as `LOG-025`. `results/README.md` and `ARCHITECTURE.md`
   ("Output tiers") rewritten to describe the tier boundary.
 
 ---
@@ -295,7 +295,7 @@ its own loader because the first of those imports it.
   entries for paths no longer produced, scoped to `02_model_analysis/` only.
   `README.md`, `ARCHITECTURE.md`, `results/README.md` and
   `publish_results.py`'s category doc-string updated to the new paths.
-- Recorded as `LOG-030`. Not done: `.claude/REORG_AND_VALIDATION.md` §A-3's
+- Recorded as `LOG-025`. Not done: `.claude/REORG_AND_VALIDATION.md` §A-3's
   recommendation to consolidate the three near-identical archetype scripts
   into one with a `--mode` flag, and its recommended rewrite of
   `compare_model_reconstructions.py` against the NB/ZINB-only comparison
@@ -360,6 +360,6 @@ its own loader because the first of those imports it.
 
 ## 2026-09-23 (diagnostics reorganisation)
 
-- `results/diagnostics/` restructured by figure type (LOG-034): `training_curves/{all_families_by_L,single_family_by_L,family_comparison_fixed_L}/{split}/` and `nb_zinb_parameters/{split}/`; all figures regenerated and republished with fresh manifest entries.
+- `results/diagnostics/` restructured by figure type (LOG-025): `training_curves/{all_families_by_L,single_family_by_L,family_comparison_fixed_L}/{split}/` and `nb_zinb_parameters/{split}/`; all figures regenerated and republished with fresh manifest entries.
 - New `code/scripts/diagnostic/plot_train_nll_curves.py` (one family across L); `plot_sweep_curves` now draws a 2x5 grid instead of one row of ten panels.
 - `materiale_presentazione/`: figures 16/17/21 and INDEX paths refreshed to the republished versions.

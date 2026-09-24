@@ -4,7 +4,7 @@ Move staged output from diagnostic_outputs/ into the tracked results/ tree,
 recording provenance in results/MANIFEST.json (models.manifest.publish).
 
 results/ is never written to directly by any other script (see
-ARCHITECTURE.md, DECISION_LOG LOG-029). This is the only door in.
+ARCHITECTURE.md, DECISION_LOG LOG-025). This is the only door in.
 
 Usage:
     python code/scripts/publish_results.py 01_exploratory
