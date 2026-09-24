@@ -57,9 +57,9 @@ Titolo, autori/relatori,
 ## E. Struttura attuale del codice (slide 12, jolly — nessun vincolo di posizione, basta che ci sia)
 
 ### 12 Layout del repository
-- `src/` (libreria) vs `scripts/` (entry point) (LOG-028)
-- `results/` come tier pubblicato con `MANIFEST.json` (LOG-029, quello sul results tier)
-- `scripts/analysis/` diviso in `hidden/` / `archetype/` / `reconstruction/` (LOG-030)
+- `src/` (libreria) vs `scripts/` (entry point) (LOG-025)
+- `results/` come tier pubblicato con `MANIFEST.json` (LOG-025)
+- `scripts/analysis/` diviso in `hidden/` / `archetype/` / `reconstruction/` (LOG-025)
 
 ## F. Come abbiamo ricavato la best architecture (slide 13-17)
 

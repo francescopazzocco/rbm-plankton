@@ -385,93 +385,84 @@ The sampling bug found during this investigation: the old `_ph_given_v` applied 
 
 ---
 
-## LOG-025 · `training_runs/` is the canonical run directory; all locations live in `paths.py`
+## LOG-025 · Repository restructure: one owner for every path, library vs entry points, published results tier, self-describing layout
 
-**Context:** Twelve scripts each re-derived the repository root with
-`Path(__file__).parent.parent.parent` and then appended their own idea of where
-the trained runs live. Six of them, plus `code/train/config.py`,
-`ARCHITECTURE.md`, `README.md` and `.claude/SESSION_TRACKING.md`, named
-`trained_models/`. On disk the 84 run directories have always been in
-`training_runs/`, which `.gitignore` labelled "legacy". The consequence was not a
-crash: `discover_run_dirs` found nothing, every family was skipped, and the whole
-`analysis/` + `diagnostic/` layer printed "no runs found" and exited 0. The
-packaging work (`pyproject.toml`, editable install of `code/src` as `models`)
-made the `models` package importable from any working directory but said nothing
-about data or output locations, so the drift was invisible to it.
+**Context:** The codebase grew around the experiments, and its structure had
+stopped saying where things are or where they belong:
 
-**Decision:** The runs stay where they are, on disk, in `training_runs/`; the
-code and the documentation are corrected to point there. A new module
-`code/src/models/paths.py` owns every filesystem location — `PROJECT_ROOT`,
-`DATA_PATH`, `RUNS_ROOT`, `RESULTS_ROOT`, `DIAGNOSTIC_ROOT` — and the
-chronological/shuffled run-directory naming. `PROJECT_ROOT` is overridable with
-the `RBM_PLANKTON_ROOT` environment variable. No script derives a root of its
-own.
+- **Paths:** twelve scripts each derived the repository root and the run
+  directory on their own; half of them named a `trained_models/` directory
+  that did not exist, so the whole analysis layer found no runs and exited 0.
+- **Code layout:** `code/train/`, `code/diagnostic/`, `code/analysis/` sat
+  next to the installable library `code/src/models/`, so there was no cue for
+  where a new script belongs (a teammate's push duplicated existing scripts
+  under new top-level folders).
+- **Results:** some scripts wrote straight into tracked `results/`; a routine
+  re-run silently overwrote eight report-cited figures. Several filenames did
+  not encode the family/L/split they came from, so re-runs overwrote each
+  other without trace.
+- **Folders:** `analysis/` was one flat directory for three unrelated jobs;
+  the chronological split sat unlabelled at directory roots; `02_model_analysis/`
+  and `diagnostics/` mixed many figure kinds in one folder; trained weights
+  lived in an ad-hoc `training_runs/{family}_L{n}[_shuffled]/`.
 
-The split strategy becomes a value, `CHRONO` or `SHUFFLED`, converted to the
-`_shuffled` directory suffix only by `paths.run_dir()`. `config.SHUFFLE_SPLIT`
-(a bool that controlled the shuffling) and `config.SHUFFLE_TAG` (a string that
-controlled the directory name) are replaced by the single `config.SPLIT`.
+**Decision:**
 
-**Rationale:** Renaming the directory on disk was the alternative, and it would
-have matched the existing documentation. It was rejected because it moves 47 MB
-of irreplaceable trained weights plus a `training_runs.zip` archive to satisfy a
-naming preference, and because the ambiguity has to be removed at its source in
-either case: the defect was twelve independent definitions of the same path, not
-the name they used. The paths are deliberately *not* declared in
-`pyproject.toml` — reading it at runtime requires first locating it, which is
-the same root-finding problem plus a `tomllib` dependency.
+1. **One owner for every location.** `code/src/models/paths.py` defines
+   `PROJECT_ROOT` (overridable with `RBM_PLANKTON_ROOT`), `DATA_PATH`,
+   `MODELS_ROOT`, `RESULTS_ROOT`, `DIAGNOSTIC_ROOT` and the split naming. No
+   script derives a path of its own. The split is a value (`CHRONO` or
+   `SHUFFLED`, `config.SPLIT`), replacing the bool/tag pair that could
+   disagree.
+2. **Library vs entry points.** Reusable logic lives in `code/src/models/`
+   (the only importable package); entry points live in
+   `code/scripts/{train,diagnostic,analysis,archive}/`, and never reimplement
+   the library. `analysis/` is split into `hidden/`, `archetype/` and
+   `reconstruction/`.
+3. **Two output tiers.** Every script writes to gitignored
+   `diagnostic_outputs/` only. `code/scripts/publish_results.py` is the only
+   way into tracked `results/`; it records producing script, git commit and
+   timestamp in `results/MANIFEST.json` (`models.manifest`), and
+   `tests/test_results_manifest.py` fails CI for any tracked file without an
+   entry.
+4. **Trained weights are an artifact tier:**
+   `artifacts/models/{family}/{split}/L{n}/seed_{k}/` (gitignored), accessed
+   via `model_dir()` / `discover_model_dirs()`.
+5. **Self-describing layout.** The path alone says what a file is: figure or
+   analysis kind outermost, split second (`<kind>/{chrono,shuffled}/`, both
+   splits labelled), and filenames carry whatever run parameter the path does
+   not (family, L, seed, mode). Applied to `02_model_analysis/` and
+   `diagnostics/` (`training_curves/{all_families_by_L,single_family_by_L,family_comparison_fixed_L}/`,
+   `nb_zinb_parameters/`).
 
-Two independent constants for one concept (`SHUFFLE_SPLIT`, `SHUFFLE_TAG`) is a
-latent footgun: setting the bool without the tag writes shuffled runs into the
-chronological directories, silently mixing two split strategies in one run
-directory.
+**Rationale:** Moving code and outputs was cheap; moving the weights was the
+only costly step and was done once, into their final place. Each defect was
+one concept with several independent definitions (a path, a split flag, an
+output location), so the fix was always to give it a single owner. Kind before
+split because the kind decides what you are looking at and the split is a
+variant of it (same reasoning as family → split → L for the weights).
 
-**Consequences:** All fourteen non-deferred scripts now run on a clean checkout
-and produce output. Verified numerically behaviour-preserving: the rebuilt
-`io.load_model` yields bit-identical parameters to the four loaders it replaces,
-`load_nan_rows`/`scale_counts`/`binarise_rows` reproduce their predecessors
-exactly, and every deterministic tracked output regenerates byte-identical.
-`trained_models/` remains gitignored so a stale reference cannot silently create
-a second run directory.
+**Consequences:** Every script runs on a clean checkout and writes to a
+predictable path; loaders and deterministic outputs were verified
+behaviour-preserving. `results/` was regenerated and republished through the
+publish flow (stale files removed, manifest rekeyed; three broken archetype
+scripts repaired rather than archived, `seaborn` dropped; broken archive
+plotters replaced by `plot_train_nll_curves.py`). `README.md`,
+`ARCHITECTURE.md` and `results/README.md` describe the new layout.
 
-Recorded here and not fixed: the Bernoulli runs currently in `training_runs/`
-store thresholds in organisms/μL, i.e. they predate LOG-024, whose consequences
-section describes thresholds in organisms/mL. `io.binarise_rows` compares the
-NaN rows to the stored thresholds unscaled, which is correct for exactly these
-runs and would silently binarise almost everything to 0 for a Bernoulli family
-retrained with the current `train.py`. The function now warns instead of scoring
-silently; choosing the fix belongs with the scale-invariance test in the
-validation phase.
+**Left open (still true):**
 
----
-
-## LOG-028 · `code/` split into `src/` (library) and `scripts/` (entry points)
-
-**Context:** `code/train/`, `code/diagnostic/`, `code/analysis/` and
-`code/archive/` sat as siblings of `code/src/models/` — the installable
-library and the CLI entry points that import it were indistinguishable by
-path alone. This surfaced when a teammate pushed two commits straight to
-`master` (`custom_analysis/`, `scripts/`) that duplicated existing
-`code/analysis/` scripts under new top-level directories, one of them
-reintroducing the `sys.path.insert` hack `c6bb000` had removed — there was no
-structural cue for where a new pipeline script belongs.
-
-**Decision:** `code/train/`, `code/diagnostic/`, `code/analysis/`,
-`code/archive/` move to `code/scripts/{train,diagnostic,analysis,archive}/`.
-`code/src/models/` is unchanged and remains the only importable package
-(`pip install -e .`). The convention going forward: new reusable logic goes
-in `src/models/`; new pipeline entry points go in the matching
-`scripts/<stage>/` directory; nothing under `scripts/` reimplements what
-`src/models/` already provides.
-
-**Consequences:** Every path reference in docstrings, `README.md`,
-`ARCHITECTURE.md` and `results/README.md` updated to `code/scripts/...`.
-`pyproject.toml` package discovery (`where = ["code/src"]`) and the CI
-workflow (lints/tests `code/src/models` and `tests/` only) were already
-scoped to `src/` and needed no change. The teammate's duplicate
-`custom_analysis/` and `scripts/` content is to be discarded, not merged, once
-`origin/master` is reconciled with local history — recorded as a follow-up,
-not resolved by this entry.
+- The Bernoulli runs store binarisation thresholds in organisms/μL (pre
+  LOG-024); `io.binarise_rows` warns instead of scoring, because a retrained
+  Bernoulli family would be binarised wrongly. The fix belongs with the
+  scale-invariance test.
+- No per-run provenance sidecar for `artifacts/models/`; provenance of the
+  existing runs is unrecoverable.
+- The three near-duplicate archetype scripts are runnable but not
+  consolidated into one `--mode` script; `compare_model_reconstructions.py`
+  is not rewritten.
+- The teammate's duplicate `custom_analysis/` and `scripts/` on
+  `origin/master` are to be discarded when histories are reconciled.
 
 ---
 
@@ -545,176 +536,3 @@ the ranking already settled, they would sharpen the explanation, not change the
 recommendation.
 
 ---
-
-## LOG-029 · `results/` becomes a published tier: `publish_results.py` + `MANIFEST.json`
-
-**Context:** Nine analysis/diagnostic scripts wrote figures and tables
-directly into tracked `results/`, alongside others that already wrote into
-gitignored `diagnostic_outputs/` — an inconsistency decided per-script, not by
-policy. Consequence, observed directly this session: a routine post-rename
-verification pass (re-running every script to confirm the `code/scripts/`
-move didn't break anything) silently overwrote eight report-cited figures and
-tables with no record of why. Separately, `results/README.md` had documented
-for some time that `03_evaluation/`, part of `04_model_selection/` and
-`diagnostics/` were "frozen snapshots" — tracked files the current code no
-longer regenerates because the producing script had since moved to
-`diagnostic_outputs/` — an open item with no resolution path.
-
-**Decision:** `results/` is now a published tier, `diagnostic_outputs/` the
-only staging tier. Every script that used to import `RESULTS_ROOT` now writes
-into the equivalent `DIAGNOSTIC_ROOT` subtree instead — including
-`use_trained_rbm.py` and `compare_model_reconstructions.py`, whose
-`results/reconstruction_plots/` default was cwd-relative and never actually
-covered by `paths.py`, nor by `.gitignore`'s tracked-results allowlist (an
-accidental gap, not a decision — those plots were never meant to be tracked).
-No script writes to `results/` any more, full stop.
-
-`code/scripts/publish_results.py` is the one door in: it copies a named
-category (or `--all`) from `diagnostic_outputs/` into `results/` and records
-each copied file in `results/MANIFEST.json` via the new `models.manifest`
-module — producing script, git commit, publish timestamp. Two scripts may
-publish into the same `results/` folder (e.g. `02_model_analysis`) without
-clobbering each other's entries; only the files actually copied get touched.
-`tests/test_results_manifest.py` fails CI if a tracked file under `results/`
-has no manifest entry, which is what makes "someone bypassed
-`publish_results.py`" a caught condition rather than a silent one.
-
-**Consequences:** The "frozen snapshot" open item is resolved by construction
-— resolving today's already-generated output through the new publish flow
-surfaced seven genuinely stale tracked files that no current script produces
-under those exact paths any more (an old flat `sweep_shuffled_final_metric.png`
-naming superseded by the `shuffled/` subdirectory convention; three
-`tables/hidden/*.csv` files missing the `zinb` family and later `L` values
-added since). Removed via `git rm`, superseded by their correctly-published
-equivalents elsewhere in the tree. `results/README.md` rewritten to describe
-the tier boundary instead of a per-directory "refreshed?" table that had
-already drifted out of date once. `.gitignore` gained an explicit
-`!results/MANIFEST.json` — it would otherwise have been silently swallowed by
-the blanket `results/*` pattern, the same class of gap that hid
-`reconstruction_plots/` above.
-
-**Left as a follow-up, not decided here:** `training_runs/` (the weights
-themselves) gets no equivalent provenance ledger — raised in conversation,
-scoped out as a separate tier with a different lifecycle (gitignored, never
-published, owned solely by `train.py`/`paths.RUNS_ROOT`).
-
----
-
-## LOG-030 · `code/scripts/analysis/` split into `hidden/`/`archetype/`/`reconstruction/`; output filenames made self-describing
-
-**Context:** All 13 `analysis/` scripts sat flat in one directory spanning
-three unrelated jobs (hidden-unit interpretation, archetype comparison,
-cross-family reconstruction), raised directly as "sparsi a caso" (scattered
-randomly). Investigating turned up a second, more consequential problem:
-several outputs under `results/02_model_analysis/` had filenames that didn't
-encode the run they came from. `hidden_pattern_analysis.py`'s
-`pattern_frequency_{mode}.csv` (mode = threshold/winner, not family/L/split)
-and `plot_visible_by_hidden.py`'s `visible_by_hidden_{mode}.csv` (mode =
-bernoulli/zinb, same visible-distribution label for e.g. `nb` and
-`nb_softmax`) meant re-running either for a different family/L/split
-silently overwrote the previous output with no way to tell, after the fact,
-which run a given file represented — the `nb_sigmoid_L6` vs. "something
-else" question that started this. `hidden_cross_model.py`'s three figures
-had `--L` configurable but not reflected in the filename, same failure mode.
-`results/MANIFEST.json` didn't help either: `02_model_analysis` is published
-as one category, so `produced_by` lists all six producing scripts for every
-file in it, not the specific one.
-
-Investigating the `archetype*`/`*archetypes*` scripts (never fixed since
-`.claude/REORG_AND_VALIDATION.md` §A-3 flagged them "untouched by request")
-found three of the four pointing at a pre-`training_runs/`/`prof/` layout
-(`weights/*.npz`, `Cheng/Data/*.csv`, `analysis/results/*.png`) that no
-longer exists, and two importing `seaborn`, which is not a project dependency
-and isn't installed — all three would have crashed immediately if run.
-
-**Decision:** `code/scripts/analysis/` split into `hidden/` (six scripts,
-"what do the hidden units mean?"), `archetype/` (four scripts, RBM vs.
-Cheng's k=5 archetypes) and `reconstruction/` (`use_trained_rbm.py` +
-`compare_model_reconstructions.py`, which imports it as a sibling — moved
-together to keep that import working unchanged). `results/02_model_analysis/`
-and `diagnostic_outputs/02_model_analysis/` gained matching `hidden/` and
-`archetype/` subdirectories (mirroring the script split, per explicit
-request) rather than staying flat.
-
-Every filename that depended on a run parameter not otherwise in its path
-now includes it: `pattern_frequency_{family}_L{L}_{mode}.csv`,
-`visible_by_hidden_{family}_L{n}[_shuffled]_seed_{k}_{mode}.csv` (derived
-from the `--weights` path, not a new required flag), `cross_model_correlation_L{L}.png`,
-`nb_pattern_frequency_L{L}.png`, `seasonal_profiles_L{L}.png`.
-`nb_pattern_frequency.png` was separately reworked this session into a
-Pareto/cumulative-coverage plot (unrelated to this entry).
-
-The three broken `archetype*` scripts were repaired rather than archived:
-default `--weights` now resolves via `models.io.best_seed_dir` from
-`--family`/`--L`/`--split` (matching every other single-run script's
-convention), `--archetypes` defaults to `prof/archetypes_k5_profiles.csv`,
-output moves to `diagnostic_outputs/02_model_analysis/archetype/`, and the
-two `seaborn` heatmaps were rewritten with a small `matplotlib.imshow` +
-`ax.text` helper (no new dependency, matching every other heatmap in the
-project). `archetype_rbm_comparison.py`'s `VBH` paths (previously
-`results/nb_chrono_vbh/visible_by_hidden_bernoulli.csv`, pointing nowhere)
-now resolve the same way rather than being hardcoded.
-
-**Consequences:** `results/02_model_analysis/` was emptied and every figure
-regenerated and republished from the moved scripts (95 manifest entries,
-`MANIFEST.json` pruned of stale entries for paths that no longer exist,
-scoped to `02_model_analysis/` only — the rest of `results/` was untouched).
-`README.md`, `ARCHITECTURE.md`, `results/README.md` and
-`publish_results.py`'s category doc-string updated to the new paths.
-
-**Left as a follow-up, not decided here:** `.claude/REORG_AND_VALIDATION.md`
-§A-3 recommends consolidating `distance_archetypes_rbm.py`,
-`overlap_archetypes_rbm.py` and `archetype_closest_rbm_scatter.py` (three
-near-identical takes on the same comparison, `sigmoid()`/
-`compute_visible_activation()` copy-pasted verbatim across all three) into
-one script with a `--mode {distance,overlap,scatter}` flag, retiring two.
-Not done here — this entry only made all three runnable again; the
-duplication itself is unchanged. Same document also still recommends a
-rewrite of `compare_model_reconstructions.py` against the NB/ZINB-only
-comparison perimeter (§0); also untouched.
-
----
-
-## LOG-031 · Chrono/shuffled output split made symmetric: `chrono/` gets its own subdirectory instead of sitting unlabelled at root
-
-**Context:** `split_out_dir()` (`code/src/models/paths.py`) wrote chronological-split output directly at `base/`, and shuffled-split output at `base/shuffled/`. Raised directly: this made the chrono files undiscoverable by path alone — every other output directory in the project (e.g. `02_model_analysis/hidden/`, `02_model_analysis/archetype/`) is named for what it contains, but a bare `results/04_model_selection/*.png` gave no hint that it was the chronological-split run specifically, only inferable by noticing the sibling `shuffled/` and reasoning "the other one must be the default." Treating chrono as an unlabelled default was a historical artefact (LOG-004 made it canonical first, shuffled was added later as a comparison), not a reason to keep the asymmetry.
-
-**Decision:** `split_out_dir()` now returns `base/chrono/` or `base/shuffled/` unconditionally — both splits get an explicit, equally-discoverable subdirectory. No split is the unlabelled default.
-
-**Rationale:** Path structure should be self-documenting regardless of which variant happens to be the "main" one historically. Symmetry also removes a footgun: before this, `04_model_selection/*.png` and `04_model_selection/shuffled/*.png` had different structural depth for the same conceptual axis, which every consumer (scripts, docs, a human browsing the tree) had to special-case.
-
-**Consequences:** Affects the 5 output locations that route through `split_out_dir()`, across both `results/` and `diagnostic_outputs/` (10 directories total): `04_model_selection/`, `02_model_analysis/hidden/`, `02_model_analysis/hidden/patterns/`, `tables/hidden/`, `diagnostics/sweep/`. Existing chrono-split files in all 10 moved from `base/*` to `base/chrono/*` (`git mv` for the tracked `results/` copies, plain `mv` for gitignored `diagnostic_outputs/`); `results/MANIFEST.json` keys updated to match (36 entries rekeyed, provenance metadata unchanged). `archetype_rbm_comparison.py`'s four hardcoded reads of `results/tables/hidden/*.csv` and `results/02_model_analysis/hidden/*.csv` (the only call sites that read these trees without going through `split_out_dir`) updated to the new `chrono/` paths. `README.md`, `results/README.md`, `ARCHITECTURE.md`, and stale path mentions in docstrings (`sweep_analysis.py`, `hidden_cross_model.py`, `hidden_pattern_analysis.py`, `publish_results.py`) updated to match.
-
-**Left out of scope:** `training_runs/{family}_L{n}[_shuffled]/` (via `run_dir()`) uses the same split concept but as a directory-*name* suffix, not a subdirectory — a structurally different, much larger-blast-radius convention (~90 run directories) where the split is already legible in the name itself. Not touched here. `02_model_analysis/hidden/visible_by_hidden/` and `02_model_analysis/archetype/*` also encode split as a filename suffix rather than a directory, and were likewise left alone — different convention, not part of this decision.
-
----
-
-## LOG-032 · `training_runs/{family}_L{n}[_shuffled]/` promoted to `artifacts/models/{family}/{split}/L{n}/`
-
-**Context:** LOG-029 and LOG-031 both explicitly deferred this directory: trained-model weights lived in `training_runs/`, one flat folder per `(family, L, split)` with the split folded into the folder name as a suffix. Every seed's `weights.npz` is read by roughly nine downstream analysis scripts (archetype comparison, hidden-state analysis, reconstruction), not just by the training run that produced it — the project's own `/project-structure` provenance convention treats a persistent, multiply-consumed derived output as an `artifacts/` tier (typed, self-descriptive subfolders), not a `runs/`-style ephemeral directory. `training_runs/` had neither: it sat at the repo root under an ad-hoc name with no tier boundary, mixing the "one training run's business" and "everyone downstream depends on this" roles that the two tiers are meant to separate. Separately, two call sites had already drifted from the centralized `paths.py` accessor exactly the way its own module docstring warns about: `compare_model_reconstructions.py` hardcoded `training_runs/{family}_L{n}_shuffled/` independently (always assuming the shuffled split), and `plot_training_runs.py` / `plot_visible_by_hidden.py`'s `_run_tag` walked the flat directory structure directly.
-
-**Decision:** `training_runs/{family}_L{n}[_shuffled]/seed_{k}/` becomes `artifacts/models/{family}/{split}/L{n}/seed_{k}/` — family, split and L each get their own path segment instead of one combined folder name. `paths.py`'s `RUNS_ROOT`/`run_dir()` renamed to `MODELS_ROOT`/`model_dir()` (body rewritten for the nested shape); `io.py`'s `discover_run_dirs()` renamed to `discover_model_dirs()` and rewritten to walk `<family>/<split>/L<n>/seed_*` instead of matching a `{family}_L{n}{suffix}` regex against a flat listing. A `chrono/` or `shuffled/` subfolder is created only for families that actually have runs there — 6 of the 10 families (`nb_relu`, `nb_sigmoid`, `nb_softmax`, `zinb_relu`, `zinb_sigmoid`, `zinb_softmax`) are shuffled-only and get no empty `chrono/`.
-
-**Consequences:** 84 existing `(family, L, split)` directories (840 `weights.npz` files across 10 families) moved on disk; `training_runs/` removed once empty. All ~20 call sites across `code/scripts/train/`, `code/scripts/diagnostic/`, `code/scripts/analysis/{hidden,archetype,reconstruction}/` and `tests/models/test_io.py` updated to the renamed accessors — `--runs-root` CLI flags renamed to `--models-root` throughout. `compare_model_reconstructions.py`'s independently-hardcoded path now goes through `model_dir()`, closing the drift flagged above. `plot_training_runs.py`'s traversal rewritten to walk the three new nesting levels (family → split → L) instead of iterating `training_runs/` directly; `plot_visible_by_hidden.py`'s `_run_tag` rewritten to read family/split/L from four path segments instead of two, otherwise its output tags would have silently lost the family name and collided across families at the same L. `.gitignore`'s `training_runs/` rule replaced by `artifacts/models/`. `use_trained_rbm.py`'s `--family` flag keeps accepting the legacy combined `nb_L6`/`bernoulli_median_L4_shuffled` form for a stable CLI, now parsed into `(family, L, split)` and resolved via `model_dir()` rather than string-concatenated by hand.
-
-**Left as a follow-up, not decided here:** no per-run provenance sidecar (a `meta.yaml`/`run.json` recording git commit, config and file hashes, per the `/project-structure` artifacts mechanism) was added — this pass is a pure directory reorg. True provenance for the 84 pre-existing runs is unrecoverable (no git-state record was ever kept for them); adding sidecars for future runs is a separate decision, kept out of this session on purpose (reorg and provenance-hardening stay sequential, not bundled).
-
----
-
-## LOG-033 · `results/02_model_analysis/` (and its `diagnostic_outputs/` mirror) reorganised kind-first, split-second
-
-**Context:** Raised directly as "caotico e confuso" (chaotic and confused). Three separate problems, all under one directory: `archetype/` had no `chrono`/`shuffled` subdirectory at all — split was only visible as a `_shuffled` filename suffix, with three unrelated analyses (`archetype_closest_rbm`, `distance_heatmap`, `overlap_heatmap`) sitting flat together. `hidden/{chrono,shuffled}/` did split correctly (LOG-031) but flattened nine unrelated analysis kinds (`cross_model_correlation`, `dominant_state`, `hidden_stackplot`, `mean_activation`, `nb_pattern_frequency`, `seasonal_profiles`, `state_frequency`, `state_timeline`, `weight_profiles`) inside each split folder, distinguished only by filename prefix; some filenames also redundantly repeated the split (`state_frequency.csv` vs. `state_frequency_shuffled.csv`) even though the parent directory already said it. `hidden/visible_by_hidden/` had the same missing-split-directory problem as `archetype/`. All three were flagged and explicitly deferred by LOG-031's "left out of scope" note.
-
-**Decision:** Nesting order is analysis-kind first, split second — `<tree>/<kind>/{chrono,shuffled}/...` — not split-first. Chosen over split-first because opening a path should tell you what you're about to see as early as possible: a kind (`mean_activation`, `state_timeline`, ...) is a different plot entirely, while a split is a variant of the same analysis — so the more informative axis goes outermost, the same reasoning LOG-032 used to order `artifacts/models/{family}/{split}/L{n}/seed_{k}/` by family (identity) before split (protocol variant) before L (hyperparameter). This also matches `hidden/patterns/{chrono,shuffled}/`, which already did kind-then-split and was left alone as the working precedent. A `chrono/` or `shuffled/` subfolder is created only where that kind/split combination actually has output. Filenames drop whatever the new directory structure already states: a per-family plot inside `weight_profiles/chrono/` is just `nb.png`, not `weight_profiles_nb.png`; a split-suffixed file inside a `shuffled/` directory drops the now-redundant `_shuffled` (`state_frequency/shuffled/state_frequency.csv`, not `state_frequency_shuffled.csv`). `visible_by_hidden/` keeps its existing `visible_by_hidden_{tag}_{mode}` filenames unchanged (already disambiguated by family+L+seed+mode, not by kind) and only gains the split subdirectory.
-
-**Consequences:** 90 files per tree (`results/` and `diagnostic_outputs/`) moved — `git mv` for the git-tracked `results/` copies (three untracked exceptions used a plain move), plain `mv` for gitignored `diagnostic_outputs/`. `results/MANIFEST.json`'s 98 `02_model_analysis/` entries rekeyed to the new paths, provenance metadata unchanged; `tests/test_results_manifest.py` still passes. Code changes: `hidden_dominant_state.py`, `hidden_mean_activation.py`, `hidden_cross_model.py`, `rbm_hidden_stackplot.py`, and the three archetype scripts (`distance_archetypes_rbm.py`, `overlap_archetypes_rbm.py`, `archetype_closest_rbm_scatter.py`) each now resolve one `split_out_dir()` call per kind they produce instead of one shared flat output directory. `plot_visible_by_hidden.py` gained a `_infer_split()` helper so its output directory defaults to the split read from the `--weights` path, and its `_run_tag()` (added in LOG-032) dropped the split suffix it previously embedded. `visualization.py`'s shared plotters (`plot_weight_profiles`, `plot_state_timeline`, `plot_family`, `plot_correlation`, `plot_pattern_frequency`, `plot_seasonal_profiles`) had their filename construction updated to match — this was not optional: the physical file moves already dropped these prefixes, so leaving the plotters unchanged would have made the very next run write a differently-named file next to the migrated one instead of overwriting it. `archetype_rbm_comparison.py`'s hardcoded `STATE_FREQ`, `MEAN_ACT` and `_vbh_path()` consumer paths updated to match; verified by running the full report end-to-end (exit 0, all 10 sections). Every touched producing script re-run against real data as a smoke test, confirming it writes to the exact already-migrated path. `results/README.md`, `README.md`, `ARCHITECTURE.md` updated.
-
----
-
-## LOG-034 · `results/diagnostics/` reorganised by figure type; same "order out of chaos" pass as LOG-028…033
-
-**Context:** Last folder of the `results/` tier still unstructured. Ten files, three kinds of figure mixed together (val metric of every family vs epoch; train NLL of one family across L; NB/ZINB θ/π trajectories) plus one cross-family comparison at fixed L, under names that did not say what they showed (`sweep_nb_diagnostics.png` is a θ trajectory, not an NLL plot). Three files (`softmax_train_nll_curves.png`, `zinb_sigmoid_train_nll_curves.png`, `zinb_softmax_train_nll_curves.png`) sat at the root with no split directory, and their producers (`code/scripts/archive/plot_*_nll.py`) still read the pre-`artifacts/` layout (`{family}_L{n}_shuffled`), so those figures could not be regenerated.
-
-**Decision:** Same philosophy as the previous reorganisations (LOG-028…033): the path alone must say what a figure is, figure kind outermost, split second. New tree: `diagnostics/training_curves/{all_families_by_L,single_family_by_L,family_comparison_fixed_L}/{split}/` and `diagnostics/nb_zinb_parameters/{split}/`. Filenames name the content (`val_metric_by_family.png`, `nb_nll_theta_by_L.png`, `zinb_nll_theta_pi_by_L.png`, `{family}_train_{nll|pll}.png`). A working `plot_train_nll_curves.py` (`--families`, `--L`, `--split`; default every family and every L found in the split, PLL for the Bernoulli families) replaces the two broken archive scripts, which covered only three arbitrary families.
-
-**Consequences:** `results/diagnostics/` and its `diagnostic_outputs/` mirror were regenerated from the current code and republished through `publish_results.py` (the old 10 files and their manifest entries removed first, since `publish()` never deletes). The single `diagnostics` category in `publish_results.py` became four, one per producer, so each manifest entry names the script that really made it. `val_metric_by_family.png` was redrawn as a 2×5 grid (it was a single unreadable row of ten panels). `single_family_by_L/` now has one figure per family per split (14 files), not the three the archive scripts happened to cover. `README.md`, `results/README.md`, `ARCHITECTURE.md` updated. The archive scripts are gitignored local files and were left in place.

@@ -11,7 +11,7 @@ from which commit, and when.
 results/MANIFEST.json is the ledger: one entry per tracked file, keyed by its
 path relative to RESULTS_ROOT. tests/test_results_manifest.py fails CI if a
 tracked file under results/ has no entry — the check that stops a plain
-`git add results/...` from bypassing this file silently. See LOG-029.
+`git add results/...` from bypassing this file silently. See LOG-025.
 """
 
 from __future__ import annotations

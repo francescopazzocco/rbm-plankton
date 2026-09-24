@@ -4,7 +4,7 @@ itself) must have a provenance entry in results/MANIFEST.json.
 A file that fails this check reached results/ some way other than
 code/scripts/publish_results.py -- i.e. a script wrote there directly, or
 someone `git add`-ed a file into it by hand. See ARCHITECTURE.md and
-DECISION_LOG LOG-029.
+DECISION_LOG LOG-025.
 """
 
 import subprocess

@@ -5,7 +5,7 @@
 directly. No script imports `RESULTS_ROOT` any more — they all write into the
 matching subtree of the gitignored `diagnostic_outputs/` (the staging tier),
 and publishing is a separate, explicit step. See `ARCHITECTURE.md` and
-`DECISION_LOG` LOG-029 for why.
+`DECISION_LOG` LOG-025 for why.
 
 ## Provenance — `MANIFEST.json`
 
@@ -29,9 +29,9 @@ python code/scripts/publish_results.py --all         # everything at once
 | Directory | Content | Produced by |
 |---|---|---|
 | `01_exploratory/` | Dataset EDA: row sums, periodogram, seasonal patterns, marginal distributions, NaN structure | `code/scripts/train/dataset_analysis.py` |
-| `02_model_analysis/hidden/<kind>/{chrono,shuffled}/` | Learned representations, one subfolder per analysis kind (`weight_profiles`, `state_timeline`, `state_frequency`, `dominant_state`, `mean_activation`, `cross_model_correlation`, `nb_pattern_frequency`, `seasonal_profiles`, `hidden_stackplot`, `visible_by_hidden`) | the `code/scripts/analysis/hidden/` scripts (LOG-033) |
+| `02_model_analysis/hidden/<kind>/{chrono,shuffled}/` | Learned representations, one subfolder per analysis kind (`weight_profiles`, `state_timeline`, `state_frequency`, `dominant_state`, `mean_activation`, `cross_model_correlation`, `nb_pattern_frequency`, `seasonal_profiles`, `hidden_stackplot`, `visible_by_hidden`) | the `code/scripts/analysis/hidden/` scripts (LOG-025) |
 | `02_model_analysis/hidden/patterns/{chrono,shuffled}/` | Binary hidden patterns of a single run | `hidden_pattern_analysis.py` |
-| `02_model_analysis/archetype/<kind>/{chrono,shuffled}/` | RBM vs. Cheng's k=5 archetypes, one subfolder per kind (`distance_heatmap`, `overlap_heatmap`, `archetype_closest_rbm`) | the `code/scripts/analysis/archetype/` scripts (LOG-033) |
+| `02_model_analysis/archetype/<kind>/{chrono,shuffled}/` | RBM vs. Cheng's k=5 archetypes, one subfolder per kind (`distance_heatmap`, `overlap_heatmap`, `archetype_closest_rbm`) | the `code/scripts/analysis/archetype/` scripts (LOG-025) |
 | `03_evaluation/` | NaN imputation test, chronological vs shuffled split comparison | `code/scripts/diagnostic/nan_test_eval.py`, `split_comparison.py` |
 | `04_model_selection/{chrono,shuffled}/` | Final validation metrics vs L | `code/scripts/diagnostic/sweep_analysis.py`, `code/scripts/archive/plot_final_metric_nb.py` |
 | `diagnostics/training_curves/all_families_by_L/{split}/` | Val metric vs epoch, every family, one line per L | `code/scripts/diagnostic/sweep_analysis.py` |
