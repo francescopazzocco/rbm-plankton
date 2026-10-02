@@ -16,8 +16,7 @@ jobs:
         with:
           python-version: "3.12"
           enable-cache: true
-
-      - run: uv venv
+          # setup-uv creates and activates .venv itself; a separate `uv venv` step fails
 
       - name: Install CPU-only torch (runner has no GPU)
         run: uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
@@ -26,7 +25,7 @@ jobs:
         run: uv pip install -e ".[dev]"
 
       - name: Lint (ruff)
-        run: uv run ruff check code/src/models tests/
+        run: uv run --no-sync ruff check code/src/models tests/
 
       - name: Test (pytest)
-        run: uv run pytest tests/
+        run: uv run --no-sync pytest tests/
