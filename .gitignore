@@ -100,3 +100,6 @@ results/*
 !results/diagnostics/**
 !results/tables/
 !results/tables/**
+
+# Presentation working material (kept locally, not published)
+materiale_presentazione/
