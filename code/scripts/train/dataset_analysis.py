@@ -31,6 +31,9 @@ from scipy import stats
 from models import paths
 from models.io import partition_rows
 from models.palette import get_markers, get_palette
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 # ---------------------------------------------------------------------------
 # Parameters
@@ -76,7 +79,7 @@ def fig1_rowsum_timeseries(df_clean, taxa_cols, out_dir):
     roll = rs.rolling("30D", center=True).median()
     cv   = rs.std() / rs.mean()
 
-    fig, axes = plt.subplots(2, 1, figsize=(13, 7), sharex=True)
+    fig, axes = plt.subplots(2, 1, figsize=(8.5, 6), sharex=True)
 
     axes[0].plot(rs.index, rs.values, lw=0.5, color="steelblue",
                  alpha=0.7, label="daily row sum")
@@ -84,9 +87,9 @@ def fig1_rowsum_timeseries(df_clean, taxa_cols, out_dir):
                  label="30-day rolling median")
     axes[0].set_ylabel("Row sum (organisms/uL)")
     axes[0].set_title(
-        f"Total daily abundance  -  CV={cv:.2f}: variability dominated by biology, not instrument drift"
+        f"Total daily abundance, CV={cv:.2f}\nvariability dominated by biology, not instrument drift"
     )
-    axes[0].legend(fontsize=9)
+    axes[0].legend()
     axes[0].grid(True, alpha=0.3)
 
     axes[1].semilogy(rs.index, rs.values, lw=0.5, color="steelblue", alpha=0.7)
@@ -101,7 +104,7 @@ def fig1_rowsum_timeseries(df_clean, taxa_cols, out_dir):
 
     plt.tight_layout()
     path = os.path.join(out_dir, "fig1_rowsum_timeseries.png")
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close()
     print(f"  saved {path}")
 
@@ -152,7 +155,7 @@ def fig2_lombscargle(df_clean, taxa_cols, out_dir):
 
     plt.tight_layout()
     path = os.path.join(out_dir, "fig2_lombscargle.png")
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close()
     print(f"  saved {path}")
 
@@ -170,7 +173,7 @@ def fig3_annual_seasonal(df_clean, taxa_cols, out_dir):
     annual  = df_clean.groupby("year")["row_sum"].agg(["median", "mean", "std"])
     monthly = df_clean.groupby(["year", "month"])["row_sum"].median().unstack(0)
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5), constrained_layout=True)
+    fig, axes = plt.subplots(2, 1, figsize=(9, 8), constrained_layout=True)
 
     # Left: annual stats
     years = annual.index
@@ -183,7 +186,7 @@ def fig3_annual_seasonal(df_clean, taxa_cols, out_dir):
             lw=1.5, label="annual mean")
     ax.plot(years, annual["median"], "s--", color="firebrick",
             lw=1.5, label="annual median")
-    ax.set_title("Annual statistics - median stable, mean inflated by 2022-23 extremes")
+    ax.set_title("Annual statistics: median stable, mean inflated by 2022-23 extremes")
     ax.set_ylabel("Row sum (organisms/uL)")
     ax.set_xticks(years)
     ax.legend()
@@ -205,13 +208,13 @@ def fig3_annual_seasonal(df_clean, taxa_cols, out_dir):
                          color=year_colors[i], markersize=7, alpha=0.95, label=str(yr))
     ax2.set_xticks(range(1, 13))
     ax2.set_xticklabels(month_labels)
-    ax2.set_title("Seasonal shape per year - Jan-Feb 2023 anomaly (2 orders of magnitude above peers)")
+    ax2.set_title("Seasonal shape per year: Jan-Feb 2023 two orders of magnitude above peers")
     ax2.set_ylabel("Monthly median row sum (log scale)")
-    ax2.legend(title="Year")
+    ax2.legend(title="Year", ncol=2)
     ax2.grid(True, alpha=0.3)
 
     path = os.path.join(out_dir, "fig3_annual_seasonal.png")
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close()
     print(f"  saved {path}")
 
@@ -228,7 +231,7 @@ def fig4_distributions(df_clean, taxa_cols, out_dir, eps_fraction=EPS_FRACTION):
 
     selected = ["aulacoseira", "cryptophyte", "rotifer", "snowella"]
 
-    fig, axes = plt.subplots(3, 4, figsize=(16, 10))
+    fig, axes = plt.subplots(3, 4, figsize=(11, 7.5))
 
     for ci, taxon in enumerate(selected):
         raw  = df_clean[taxon].values.astype(float)
@@ -237,7 +240,7 @@ def fig4_distributions(df_clean, taxa_cols, out_dir, eps_fraction=EPS_FRACTION):
 
         # Row 0: raw counts
         axes[0, ci].hist(raw, bins=60, color="steelblue", alpha=0.8, edgecolor="none")
-        axes[0, ci].set_title(f"{taxon} (~{(raw == 0).mean():.0%} zeros)", fontsize=14)
+        axes[0, ci].set_title(f"{taxon} (~{(raw == 0).mean():.0%} zeros)", fontsize=13)
         axes[0, ci].text(
             0.97, 0.95,
             f"skew={stats.skew(raw):.1f}",
@@ -246,6 +249,7 @@ def fig4_distributions(df_clean, taxa_cols, out_dir, eps_fraction=EPS_FRACTION):
         )
         axes[0, ci].grid(True, alpha=0.3)
         axes[0, ci].tick_params(labelsize=11)
+        axes[0, ci].xaxis.set_major_locator(plt.MaxNLocator(3))
 
         # Row 1: log-transformed
         axes[1, ci].hist(logv, bins=60, color="darkorange", alpha=0.8, edgecolor="none")
@@ -256,6 +260,7 @@ def fig4_distributions(df_clean, taxa_cols, out_dir, eps_fraction=EPS_FRACTION):
         )
         axes[1, ci].grid(True, alpha=0.3)
         axes[1, ci].tick_params(labelsize=11)
+        axes[1, ci].xaxis.set_major_locator(plt.MaxNLocator(4))
 
         # Row 2: log + z-score vs N(0,1)
         axes[2, ci].hist(zlog, bins=60, color="seagreen", alpha=0.8,
@@ -267,7 +272,8 @@ def fig4_distributions(df_clean, taxa_cols, out_dir, eps_fraction=EPS_FRACTION):
             transform=axes[2, ci].transAxes, ha="right", va="top", fontsize=11,
             bbox=dict(boxstyle="round", fc="white", alpha=0.8),
         )
-        axes[2, ci].legend(fontsize=11)
+        if ci == 0:  # one legend is enough, and keeps clear of the skew boxes
+            axes[2, ci].legend(fontsize=11, loc="upper left")
         axes[2, ci].grid(True, alpha=0.3)
         axes[2, ci].tick_params(labelsize=11)
 
@@ -275,15 +281,14 @@ def fig4_distributions(df_clean, taxa_cols, out_dir, eps_fraction=EPS_FRACTION):
     axes[1, 0].set_ylabel("Frequency", fontsize=13)
     axes[2, 0].set_ylabel("Density", fontsize=13)
     fig.suptitle(
-        r"Marginal distributions: 1) raw  -  2) log-transform  -  3) $z$-score" "\n"
-        r"X axis: 1) organisms/uL (raw counts)   2) $\log(v + \epsilon)$   "
-        r"3) $z$-score (standardized log, dimensionless)",
-        fontsize=16, y=1.01,
+        r"Marginal distributions, top to bottom: raw (organisms/uL), "
+        r"$\log(v + \epsilon)$, $z$-scored log",
+        fontsize=14,
     )
 
     plt.tight_layout()
     path = os.path.join(out_dir, "fig4_distributions.png")
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close()
     print(f"  saved {path}")
 
@@ -296,19 +301,19 @@ def fig5_nan_structure(df_raw, taxa_cols, out_dir):
     nan_per_row = df_raw[taxa_cols].isna().sum(axis=1)
     row_sum     = df_raw[taxa_cols].sum(axis=1)
 
-    fig, axes = plt.subplots(2, 1, figsize=(13, 6), sharex=True)
+    fig, axes = plt.subplots(2, 1, figsize=(8.5, 6), sharex=True)
 
     axes[0].scatter(df_raw["date"], nan_per_row, s=3, color="firebrick", alpha=0.6)
     axes[0].set_ylabel("NaN count per row")
     axes[0].set_title(
-        "NaN structure - block outages (same taxa missing for entire months), not random scatter"
+        "NaN structure: block outages, not random scatter\n(same taxa missing for entire months)"
     )
     axes[0].grid(True, alpha=0.3)
 
     axes[1].scatter(df_raw["date"], row_sum, s=3, color="steelblue", alpha=0.5)
     axes[1].set_ylabel("Row sum (organisms/uL)")
     axes[1].set_title(
-        "Row sum for context - NaN blocks do not coincide with low-abundance periods"
+        "Row sum for context: NaN blocks do not\ncoincide with low-abundance periods"
     )
     axes[1].grid(True, alpha=0.3)
 
@@ -318,7 +323,7 @@ def fig5_nan_structure(df_raw, taxa_cols, out_dir):
 
     plt.tight_layout()
     path = os.path.join(out_dir, "fig5_nan_structure.png")
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close()
     print(f"  saved {path}")
 

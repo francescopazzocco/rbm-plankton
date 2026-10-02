@@ -9,7 +9,10 @@ from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, model_dir, spli
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.paths import PROJECT_ROOT as ROOT
 from models.visualization import display_name
+from models.plot_style import FIG_DPI, apply_style
 from scipy.spatial.distance import euclidean
+
+apply_style()
 
 
 def resolve_weights(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
@@ -118,7 +121,7 @@ def main():
     arch_names = list(df_arch.index)
     
     # Create figure with subplots (one per archetype)
-    fig, axes = plt.subplots(n_arch, 1, figsize=(14, 3*n_arch))
+    fig, axes = plt.subplots(n_arch, 1, figsize=(9, 2.0*n_arch))
     if n_arch == 1:
         axes = [axes]
     
@@ -163,32 +166,33 @@ def main():
         for k_idx, h in enumerate(closest_k):
             ax2.plot(x_pos, W_vis[:, h], linestyle=linestyles[k_idx], linewidth=2, label=f"H{h}", alpha=0.8, color=colors_hidden[k_idx])
         
-        ax.set_ylabel(f"{arch} Weight", color='dimgrey')
-        ax2.set_ylabel(f"RBM Activation (Top {args.top_k})", color='black')
-        ax.set_title(f"{arch} vs Closest RBM Hidden Units ({', '.join([f'H{h}' for h in closest_k])})")
+        ax.set_ylabel(f"{arch} weight", color='dimgrey', fontsize=14)
+        ax2.set_ylabel("RBM weight", color='black', fontsize=14)
+        ax.set_title(f"{arch} vs closest hidden units ({', '.join([f'H{h}' for h in closest_k])})", fontsize=15)
         
         # Set xticks for all plots
         ax.set_xticks(x_pos)
         
         # Only set x-axis labels for the last subplot
         if i == n_arch - 1:
-            ax.set_xticklabels(common_taxa, rotation=45, ha='right', fontsize=8)
+            ax.set_xticklabels(common_taxa, rotation=90, fontsize=7)
             ax.set_xlabel("Taxa")
         else:
             ax.set_xticklabels([])
         
-        ax.tick_params(axis='y', labelcolor='dimgrey')
+        ax.tick_params(axis='y', labelcolor='dimgrey', labelsize=13)
+        ax2.tick_params(axis='y', labelsize=13)
         
         # Combine legends
         lines1, labels1 = ax.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
-        ax.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=8)
+        ax.legend(lines1 + lines2, labels1 + labels2, loc='upper left', ncol=len(lines1 + lines2), fontsize=13)
         
         ax.grid(True, alpha=0.3)
     
-    fig.suptitle(f"Archetypes vs closest hidden units - {model_tag}", fontweight="bold")
+    fig.suptitle(f"Archetypes vs closest hidden units - {model_tag}", fontweight="bold", fontsize=16)
     plt.tight_layout()
-    plt.savefig(out, dpi=150)
+    plt.savefig(out, dpi=FIG_DPI)
     print(f"Plot saved to {out}")
 
 if __name__ == "__main__":

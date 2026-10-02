@@ -19,6 +19,9 @@ import pandas as pd
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from models.paths import DIAGNOSTIC_ROOT, SPLITS, split_out_dir
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 
 def _run_tag(weights_path: Path) -> str:
@@ -144,7 +147,7 @@ def plot_scatter(species, probs_list, labels, out_path: Path, title: str):
     ax.grid(True, axis="y", alpha=0.2)
     ax.legend(frameon=False, fontsize=8)
     fig.tight_layout()
-    fig.savefig(out_path, dpi=250, bbox_inches="tight")
+    fig.savefig(out_path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -219,7 +222,7 @@ def plot_per_hidden_rows(species, probs_list, labels, out_path: Path, title: str
         axes[-1].set_xlim(-0.5, D - 0.5)
     fig.suptitle(title)
     fig.subplots_adjust(left=0.06, right=0.99, top=0.96, bottom=0.18)
-    fig.savefig(out_path, dpi=250, bbox_inches="tight")
+    fig.savefig(out_path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -301,7 +304,7 @@ def plot_per_species_grid(species, probs_list, labels, out_path: Path, title: st
     fig.text(0.02, 0.5, ylab, va="center", rotation="vertical", fontsize=12)
     fig.suptitle(title, fontsize=14, y=0.99)
     fig.subplots_adjust(left=0.06, right=0.98, top=0.95, bottom=0.05, hspace=0.3, wspace=0.1)
-    fig.savefig(out_path, dpi=250, bbox_inches="tight")
+    fig.savefig(out_path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
 
 

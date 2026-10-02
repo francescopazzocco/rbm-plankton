@@ -22,6 +22,9 @@ import pandas as pd
 from models.io import load_hidden_activations
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import plot_training_curves, plot_weight_heatmap
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 
 def load_history_from_csv(csv_path: Path) -> dict:
@@ -80,7 +83,7 @@ def plot_hidden_activations_from_csv(activations_csv: Path, out_dir: Path):
     plt.suptitle("Hidden unit activations h(t)  |  orange = summer", fontsize=11)
     plt.tight_layout()
     path = out_dir / "hidden_activations.png"
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close()
     print(f"[Plot]  saved {path}")
 

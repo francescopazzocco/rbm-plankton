@@ -11,11 +11,12 @@ Two figures per model family:
 
 Output: results/02_model_analysis/hidden/weight_profiles/{chrono,shuffled}/{family}.png
         results/02_model_analysis/hidden/state_timeline/{chrono,shuffled}/{family}.png
+        results/02_model_analysis/hidden/state_timeline/{chrono,shuffled}/{family}_L{n}.png  (with --strip-L n)
         results/02_model_analysis/hidden/state_frequency/{chrono,shuffled}/state_frequency.csv
         results/02_model_analysis/hidden/dominant_state/{chrono,shuffled}/L6.csv
 
 Usage:
-    python code/scripts/analysis/hidden/hidden_dominant_state.py [--split chrono|shuffled]
+    python code/scripts/analysis/hidden/hidden_dominant_state.py [--split chrono|shuffled] [--strip-L 6]
 """
 
 import argparse
@@ -47,6 +48,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="Which split strategy's runs to analyse (default: chrono)")
     parser.add_argument("--models-root", type=Path, default=MODELS_ROOT,
                         help="Directory holding artifacts/models/{family}/{split}/L{n} directories")
+    parser.add_argument("--strip-L", type=int, default=None,
+                        help="Also save a single-L timeline strip, {family}_L{n}.png (default: none)")
     return parser.parse_args(argv)
 
 
@@ -86,6 +89,9 @@ def main():
         print(f"\n-- {family} --")
         plot_weight_profiles(family, runs[family], weight_profiles_dir)
         plot_state_timeline(family, runs[family], state_timeline_dir)
+        if args.strip_L in runs[family]:
+            plot_state_timeline(family, {args.strip_L: runs[family][args.strip_L]},
+                                state_timeline_dir, stem=f"{family}_L{args.strip_L}")
 
     rows = []
     for family, family_runs in runs.items():

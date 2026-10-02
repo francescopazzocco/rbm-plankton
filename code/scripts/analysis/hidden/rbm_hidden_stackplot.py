@@ -32,6 +32,9 @@ from models.io import (
 from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import display_name
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 
 def resolve_seed_dir(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
@@ -88,7 +91,7 @@ def plot_stackplot(df: pd.DataFrame, output_path: Path, title: str) -> None:
     # stackplot band); acceptable here since adjacent bands are still split by
     # a visible boundary line, unlike overlapping scatter/line series.
     colors = get_palette(n_hidden)
-    fig, ax = plt.subplots(figsize=(18, 9))
+    fig, ax = plt.subplots(figsize=(14, 6.5))
     ax.stackplot(
         dates,
         *[normalized[col].to_numpy() for col in hidden_cols],
@@ -107,13 +110,13 @@ def plot_stackplot(df: pd.DataFrame, output_path: Path, title: str) -> None:
     ax.set_ylim(0, 1)
     # Legend linear and below plot
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), ncol=min(10, n_hidden), frameon=False)
-    # Every 2 months for easier month identification
-    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+    # Every 3 months: one tick per season
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     ax.grid(True, axis="y", alpha=0.25)
     fig.tight_layout(rect=(0, 0.08, 1, 1))
-    fig.savefig(output_path, dpi=300, bbox_inches="tight")
+    fig.savefig(output_path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
 
 

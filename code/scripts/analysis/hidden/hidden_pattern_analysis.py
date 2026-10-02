@@ -48,7 +48,10 @@ from models.visualization import (
     pattern_frequency,
     pattern_labels,
 )
+from models.plot_style import FIG_DPI, apply_style
 from scipy.cluster.hierarchy import leaves_list, linkage
+
+apply_style()
 
 
 def resolve_seed_dir(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
@@ -92,7 +95,7 @@ def plot_pattern_histogram(summary: pd.DataFrame, output_path: Path, title: str)
         fontsize=9,
     )
     fig.tight_layout(rect=(0, 0.05, 1, 1))
-    fig.savefig(output_path, dpi=250, bbox_inches="tight")
+    fig.savefig(output_path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -140,7 +143,7 @@ def plot_pattern_timeline(timeline: pd.DataFrame, output_path: Path, title: str)
         fontsize=9,
     )
     fig.tight_layout(rect=(0, 0.05, 1, 1))
-    fig.savefig(output_path, dpi=250, bbox_inches="tight")
+    fig.savefig(output_path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
 
 

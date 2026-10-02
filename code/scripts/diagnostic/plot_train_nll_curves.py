@@ -25,6 +25,9 @@ import matplotlib.pyplot as plt
 from models.io import SHUFFLED, SPLITS, discover_model_dirs, model_dir, split_out_dir
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import FAMILY_META, aggregate_curves, display_name
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -72,7 +75,7 @@ def main():
         ax.grid(True, alpha=0.3)
         fig.tight_layout()
         out = out_dir / f"{family}_{col}.png"
-        fig.savefig(out, dpi=150)
+        fig.savefig(out, dpi=FIG_DPI)
         plt.close(fig)
         print(f"Saved: {out}")
 

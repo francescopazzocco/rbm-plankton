@@ -40,6 +40,9 @@ from models.palette import get_palette
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import display_name
 from models.utils import get_device
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 OUT_DIR     = DIAGNOSTIC_ROOT / "tables"
 FIG_DIR     = DIAGNOSTIC_ROOT / "03_evaluation"
@@ -105,7 +108,7 @@ def plot_comparison(summary: pd.DataFrame, out: Path):
 
     fig.suptitle("Split strategy comparison — NaN inference test", fontsize=11)
     fig.tight_layout()
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     plt.close(fig)
     print(f"Figure: {out}")
 

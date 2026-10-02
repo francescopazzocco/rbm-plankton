@@ -5,9 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, model_dir, split_out_dir
+from models.palette import ARCHETYPE_COLORS
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.paths import PROJECT_ROOT as ROOT
 from models.visualization import display_name
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 
 def resolve_weights(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
@@ -19,19 +23,24 @@ def resolve_weights(family: str, n_hidden: int, split: str, models_root: Path) -
     return seed_dir / "weights.npz"
 
 
-def plot_heatmap(ax, matrix, annot, xticklabels, yticklabels, cmap):
-    """Matplotlib-only annotated heatmap (no seaborn dependency)."""
-    im = ax.imshow(matrix, cmap=cmap, aspect="auto")
-    ax.set_xticks(range(len(xticklabels)))
-    ax.set_xticklabels(xticklabels, rotation=45, ha="right", fontsize=8)
-    ax.set_yticks(range(len(yticklabels)))
-    ax.set_yticklabels(yticklabels, fontsize=8)
-    thresh = matrix.min() + (matrix.max() - matrix.min()) / 2
+def plot_heatmap(ax, matrix, annot, xticklabels, yticklabels):
+    """Annotated share heatmap in the style of softmax_vs_archetypes.py.
+
+    Fixed 0-1 Blues scale, cell = share (%) with the count in brackets, archetype
+    ticks in their archetype colour, so the two archetype heatmaps read alike.
+    """
+    im = ax.imshow(matrix, cmap="Blues", vmin=0, vmax=1, aspect="auto")
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
-            ax.text(j, i, f"{annot[i, j]:d}", ha="center", va="center",
-                    fontsize=7, color="white" if matrix[i, j] < thresh else "black")
-    plt.colorbar(im, ax=ax, shrink=0.8)
+            v = matrix[i, j]
+            ax.text(j, i, f"{v:.0%}\n({annot[i, j]:d})", ha="center", va="center",
+                    fontsize=11, color="white" if v > 0.55 else "black")
+    ax.set_xticks(range(len(xticklabels)), xticklabels)
+    ax.set_yticks(range(len(yticklabels)), yticklabels)
+    for tick, c in zip(ax.get_yticklabels(), ARCHETYPE_COLORS):
+        tick.set_color(c)
+        tick.set_fontweight("bold")
+    plt.colorbar(im, ax=ax, shrink=0.85, label="share of archetype taxa")
     return im
 
 
@@ -151,14 +160,16 @@ def main():
             res_frac[i, j] = overlap / len_A if len_A > 0 else 0
                 
     # Plot heatmap
-    fig, ax = plt.subplots(figsize=(10, 6))
-    # Heatmap colors based on fraction (res_frac), numbers printed based on count (res_counts)
-    plot_heatmap(ax, res_frac, res_counts, hidden_names, arch_names, cmap="YlGnBu")
-    ax.set_title(f"Archetype vs Hidden Unit Overlap\n(Color = Fraction of Archetype, Text = Common Species Count)\nTop {args.pct*100:.0f}% Mass | {model_tag}")
-    ax.set_xlabel("RBM Hidden Units")
-    ax.set_ylabel("Archetypes")
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+    # colour = share of the archetype's taxa found in the unit, text = share and shared-taxa count
+    plot_heatmap(ax, res_frac, res_counts, hidden_names, arch_names)
+    ax.set_title(f"{model_tag}, best seed vs archetypes (k = 5)\n"
+                 f"share of each archetype's top-{args.pct:.0%} taxa also in the unit's top-{args.pct:.0%}",
+                 fontsize=12)
+    ax.set_xlabel("Hidden unit")
+    ax.set_ylabel("Archetype")
     fig.tight_layout()
-    fig.savefig(out)
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Heatmap saved to {out}")
 
     # Also save CSV with fractions

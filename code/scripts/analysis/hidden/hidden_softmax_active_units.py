@@ -26,6 +26,9 @@ from models.io import CHRONO, SPLITS, discover_model_dirs, split_out_dir
 from models.palette import OKABE_ITO
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import absorber_lo, display_name, mean_activations
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 FAMILIES = ["nb_softmax", "zinb_softmax"]
 COLORS = {"nb_softmax": OKABE_ITO[5], "zinb_softmax": OKABE_ITO[6]}
@@ -81,7 +84,7 @@ def plot(df: pd.DataFrame, out: Path):
         ax.spines[side].set_visible(False)
     ax.legend(frameon=False, loc="upper left", fontsize=9)
     fig.tight_layout()
-    fig.savefig(out, dpi=200, bbox_inches="tight")
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 

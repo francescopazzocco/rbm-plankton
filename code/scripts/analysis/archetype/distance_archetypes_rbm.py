@@ -8,7 +8,10 @@ from models.io import CHRONO, METRIC_COL, SPLITS, best_seed_dir, model_dir, spli
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.paths import PROJECT_ROOT as ROOT
 from models.visualization import display_name
+from models.plot_style import FIG_DPI, apply_style
 from scipy.spatial.distance import euclidean
+
+apply_style()
 
 
 def resolve_weights(family: str, n_hidden: int, split: str, models_root: Path) -> Path:
@@ -24,14 +27,14 @@ def plot_heatmap(ax, matrix, xticklabels, yticklabels, cmap, vmin, vmax, fmt="{:
     """Matplotlib-only annotated heatmap (no seaborn dependency)."""
     im = ax.imshow(matrix, cmap=cmap, vmin=vmin, vmax=vmax, aspect="auto")
     ax.set_xticks(range(len(xticklabels)))
-    ax.set_xticklabels(xticklabels, rotation=45, ha="right", fontsize=8)
+    ax.set_xticklabels(xticklabels, fontsize=13)
     ax.set_yticks(range(len(yticklabels)))
-    ax.set_yticklabels(yticklabels, fontsize=8)
+    ax.set_yticklabels(yticklabels, fontsize=13)
     thresh = matrix.min() + (matrix.max() - matrix.min()) / 2
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
             ax.text(j, i, fmt.format(matrix[i, j]), ha="center", va="center",
-                    fontsize=7, color="white" if matrix[i, j] < thresh else "black")
+                    fontsize=13, color="white" if matrix[i, j] < thresh else "black")
     plt.colorbar(im, ax=ax, shrink=0.8)
     return im
 
@@ -191,7 +194,7 @@ def main():
     ax.set_xlabel("Model 1 Hidden Units" if args.weights2 else "RBM Hidden Units")
     ax.set_ylabel(y_label)
     fig.tight_layout()
-    fig.savefig(out)
+    fig.savefig(out, dpi=FIG_DPI)
     print(f"Heatmap saved to {out}")
 
     # Save CSV

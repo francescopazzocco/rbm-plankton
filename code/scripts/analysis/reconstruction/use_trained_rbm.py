@@ -37,6 +37,9 @@ from models import utils as model_utils
 from models import io as data_io
 from models.palette import get_palette
 from models.paths import CHRONO, DIAGNOSTIC_ROOT, SHUFFLED, model_dir
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 _FAMILY_DIR_RE = re.compile(r"^(?P<family>.+)_L(?P<n_hidden>\d+)(?P<shuffled>_shuffled)?$")
 
@@ -337,7 +340,7 @@ def plot_overall_summary(selected_top: dict[str, list[dict]], taxa_cols: list[st
     axes[-1].set_xticklabels(taxa_cols, rotation=90, fontsize=6)
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=200)
+    fig.savefig(out_path, dpi=FIG_DPI)
     plt.close(fig)
     print(f"[Overall] Saved plots to {out_path}")
 
@@ -568,7 +571,7 @@ def main():
                     used_input = V.detach().clone()
                     rec_tensor = rec.detach().clone()
                     # scalar reconstruction error for entry i (L2 norm -> abs)
-                    re = float((orig[i] - rec[i]).pow(2).item() ** 0.5)
+                    rec_err = float((orig[i] - rec[i]).pow(2).item() ** 0.5)
                     # mean L1 error over the other entries
                     mask = torch.ones(D, device=model.device, dtype=torch.bool)
                     mask[i] = False
@@ -594,7 +597,7 @@ def main():
                             step_recon = step_rec.detach()
                             progressive_errs[step_idx].append(float((orig[i] - step_recon[i]).pow(2).item() ** 0.5))
                             progressive_dists[step_idx].append(float(torch.abs(orig[mask] - step_recon[mask]).mean().item()))
-                    errs.append(re)
+                    errs.append(rec_err)
                     dists.append(rd)
                     cos_masked.append(cs_masked)
                     cos_others.append(cs_other)
@@ -766,7 +769,7 @@ def main():
             axes[2, 1].legend(fontsize=7, ncol=min(args.CD, 4), loc='upper right')
 
         plt.tight_layout()
-        fig.savefig(out_path, dpi=200)
+        fig.savefig(out_path, dpi=FIG_DPI)
         print(f"[Eval] Saved plots to {out_path}")
 
 

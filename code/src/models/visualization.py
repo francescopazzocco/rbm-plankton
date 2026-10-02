@@ -25,6 +25,9 @@ import torch
 from scipy.cluster.hierarchy import leaves_list, linkage
 
 from .palette import OKABE_ITO, PALETTE, get_markers, get_palette
+from .plot_style import FIG_DPI, apply_style, show_titles
+
+apply_style()
 
 # =============================================================================
 # main_multiseed
@@ -93,7 +96,7 @@ def plot_training_curves(history, out_dir):
     plt.tight_layout()
     for ext in [".png", ".pdf"]:
         path = out_dir / f"training_curves{ext}"
-        plt.savefig(path, dpi=150 if ext == ".png" else 300, bbox_inches="tight")
+        plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
         print(f"[Plot]  saved {path}")
     plt.close()
 
@@ -116,7 +119,7 @@ def plot_weight_heatmap(W, taxa_cols, out_dir):
     plt.tight_layout()
     for ext in [".png", ".pdf"]:
         path = out_dir / f"weight_heatmap{ext}"
-        plt.savefig(path, dpi=150 if ext == ".png" else 300, bbox_inches="tight")
+        plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
         print(f"[Plot]  saved {path}")
     plt.close()
 
@@ -160,7 +163,7 @@ def plot_hidden_activations(rbm, X_train, X_val, dates_train, dates_val, out_dir
     plt.suptitle("Hidden unit activations h(t)  |  orange = summer", fontsize=11)
     plt.tight_layout()
     path = out_dir / "hidden_activations.png"
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
     plt.close()
     print(f"[Plot]  saved {path}")
 
@@ -338,24 +341,28 @@ def _plot_final_metric_panel(ax, title: str, families: list[str], runs) -> set[i
                     linewidth=2, markersize=7, capsize=4,
                     label=PROFILE_LABEL.get(profile, family) if len(families) > 1 else display_name(family))
         if len(families) == 1:
-            for x, y, s in zip(xs, means, stds):
+            for k, (x, y, s) in enumerate(zip(xs, means, stds)):
+                # alternate above/below so neighbouring labels do not collide
                 ax.annotate(f"{y:.3f}±{s:.3f}", (x, y), textcoords="offset points",
-                            xytext=(0, 8), ha="center", fontsize=7)
+                            xytext=(0, 12 if k % 2 == 0 else -22), ha="center", fontsize=10,
+                            bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.8))
 
     visible_label = PANEL_VISIBLE_LABEL.get(title, title)
     if len(families) > 1:
-        panel_title = f"{visible_label} — final val metric vs L, by hidden-unit type"
+        panel_title = f"{visible_label}\nfinal val metric vs L, by hidden-unit type"
     else:
         hidden_label = PROFILE_LABEL[_profile_of(families[0], title)]
-        panel_title = f"{visible_label}, {hidden_label} — final val metric vs L"
-    ax.set_title(panel_title, fontsize=10)
+        panel_title = f"{visible_label}, {hidden_label}\nfinal val metric vs L"
+    ax.set_title(panel_title, fontsize=12)
     ax.set_xlabel("L (hidden units)")
     ax.set_ylabel(FAMILY_META[families[0]]["label"])
+    if len(families) == 1:
+        ax.margins(x=0.08, y=0.15)  # room for the value labels above the points
     if all_xs:
         ax.set_xticks(sorted(all_xs))
     ax.grid(True, alpha=0.3)
     if len(families) > 1:
-        ax.legend(fontsize=8)
+        ax.legend()
     return all_xs
 
 
@@ -364,11 +371,11 @@ def plot_final_metric(runs, figures_dir: Path):
         fig, ax = plt.subplots(1, 1, figsize=(6, 4.5))
         _plot_final_metric_panel(ax, title, families, runs)
         ax.set_title(ax.get_title() + "\n(last epoch, mean ± std, shaded = min/max over seeds)",
-                     fontsize=10)
+                     fontsize=11)
 
         fig.tight_layout()
         out = figures_dir / f"sweep_final_metric_{title}.png"
-        fig.savefig(out, dpi=150)
+        fig.savefig(out, dpi=FIG_DPI)
         print(f"Saved: {out}")
         plt.close(fig)
 
@@ -392,7 +399,7 @@ def plot_final_metric_overview(runs, figures_dir: Path):
                  fontsize=12)
     fig.tight_layout()
     out = figures_dir / "sweep_final_metric_overview.png"
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -417,11 +424,14 @@ def plot_final_metric_individual(runs, figures_dir: Path):
             if not all_xs:
                 plt.close(fig)
                 continue
-            ax.set_title(ax.get_title() + "\n(last epoch, mean ± std, shaded = min/max over seeds)",
-                         fontsize=10)
+            if show_titles():
+                ax.set_title(ax.get_title() + "\n(last epoch, mean ± std, shaded = min/max over seeds)",
+                             fontsize=11)
+            else:
+                ax.set_title("")
             fig.tight_layout()
             out = out_dir / f"sweep_final_metric_{family}.png"
-            fig.savefig(out, dpi=150)
+            fig.savefig(out, dpi=FIG_DPI)
             print(f"Saved: {out}")
             plt.close(fig)
 
@@ -429,29 +439,33 @@ def plot_final_metric_individual(runs, figures_dir: Path):
 def plot_sweep_curves(runs, figures_dir: Path):
     n_cols = 5
     n_rows = -(-len(FAMILY_META) // n_cols)
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.6 * n_cols, 3.8 * n_rows),
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(3.4 * n_cols, 3.0 * n_rows),
                              sharey=False, squeeze=False)
-    fig.suptitle("Val metric training curves by L (mean ± 1σ over seeds)", fontsize=14)
+    if show_titles():
+        fig.suptitle("Val metric training curves by L (mean ± 1σ over seeds)")
     cmap = plt.colormaps["viridis"]
     axes_flat = axes.ravel()
     for ax in axes_flat[len(FAMILY_META):]:
         ax.set_visible(False)
 
+    # One colour per L value across all panels (not per position within a
+    # panel), so the single shared legend below is valid for every family.
+    all_l = sorted({l_val for family in FAMILY_META for l_val in runs.get(family, {})})
+    span = max(all_l[-1] - all_l[0], 1) if all_l else 1
+    l_color = {l_val: cmap((l_val - all_l[0]) / span) for l_val in all_l}
+
     for ax, (family, meta) in zip(axes_flat, FAMILY_META.items()):
         col = meta["col"]
         family_runs = runs.get(family, {})
-        l_values = sorted(family_runs)
-        n = len(l_values)
-        for i, l_val in enumerate(l_values):
+        for i, l_val in enumerate(sorted(family_runs)):
             agg = aggregate_curves(family_runs[l_val], col)
             if agg is None:
-                ax.annotate(f"L={l_val}: diverged", xy=(0.05, 0.05 + i * 0.07),
-                            xycoords="axes fraction", fontsize=8, color="red")
+                ax.annotate(f"L={l_val}: diverged", xy=(0.05, 0.05 + i * 0.09),
+                            xycoords="axes fraction", fontsize=11, color="red")
                 continue
             mean_curve, std_curve = agg
-            color = cmap(i / max(n - 1, 1))
-            ax.plot(mean_curve.index, mean_curve.values, color=color,
-                    linewidth=1.5, label=f"L={l_val}")
+            color = l_color[l_val]
+            ax.plot(mean_curve.index, mean_curve.values, color=color, linewidth=1.5)
             ax.fill_between(mean_curve.index,
                             mean_curve.values - std_curve.values,
                             mean_curve.values + std_curve.values,
@@ -459,12 +473,14 @@ def plot_sweep_curves(runs, figures_dir: Path):
         ax.set_title(display_name(family))
         ax.set_xlabel("Epoch")
         ax.set_ylabel(meta["label"])
-        ax.legend(fontsize=7, ncol=2, loc="upper right")
         ax.grid(True, alpha=0.3)
 
+    handles = [plt.Line2D([0], [0], color=l_color[lv], linewidth=3, label=f"L={lv}") for lv in all_l]
+    fig.legend(handles=handles, loc="lower center", ncol=len(handles), frameon=False,
+               bbox_to_anchor=(0.5, -0.04))
     fig.tight_layout()
     out = figures_dir / "val_metric_by_family.png"
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -492,7 +508,7 @@ def plot_nb_diagnostics(runs, figures_dir: Path):
                                 color=color, alpha=0.2)
         else:
             ax_nll.annotate(f"L={l_val}: diverged", xy=(0.05, 0.05 + i * 0.07),
-                            xycoords="axes fraction", fontsize=8, color="red")
+                            xycoords="axes fraction", fontsize=11, color="red")
         theta_agg = aggregate_curves(nb_runs[l_val], "theta_mean")
         if theta_agg is not None:
             theta_mean, theta_std = theta_agg
@@ -505,17 +521,17 @@ def plot_nb_diagnostics(runs, figures_dir: Path):
     ax_nll.set_title("Val NLL (↓)")
     ax_nll.set_xlabel("Epoch")
     ax_nll.set_ylabel("NLL")
-    ax_nll.legend(fontsize=8)
+    ax_nll.legend()
     ax_nll.grid(True, alpha=0.3)
     ax_theta.set_title("θ mean (dispersion)")
     ax_theta.set_xlabel("Epoch")
     ax_theta.set_ylabel("θ")
-    ax_theta.legend(fontsize=8)
+    ax_theta.legend()
     ax_theta.grid(True, alpha=0.3)
 
     fig.tight_layout()
     out = figures_dir / "nb_nll_theta_by_L.png"
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -527,7 +543,7 @@ def plot_zinb_diagnostics(runs, figures_dir: Path):
     n = len(l_values)
     cmap = plt.colormaps["viridis"]
 
-    fig, (ax_nll, ax_theta, ax_pi) = plt.subplots(1, 3, figsize=(15, 4))
+    fig, (ax_nll, ax_theta, ax_pi) = plt.subplots(1, 3, figsize=(13, 4))
     fig.suptitle("ZINB-Bernoulli: NLL, θ, and π trajectories by L (mean ± 1σ over seeds)", fontsize=13)
 
     for i, l_val in enumerate(l_values):
@@ -543,7 +559,7 @@ def plot_zinb_diagnostics(runs, figures_dir: Path):
                                 color=color, alpha=0.2)
         else:
             ax_nll.annotate(f"L={l_val}: diverged", xy=(0.05, 0.05 + i * 0.07),
-                            xycoords="axes fraction", fontsize=8, color="red")
+                            xycoords="axes fraction", fontsize=11, color="red")
         theta_agg = aggregate_curves(zinb_runs[l_val], "theta_mean")
         if theta_agg is not None:
             theta_mean, theta_std = theta_agg
@@ -564,22 +580,22 @@ def plot_zinb_diagnostics(runs, figures_dir: Path):
     ax_nll.set_title("Val NLL (↓)")
     ax_nll.set_xlabel("Epoch")
     ax_nll.set_ylabel("NLL")
-    ax_nll.legend(fontsize=8)
+    ax_nll.legend()
     ax_nll.grid(True, alpha=0.3)
     ax_theta.set_title("θ mean (dispersion)")
     ax_theta.set_xlabel("Epoch")
     ax_theta.set_ylabel("θ")
-    ax_theta.legend(fontsize=8)
+    ax_theta.legend()
     ax_theta.grid(True, alpha=0.3)
     ax_pi.set_title("π mean (inflation)")
     ax_pi.set_xlabel("Epoch")
     ax_pi.set_ylabel("π")
-    ax_pi.legend(fontsize=8)
+    ax_pi.legend()
     ax_pi.grid(True, alpha=0.3)
 
     fig.tight_layout()
     out = figures_dir / "zinb_nll_theta_pi_by_L.png"
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -699,45 +715,56 @@ def plot_weight_profiles(family: str, family_runs: dict, out_dir: Path):
         plt.colorbar(im, ax=ax, fraction=0.03, pad=0.04, label="weight")
     fig.tight_layout()
     out = out_dir / f"{family}.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
 
-def plot_state_timeline(family: str, family_runs: dict, out_dir: Path):
+# Okabe-Ito has 8 colours; hidden units h8, h9 (L = 9, 10) get their own
+# instead of cycling back onto h0, h1, which would merge two states visually.
+_UNIT_COLORS_EXTRA = ["#999999", "#8C564B"]  # gray, brown
+
+
+def _unit_colors(n: int) -> list[str]:
+    """n distinct hidden-unit colours: Okabe-Ito first, then _UNIT_COLORS_EXTRA."""
+    return (get_palette(min(n, len(OKABE_ITO))) + _UNIT_COLORS_EXTRA)[:n]
+
+
+def plot_state_timeline(family: str, family_runs: dict, out_dir: Path, stem: str | None = None):
+    """Dominant hidden unit per day, one thin strip per L, one shared legend.
+
+    Strips are kept thin and the figure wide so the time axis stays readable
+    when the figure is shown at slide size. `stem` overrides the output name,
+    e.g. to save a single-L strip next to the all-L figure.
+    """
     l_values = sorted(family_runs)
     n_l = len(l_values)
-    fig, axes = plt.subplots(n_l, 1, figsize=(14, 2.2 * n_l), sharex=True)
-    if n_l == 1:
-        axes = [axes]
-    fig.suptitle(f"{display_name(family)} - dominant hidden state over time", fontsize=11)
-    max_l  = max(l_values)
-    unit_colors = get_palette(max_l)
+    max_l = max(l_values)
+    unit_colors = _unit_colors(max_l)
+    fig, axes = plt.subplots(n_l, 1, figsize=(15, 0.62 * n_l + 0.9), sharex=True, squeeze=False)
+    axes = axes[:, 0]
 
     for ax, l_val in zip(axes, l_values):
         act   = load_activations(family_runs[l_val]["activations"])
         state = dominant_state(act)
         dates = state.index
-        colors = [unit_colors[s] for s in state.values]
-        ax.scatter(dates, np.zeros(len(dates)), c=colors,
-                   marker="|", s=200, linewidths=2)
+        ax.scatter(dates, np.zeros(len(dates)), c=[unit_colors[s] for s in state.values],
+                   marker="|", s=900, linewidths=2.2)
         ax.set_yticks([])
-        ax.set_ylabel(f"L={l_val}", rotation=0, labelpad=30, fontsize=9, va="center")
+        ax.set_ylim(-1, 1)
+        ax.set_ylabel(f"L={l_val}", rotation=0, labelpad=22, fontsize=15, va="center")
         ax.set_xlim(dates.min(), dates.max())
-        handles = [
-            plt.Line2D([0], [0], marker="|", color="w",
-                       markerfacecolor=unit_colors[i],
-                       markeredgecolor=unit_colors[i],
-                       markersize=10, label=f"h{i}")
-            for i in range(l_val)
-        ]
-        ax.legend(handles=handles, loc="upper right", fontsize=7,
-                  ncol=l_val, framealpha=0.7)
+        for side in ("top", "right", "left"):
+            ax.spines[side].set_visible(False)
+    axes[-1].tick_params(axis="x", labelsize=15)
 
-    axes[-1].set_xlabel("date", fontsize=9)
-    fig.tight_layout()
-    out = out_dir / f"{family}.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    handles = [plt.Line2D([0], [0], marker="s", color="w", markerfacecolor=unit_colors[i],
+                          markersize=14, label=f"h{i}") for i in range(max_l)]
+    fig.legend(handles=handles, loc="lower center", ncol=max_l, fontsize=15, frameon=False,
+               bbox_to_anchor=(0.5, -0.01))
+    fig.tight_layout(rect=(0, 0.07 if n_l > 1 else 0.22, 1, 1), h_pad=0.2)
+    out = out_dir / f"{stem or family}.png"
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -774,10 +801,10 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
     lo = absorber_lo(family)
     l_values = sorted(family_runs)
     n = len(l_values)
-    fig, axes = plt.subplots(1, n, figsize=(3 * n, 3.5), sharey=True)
+    fig, axes = plt.subplots(1, n, figsize=(2.4 * n, 3.0), sharey=True)
     if n == 1:
         axes = [axes]
-    fig.suptitle(f"{display_name(family)} - mean hidden activation per unit", fontsize=12)
+    fig.suptitle(f"{display_name(family)} - mean hidden activation per unit")
 
     for ax, l_val in zip(axes, l_values):
         means = mean_activations(family_runs[l_val])
@@ -791,25 +818,28 @@ def plot_family(family: str, family_runs: dict, out_dir: Path):
         ax.bar(units, means.values, color=bar_colors)
         ax.axhline(ABSORBER_HI, color=_COLOR_ALWAYS_ON, linestyle="--", linewidth=0.8, alpha=0.6)
         ax.axhline(lo, color=_COLOR_ALWAYS_OFF, linestyle="--", linewidth=0.8, alpha=0.6)
-        ax.set_title(f"L={l_val}", fontsize=10)
+        ax.set_title(f"L={l_val}")
         ax.set_xlabel("hidden unit")
         ax.set_xticks(units)
         ax.set_ylim(0, 1.05)
         if ax is axes[0]:
             ax.set_ylabel("mean p(h=1)")
+        # past 7 bars a horizontal label is wider than its bar: stand it up
+        rotation = 90 if len(means) > 7 else 0
         for i, v in enumerate(means.values):
-            ax.text(i, v + 0.02, f"{v:.2f}", ha="center", va="bottom", fontsize=7)
+            ax.text(i, v + 0.02, f"{v:.2f}", ha="center", va="bottom", fontsize=10,
+                    rotation=rotation)
 
     legend = [
         mpatches.Patch(color=_COLOR_ALWAYS_ON, label=f"always-on  (>{ABSORBER_HI})"),
         mpatches.Patch(color=_COLOR_ALWAYS_OFF, label=f"always-off (<{lo})"),
         mpatches.Patch(color=_COLOR_ACTIVE, label="active"),
     ]
-    fig.legend(handles=legend, loc="lower center", ncol=3, fontsize=8,
-               bbox_to_anchor=(0.5, -0.05))
+    fig.legend(handles=legend, loc="lower center", ncol=3, frameon=False,
+               bbox_to_anchor=(0.5, -0.08))
     fig.tight_layout()
     out = out_dir / f"{family}.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -841,7 +871,7 @@ def plot_correlation(corr: pd.DataFrame, out_dir: Path, target_l: int = 6, famil
     fig.tight_layout()
     stem = f"{suffix[1:]}_L{target_l}" if suffix else f"L{target_l}"
     out = out_dir / f"{stem}.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -872,16 +902,17 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
     ax1.bar(range(n), freq["fraction"],
             color=[n_units_colors[int(u)] for u in freq["n_units_on"]])
     ax1.set_xticks(range(n))
-    ax1.set_xticklabels(freq["pattern"], fontsize=7, rotation=90,
+    ax1.set_xticklabels(freq["pattern"], fontsize=9, rotation=90,
                         fontfamily="monospace")
     ax1.set_ylabel("fraction of days (this pattern)")
     ax1.set_xlabel(f"binary pattern (h0...h{target_l - 1}, 1=ON), ranked by frequency")
-    ax1.set_title(f"{label} L={target_l} - activation-pattern coverage",
-                  fontweight="bold", pad=22)
-    ax1.text(0.5, 1.015,
-             rf"unit on iff $p(h_j=1 \mid v) \geq {PATTERN_THRESHOLD}$, "
-             f"{n} distinct patterns of {2 ** target_l} possible",
-             transform=ax1.transAxes, ha="center", va="bottom")
+    if show_titles():
+        ax1.set_title(f"{label} L={target_l} - activation-pattern coverage",
+                      fontweight="bold", pad=22)
+        ax1.text(0.5, 1.015,
+                 rf"unit on iff $p(h_j=1 \mid v) \geq {PATTERN_THRESHOLD}$, "
+                 f"{n} distinct patterns of {2 ** target_l} possible",
+                 transform=ax1.transAxes, ha="center", va="bottom")
 
     ax2 = ax1.twinx()
     ax2.plot(range(n), cumulative, color=OKABE_ITO[0], marker="o", ms=3, lw=1.5,
@@ -894,14 +925,18 @@ def plot_pattern_frequency(freq: pd.DataFrame, out_dir: Path, target_l: int = 6,
         k = int((cumulative >= thr).idxmax()) + 1
         ax2.axhline(thr, color=cutoff_color, ls="--", lw=0.8, alpha=0.5)
         ax2.axvline(k - 1, color=cutoff_color, ls="--", lw=0.8, alpha=0.5)
+        # labels stacked in the empty lower-right area, arrowed to their cutoff,
+        # so consecutive cutoffs never print on top of each other
         ax2.annotate(f"{k} patterns -> {thr:.0%}",
-                     xy=(k - 1, thr), xytext=(k - 1 + n * 0.02, thr - 0.06 - 0.08 * i),
-                     fontsize=8, color=cutoff_color)
+                     xy=(k - 1, thr), xytext=(n * 0.55, 0.70 - 0.12 * i),
+                     fontsize=12, color=cutoff_color,
+                     arrowprops=dict(arrowstyle="->", color=cutoff_color, lw=0.8,
+                                     relpos=(0, 0.5), shrinkA=2))
 
     fig.tight_layout()
     stem = f"{suffix[1:]}_L{target_l}" if suffix else f"L{target_l}"
     out = out_dir / f"{stem}.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)
 
@@ -943,6 +978,6 @@ def plot_seasonal_profiles(nb_prof: pd.DataFrame, bb_prof: pd.DataFrame,
     fig.tight_layout()
     stem = f"{suffix[1:]}_L{target_l}" if suffix else f"L{target_l}"
     out = out_dir / f"{stem}.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     print(f"Saved: {out}")
     plt.close(fig)

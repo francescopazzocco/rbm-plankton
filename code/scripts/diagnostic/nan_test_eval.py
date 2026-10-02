@@ -27,6 +27,7 @@ Each evaluated run is identified as {family}_L{n}_{split}: the specs use the
 optimal L per family, so capacity and split vary between bars.
 """
 
+import argparse
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
@@ -48,6 +49,9 @@ from models.io import (
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.utils import get_device
 from models.visualization import COLORS, display_name
+from models.plot_style import FIG_DPI, apply_style, show_titles
+
+apply_style()
 
 
 # -- Config ------------------------------------------------------------------
@@ -159,13 +163,29 @@ def run_label(family: str, n_hidden: int, split: str) -> str:
     return f"{display_name(family)} L={n_hidden} ({split})"
 
 
+def count_runs(run_meta: dict, present) -> list[str]:
+    """Runs to draw: count models only.
+
+    Bernoulli families score BCE on binarised data, a different scale from the
+    count NLL, so their bars would share an axis without sharing a unit.
+    """
+    return [r for r in run_meta if r in set(present) and not r.startswith("bernoulli")]
+
+
+def bar_hatch(run: str) -> str | None:
+    """Hatch that separates runs sharing a family colour (chrono split, ZINB)."""
+    if run.endswith(CHRONO):
+        return "//"
+    return ".." if run.startswith("zinb") else None
+
+
 def plot_bars(summary: pd.DataFrame, out: Path, run_meta: dict):
-    runs = [r for r in run_meta if r in summary["run"].unique()]
+    runs = count_runs(run_meta, summary["run"].unique())
     n_runs = len(runs)
     w = 0.75 / n_runs
     x = np.arange(len(PATTERNS))
 
-    fig, ax = plt.subplots(figsize=(11, 5))
+    fig, ax = plt.subplots(figsize=(12, 5))
     for i, run in enumerate(runs):
         cfg = run_meta[run]
         sub = summary[summary["run"] == run].set_index("pattern")
@@ -174,17 +194,19 @@ def plot_bars(summary: pd.DataFrame, out: Path, run_meta: dict):
         offset = (i - (n_runs - 1) / 2) * w
         ax.bar(x + offset, means, w, yerr=stds, capsize=3,
                color=cfg["color"], alpha=0.85, label=cfg["label"],
+               hatch=bar_hatch(run), edgecolor="white",
                error_kw={"linewidth": 1.0})
 
     ax.set_xticks(x)
     ax.set_xticklabels([PATTERN_LABELS[p] for p in PATTERNS])
     ax.set_xlabel("Missingness pattern")
-    ax.set_ylabel("NLL on observed taxa\n(NB/ZINB: count NLL  |  Bernoulli: BCE)")
-    ax.set_title("NaN test set evaluation - all model families (optimal L per family)")
-    ax.legend(fontsize=7, ncol=2, loc="upper left")
+    ax.set_ylabel("Count NLL per observed taxon")
+    if show_titles():
+        ax.set_title("NaN test set evaluation - count models (optimal L per family)")
+    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), frameon=False)
     ax.set_ylim(bottom=0)
     fig.tight_layout()
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -192,7 +214,7 @@ def plot_timeseries(df: pd.DataFrame, out: Path, run_meta: dict):
     p31 = df[df["n_miss"] == 31].copy()
     p31["date"] = pd.to_datetime(p31["date"])
     p31 = p31.sort_values("date")
-    runs = [r for r in run_meta if r in p31["run"].unique()]
+    runs = count_runs(run_meta, p31["run"].unique())
 
     fig, ax = plt.subplots(figsize=(12, 4))
     for run in runs:
@@ -201,12 +223,12 @@ def plot_timeseries(df: pd.DataFrame, out: Path, run_meta: dict):
         ax.plot(sub["date"], sub["nll"], "o-", color=cfg["color"],
                 markersize=3, linewidth=1, label=cfg["label"], alpha=0.85)
     ax.set_xlabel("Date")
-    ax.set_ylabel("NLL / BCE (52 observed taxa)")
-    ax.set_title("p31 pattern - per-day test NLL, all model families (optimal L per family)")
-    ax.legend(fontsize=7, ncol=2)
+    ax.set_ylabel("Count NLL per observed taxon (52 taxa)")
+    ax.set_title("p31 pattern - per-day test NLL, count models (optimal L per family)")
+    ax.legend(ncol=2)
     ax.tick_params(axis="x", rotation=30)
     fig.tight_layout()
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     plt.close(fig)
 
 
@@ -236,9 +258,36 @@ def score_kind(family: str) -> str:
     return "zinb" if family.startswith("zinb") else "nb"
 
 
+def spec_meta() -> dict[str, dict]:
+    """Colour and label of every run in _SPECS, keyed by run_key."""
+    return {run_key(f, n, s): {"color": FAMILY_COLORS[f], "label": run_label(f, n, s)}
+            for f, n, s in _SPECS}
+
+
+def plot_from_csv(out_root: Path):
+    """Redraw both figures from the saved CSVs, without re-running the Gibbs imputation.
+
+    The imputation is stochastic, so re-running it to restyle a figure would
+    also move the numbers the figure reports.
+    """
+    df = pd.read_csv(out_root / "nan_eval_rows.csv")
+    summary = pd.read_csv(out_root / "nan_eval_summary.csv")
+    plot_bars(summary, out_root / "nan_eval_bars.png", spec_meta())
+    plot_timeseries(df, out_root / "nan_eval_timeseries.png", spec_meta())
+    print(f"Figures redrawn from CSV: {out_root}/nan_eval_bars.png  &  nan_eval_timeseries.png")
+
+
 def main():
+    parser = argparse.ArgumentParser(description="NaN test set imputation and scoring.")
+    parser.add_argument("--plot-only", action="store_true",
+                        help="Redraw the figures from the existing CSVs instead of re-evaluating")
+    args = parser.parse_args()
+
     config = EvalConfig()
     config.out_root.mkdir(parents=True, exist_ok=True)
+    if args.plot_only:
+        plot_from_csv(config.out_root)
+        return
     device = get_device()
 
     nan_df, taxa = load_nan_rows()

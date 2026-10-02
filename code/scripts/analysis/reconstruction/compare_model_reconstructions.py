@@ -29,7 +29,10 @@ if str(SCRIPT_DIR) not in sys.path:
 from models import io as data_io
 from models.paths import DIAGNOSTIC_ROOT, SHUFFLED, model_dir
 from models.visualization import COLORS, display_name
+from models.plot_style import FIG_DPI, apply_style
 import use_trained_rbm as trained_loader
+
+apply_style()
 
 MODEL_FAMILIES = [
     ("bernoulli_median", "bernoulli_median"),
@@ -483,7 +486,7 @@ def plot_overall_summary(
 
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=200)
+    fig.savefig(out_path, dpi=FIG_DPI)
     print(f"[Save] {out_path}")
 
 
@@ -832,7 +835,7 @@ def main():
             if not out_path.stem.endswith(stem_suffix):
                 out_path = out_path.with_name(f"{out_path.stem}{stem_suffix}{out_path.suffix}")
 
-    fig.savefig(out_path, dpi=200)
+    fig.savefig(out_path, dpi=FIG_DPI)
     print(f"[Save] {out_path}")
 
 

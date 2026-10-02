@@ -22,6 +22,9 @@ import matplotlib.pyplot as plt
 from models.io import SHUFFLED, SPLITS, model_dir, split_out_dir
 from models.paths import DIAGNOSTIC_ROOT, MODELS_ROOT
 from models.visualization import COLORS, aggregate_curves, display_name
+from models.plot_style import FIG_DPI, apply_style
+
+apply_style()
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -40,7 +43,7 @@ def main():
     out_dir = split_out_dir(DIAGNOSTIC_ROOT / "diagnostics" / "training_curves" / "family_comparison_fixed_L", args.split)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), sharey=True)
     for family in args.families:
         csvs = sorted(model_dir(family, args.L, args.split, args.models_root)
                       .glob("seed_*/rbm_training_curves.csv"))
@@ -57,13 +60,13 @@ def main():
         ax.set_title(title)
         ax.set_xlabel("Epoch")
         ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=8)
+        ax.legend()
     axes[0].set_ylabel("NLL per entry")
     fig.suptitle(f"{' vs '.join(display_name(f) for f in args.families)} - L={args.L} "
                  f"({args.split}), mean ± 1σ over seeds", fontweight="bold")
     fig.tight_layout()
     out = out_dir / f"{'_vs_'.join(args.families)}_L{args.L}.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
     print(f"Saved: {out}")
 
