@@ -70,6 +70,7 @@ training_runs_CD1/
 trained_models/
 weights/
 weights.zip
+training_runs.zip
 
 # Legacy generated figures
 figures/
