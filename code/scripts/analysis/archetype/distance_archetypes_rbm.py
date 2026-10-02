@@ -80,7 +80,7 @@ def main():
     parser.add_argument("--L", type=int, default=7, help="Hidden unit count (default: 7)")
     parser.add_argument("--split", choices=SPLITS, default=CHRONO, help="Split strategy (default: chrono)")
     parser.add_argument("--models-root", type=Path, default=MODELS_ROOT)
-    parser.add_argument("--archetypes", type=Path, default=ROOT / "prof" / "archetypes_k5_profiles.csv",
+    parser.add_argument("--archetypes", type=Path, default=ROOT / "data" / "archetypes" / "archetypes_k5_profiles.csv",
                         help="archetypes csv path (used if weights2 is not provided)")
     parser.add_argument("--weights2", type=str, default=None, help="optional second npz weights path (Model 2) to compare RBM vs RBM")
     parser.add_argument("--out", type=Path, default=None, help="output plot path")

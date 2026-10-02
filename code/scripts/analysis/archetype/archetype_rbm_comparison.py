@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Quantitative evidence for the archetype vs. RBM comparison report.
 
-Reads Cheng's archetype profiles (prof/) and the precomputed RBM
+Reads the archetype profiles (data/archetypes/) and the precomputed RBM
 visible-by-hidden CSVs, seasonal profiles, state frequencies, and mean
 activation summaries.  Prints all tables used in
 doc/archetype_rbm_comparison.md.
@@ -25,8 +25,8 @@ from models.paths import MODELS_ROOT
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-PROF_PROFILES   = ROOT / "prof" / "archetypes_k5_profiles.csv"
-PROF_TIMESERIES = ROOT / "prof" / "archetypes_k5_timeseries.csv"
+ARCH_PROFILES   = ROOT / "data" / "archetypes" / "archetypes_k5_profiles.csv"
+ARCH_TIMESERIES = ROOT / "data" / "archetypes" / "archetypes_k5_timeseries.csv"
 
 
 def _vbh_path(family: str, mode: str, split: str, n_hidden: int = 6) -> Path:
@@ -69,7 +69,7 @@ def separator(title: str) -> None:
 # ---------------------------------------------------------------------------
 def archetype_dominant_taxa(top_n: int = 5) -> None:
     separator("1. Cheng's archetypes — dominant taxa")
-    df = pd.read_csv(PROF_PROFILES, index_col=0)
+    df = pd.read_csv(ARCH_PROFILES, index_col=0)
     for arch in df.index:
         row = df.loc[arch].sort_values(ascending=False).head(top_n)
         print(f"\n{arch}:")
@@ -82,7 +82,7 @@ def archetype_dominant_taxa(top_n: int = 5) -> None:
 # ---------------------------------------------------------------------------
 def archetype_dominance_ratio() -> None:
     separator("2. Fraction of weight in top taxon per archetype (dominance check)")
-    df = pd.read_csv(PROF_PROFILES, index_col=0)
+    df = pd.read_csv(ARCH_PROFILES, index_col=0)
     for arch in df.index:
         row = df.loc[arch]
         top_val  = row.max()
@@ -97,7 +97,7 @@ def archetype_dominance_ratio() -> None:
 # ---------------------------------------------------------------------------
 def archetype_dominance_days() -> None:
     separator("3. Cheng's archetypes — fraction of days as dominant state")
-    ts = pd.read_csv(PROF_TIMESERIES, index_col=0, parse_dates=True)
+    ts = pd.read_csv(ARCH_TIMESERIES, index_col=0, parse_dates=True)
     dominant = ts.idxmax(axis=1)
     counts   = dominant.value_counts().sort_index()
     total    = len(dominant)

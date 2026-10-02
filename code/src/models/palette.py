@@ -79,6 +79,6 @@ def style_map(order: list) -> dict:
 
 
 # Archetype colours A1..A5: matplotlib's tab10, the scheme of the archetypal
-# analysis figures we received (prof/archetypes_k5_composition_timeseries.png),
+# analysis figures we received (data/archetypes/archetypes_k5_composition_timeseries.png),
 # so our archetype figures can sit next to them without a colour remap.
 ARCHETYPE_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]

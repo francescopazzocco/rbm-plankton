@@ -1,6 +1,6 @@
 """archetype_top_taxa_venn.py - Five-set Venn diagram of the top taxa of each archetype.
 
-Each archetype (row of prof/archetypes_k5_profiles.csv) contributes the set of
+Each archetype (row of data/archetypes/archetypes_k5_profiles.csv) contributes the set of
 its --top largest-weight taxa. The sets are drawn as the symmetric five-ellipse
 Venn diagram, and every taxon is written inside the region that matches its
 membership pattern (e.g. a taxon in the top set of A3 and A5 only is written
@@ -76,7 +76,7 @@ def pretty(taxon: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--archetypes", type=Path, default=ROOT / "prof" / "archetypes_k5_profiles.csv")
+    parser.add_argument("--archetypes", type=Path, default=ROOT / "data" / "archetypes" / "archetypes_k5_profiles.csv")
     parser.add_argument("--top", type=int, default=5, help="Taxa per archetype (largest weights)")
     parser.add_argument("--out", type=Path,
                         default=DIAGNOSTIC_ROOT / "02_model_analysis" / "archetype" / "top_taxa_venn")

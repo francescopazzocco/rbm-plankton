@@ -110,7 +110,7 @@ def main():
     parser.add_argument("--L", type=int, default=7, help="Hidden unit count (default: 7)")
     parser.add_argument("--split", choices=SPLITS, default=CHRONO, help="Split strategy (default: chrono)")
     parser.add_argument("--models-root", type=Path, default=MODELS_ROOT)
-    parser.add_argument("--archetypes", type=Path, default=ROOT / "prof" / "archetypes_k5_profiles.csv",
+    parser.add_argument("--archetypes", type=Path, default=ROOT / "data" / "archetypes" / "archetypes_k5_profiles.csv",
                         help="archetypes csv path")
     parser.add_argument("--out", type=Path, default=None, help="output plot path")
     parser.add_argument("--pct", type=float, default=0.98, help="fraction of mass to cover")

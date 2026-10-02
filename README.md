@@ -115,7 +115,7 @@ root/
 │   ├── 03_evaluation/
 │   ├── 04_model_selection/
 │   └── tables/
-├── prof/                     # Archetype comparison data (keep)
+├── data/archetypes/          # Archetype comparison data (local, not tracked)
 ├── .gitignore
 ├── requirements.txt
 ├── ARCHITECTURE.md
@@ -169,6 +169,11 @@ Same checks CI runs on every push/PR (`.github/workflows/ci.yml`).
 
 Place the raw CSV at `data/raw/TimeSeries_countsuL_clean.csv` (83 taxa columns,
 daily resolution, organisms/µL). This file is gitignored — users must provide it.
+
+The archetype comparison scripts (`code/scripts/analysis/archetype/`) also read the
+k = 5 archetypal analysis of the same series, which is not distributed either:
+`data/archetypes/archetypes_k5_profiles.csv` (taxon weights per archetype) and
+`data/archetypes/archetypes_k5_timeseries.csv` (archetype weights per day).
 
 The pipeline automatically handles:
 - Dropping all-zero and fully-NaN rows
@@ -282,7 +287,7 @@ comparison (shared, copy-pasted `sigmoid()`/`compute_visible_activation()`
 helpers). `.claude/REORG_AND_VALIDATION.md` (§A-3) recommends consolidating
 them into one script with a `--mode {distance,overlap,scatter}` flag; not
 done here — this pass only made all three runnable against the current
-`artifacts/models/`/`prof/` layout (they previously pointed at paths that no
+`artifacts/models/`/`data/archetypes/` layout (they previously pointed at paths that no
 longer exist and had no output on disk).
 
 ### Reconstruction comparison

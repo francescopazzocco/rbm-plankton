@@ -1,7 +1,7 @@
 """softmax_vs_archetypes.py - One-hot Softmax states against the dominant archetype, day by day.
 
 The Softmax hidden layer assigns every day to exactly one unit; archetypal
-analysis (prof/archetypes_k5_timeseries.csv) gives every day a weight per
+analysis (data/archetypes/archetypes_k5_timeseries.csv) gives every day a weight per
 archetype, which we reduce to its dominant archetype. Both are a hard
 partition of the same days, so they can be compared directly, without going
 through weight profiles:
@@ -96,7 +96,7 @@ def main():
     parser.add_argument("--L", type=int, default=6)
     parser.add_argument("--split", choices=SPLITS, default=SHUFFLED)
     parser.add_argument("--models-root", type=Path, default=MODELS_ROOT)
-    parser.add_argument("--archetypes", type=Path, default=ROOT / "prof" / "archetypes_k5_timeseries.csv")
+    parser.add_argument("--archetypes", type=Path, default=ROOT / "data" / "archetypes" / "archetypes_k5_timeseries.csv")
     parser.add_argument("--sweep-L", type=int, nargs="*", default=[],
                         help="Also score every seed at these L (CSV + summary)")
     args = parser.parse_args()

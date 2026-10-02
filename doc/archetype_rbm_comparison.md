@@ -22,7 +22,7 @@ Archetypal analysis and the RBM hidden-node analysis were run independently on t
 
 ## 2. Archetypes analysis (k=5)
 
-Source files: `prof/archetypes_k5_profiles.csv`, `prof/archetypes_k5_timeseries.csv`, and companion figures.
+Source files: `data/archetypes/archetypes_k5_profiles.csv`, `data/archetypes/archetypes_k5_timeseries.csv`, and companion figures.
 
 | Archetype | Dominant taxon (weight) | Season | Ecological interpretation |
 |-----------|------------------------|--------|--------------------------|
@@ -167,7 +167,7 @@ All quantitative claims in this document are derived from the following data sou
 
 ### 7.1 Archetype profiles — dominant taxa and weight fractions
 
-Source: `prof/archetypes_k5_profiles.csv`
+Source: `data/archetypes/archetypes_k5_profiles.csv`
 
 | Archetype | Top taxon | Weight | Fraction of total |
 |-----------|-----------|--------|-------------------|
@@ -181,7 +181,7 @@ A1 and A2 are strongly uni-taxon archetypes; A3–A5 are mixed assemblages. A4 h
 
 ### 7.2 Archetype temporal dominance
 
-Source: `prof/archetypes_k5_timeseries.csv` — fraction of days on which each archetype has the highest weight.
+Source: `data/archetypes/archetypes_k5_timeseries.csv` — fraction of days on which each archetype has the highest weight.
 
 | Archetype | Days dominant | Fraction |
 |-----------|--------------|---------|
