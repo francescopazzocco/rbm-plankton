@@ -65,10 +65,10 @@ def separator(title: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# 1. Cheng's archetype dominant taxa
+# 1. Archetype dominant taxa
 # ---------------------------------------------------------------------------
 def archetype_dominant_taxa(top_n: int = 5) -> None:
-    separator("1. Cheng's archetypes — dominant taxa")
+    separator("1. Archetypes — dominant taxa")
     df = pd.read_csv(ARCH_PROFILES, index_col=0)
     for arch in df.index:
         row = df.loc[arch].sort_values(ascending=False).head(top_n)
@@ -96,7 +96,7 @@ def archetype_dominance_ratio() -> None:
 # 3. Archetype timeseries — fraction of days each archetype is dominant
 # ---------------------------------------------------------------------------
 def archetype_dominance_days() -> None:
-    separator("3. Cheng's archetypes — fraction of days as dominant state")
+    separator("3. Archetypes — fraction of days as dominant state")
     ts = pd.read_csv(ARCH_TIMESERIES, index_col=0, parse_dates=True)
     dominant = ts.idxmax(axis=1)
     counts   = dominant.value_counts().sort_index()

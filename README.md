@@ -88,7 +88,7 @@ root/
 │   │   │   ├── hidden_pattern_analysis.py  # Binary hidden patterns of one run
 │   │   │   ├── rbm_hidden_stackplot.py     # Hidden activation share over time
 │   │   │   └── plot_visible_by_hidden.py   # Visible probs per hidden node
-│   │   ├── archetype/                    # RBM vs Cheng's k=5 archetypes
+│   │   ├── archetype/                    # RBM vs k=5 archetypal analysis
 │   │   │   ├── archetype_rbm_comparison.py       # Tables for doc/archetype_rbm_comparison.md
 │   │   │   ├── distance_archetypes_rbm.py        # Archetype↔hidden-unit distance heatmap
 │   │   │   ├── overlap_archetypes_rbm.py         # Archetype↔hidden-unit overlap heatmap

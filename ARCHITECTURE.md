@@ -188,7 +188,7 @@ code/
         hidden_pattern_analysis.py    binary hidden patterns of one run → hidden/patterns/{chrono,shuffled}/
         rbm_hidden_stackplot.py       hidden activation share over time → hidden_stackplot/
         plot_visible_by_hidden.py     visible-unit probabilities per hidden node → hidden/visible_by_hidden/{chrono,shuffled}/
-      archetype/                     RBM vs. Cheng's k=5 archetypes → results/02_model_analysis/archetype/<kind>/{chrono,shuffled}/
+      archetype/                     RBM vs. k=5 archetypal analysis → results/02_model_analysis/archetype/<kind>/{chrono,shuffled}/
         archetype_rbm_comparison.py        quantitative comparison, tables for doc/archetype_rbm_comparison.md
         distance_archetypes_rbm.py         archetype↔hidden-unit distance → distance_heatmap/
         overlap_archetypes_rbm.py          archetype↔hidden-unit overlap → overlap_heatmap/

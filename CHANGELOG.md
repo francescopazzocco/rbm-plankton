@@ -281,7 +281,7 @@ its own loader because the first of those imports it.
 - Found while investigating: three of the four `archetype*` scripts
   (`distance_archetypes_rbm.py`, `overlap_archetypes_rbm.py`,
   `archetype_closest_rbm_scatter.py`) pointed at a pre-`training_runs/`
-  layout (`weights/*.npz`, `Cheng/Data/*.csv`) that no longer exists, and two
+  layout (`weights/*.npz` and an old archetype-data folder) that no longer exists, and two
   imported `seaborn`, not a project dependency and not installed — all three
   would have crashed immediately. Repaired: default `--weights` now resolves
   via `models.io.best_seed_dir` from `--family`/`--L`/`--split`, `--archetypes`
