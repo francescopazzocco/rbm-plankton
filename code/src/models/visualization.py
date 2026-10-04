@@ -353,7 +353,8 @@ def _plot_final_metric_panel(ax, title: str, families: list[str], runs) -> set[i
     else:
         hidden_label = PROFILE_LABEL[_profile_of(families[0], title)]
         panel_title = f"{visible_label}, {hidden_label}\nfinal val metric vs L"
-    ax.set_title(panel_title, fontsize=12)
+    if show_titles():
+        ax.set_title(panel_title, fontsize=12)
     ax.set_xlabel("L (hidden units)")
     ax.set_ylabel(FAMILY_META[families[0]]["label"])
     if len(families) == 1:
@@ -370,8 +371,9 @@ def plot_final_metric(runs, figures_dir: Path):
     for title, families in PANEL_GROUPS:
         fig, ax = plt.subplots(1, 1, figsize=(6, 4.5))
         _plot_final_metric_panel(ax, title, families, runs)
-        ax.set_title(ax.get_title() + "\n(last epoch, mean ± std, shaded = min/max over seeds)",
-                     fontsize=11)
+        if show_titles():
+            ax.set_title(ax.get_title() + "\n(last epoch, mean ± std, shaded = min/max over seeds)",
+                         fontsize=11)
 
         fig.tight_layout()
         out = figures_dir / f"sweep_final_metric_{title}.png"
