@@ -309,24 +309,3 @@ python code/scripts/archive/plot_final_metric_nb.py  # Final NLL vs L (NB+ZINB s
 python code/scripts/archive/plot_sigmoid_nll.py      # NB softmax train NLL curves
 python code/scripts/archive/plot_zinb_nll.py         # ZINB sigmoid/softmax train NLL curves
 ```
-
----
-
-## Status
-
-| Stage | Status |
-|-------|--------|
-| Dataset EDA | Done |
-| L-sweep (N=10 seeds, L∈{3,4,5,6,7}, all families) | Done |
-| L selection | Done — L=6 for all families (LOG-017) |
-| Hidden activation analysis | Done |
-| Cross-model comparison (NB vs BB-median) | Done |
-| NaN test set evaluation | In progress |
-
-**Key results:**
-- L=6 selected: cumulative ~2.5% NLL/PLL gain over L=3; no gain at L=7
-- Both NB-RBM and BB-median independently recover the same two dominant
-  ecological axes (summer community, winter community)
-- NB uses compositional representation (~30 distinct 6-bit patterns);
-  BB-median uses exclusive switching
-- `bernoulli_zero` is near-trivial, confirming the median threshold decision
